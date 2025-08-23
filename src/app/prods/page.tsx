@@ -1,6 +1,6 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { Filter, Grid, List, Star, ShoppingCart, Heart } from 'lucide-react';
+import { Grid, List, Star, ShoppingCart, Heart } from 'lucide-react';
 
 const ProductsPage = () => {
   const products = [

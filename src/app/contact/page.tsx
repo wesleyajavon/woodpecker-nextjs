@@ -63,7 +63,7 @@ const ContactPage = () => {
             Contactez-nous
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Nous sommes là pour vous aider. N'hésitez pas à nous contacter pour toute question.
+            Nous sommes là pour vous aider. N&apos;hésitez pas à nous contacter pour toute question.
           </p>
         </div>
 
