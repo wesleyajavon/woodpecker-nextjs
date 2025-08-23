@@ -1,36 +1,157 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Woodpecker - MVP Next.js
 
-## Getting Started
+Un MVP moderne inspiré de [Traplysse](https://traplysse.com/) construit avec Next.js, TypeScript et Tailwind CSS.
 
-First, run the development server:
+## 🚀 Fonctionnalités
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Pages principales
+- **Page d'accueil** - Hero section avec statistiques et CTA
+- **Produits** - Catalogue avec filtres et recherche
+- **Kits** - Collection de kits de production musicale
+- **Contact** - Formulaire de contact et informations
+
+### Composants
+- Navigation responsive avec menu mobile
+- Hero section animée avec Framer Motion
+- Grille de produits avec filtres
+- Footer complet avec liens et réseaux sociaux
+- Design moderne et responsive
+
+### Technologies
+- **Next.js 14** avec App Router
+- **TypeScript** pour la sécurité des types
+- **Tailwind CSS** pour le styling
+- **Framer Motion** pour les animations
+- **Lucide React** pour les icônes
+
+## 🛠️ Installation
+
+1. **Cloner le projet**
+   ```bash
+   git clone <repository-url>
+   cd woodpecker-nextjs
+   ```
+
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
+
+3. **Lancer le serveur de développement**
+   ```bash
+   npm run dev
+   ```
+
+4. **Ouvrir dans le navigateur**
+   ```
+   http://localhost:3000
+   ```
+
+## 📁 Structure du projet
+
+```
+src/
+├── app/                    # App Router Next.js
+│   ├── page.tsx          # Page d'accueil
+│   ├── prods/            # Page des produits
+│   ├── kits/             # Page des kits
+│   └── contact/          # Page de contact
+├── components/            # Composants réutilisables
+│   ├── Navigation.tsx    # Navigation principale
+│   ├── Hero.tsx          # Section hero
+│   ├── FeaturedProducts.tsx # Produits en vedette
+│   └── Footer.tsx        # Pied de page
+└── globals.css           # Styles globaux
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Design System
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Couleurs
+- **Primaire** : Purple (600-700)
+- **Secondaire** : Pink (600-700)
+- **Neutre** : Gray (50-900)
+- **Accent** : Yellow (400) pour les étoiles
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Typographie
+- **Titres** : Font-bold, tailles 2xl-7xl
+- **Corps** : Font-medium, tailles sm-xl
+- **Navigation** : Font-semibold
 
-## Learn More
+### Composants
+- **Cartes** : Rounded-2xl, shadow-lg, hover effects
+- **Boutons** : Rounded-full, gradients, hover animations
+- **Formulaires** : Rounded-lg, focus rings
 
-To learn more about Next.js, take a look at the following resources:
+## 🔧 Scripts disponibles
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev          # Serveur de développement
+npm run build        # Build de production
+npm run start        # Serveur de production
+npm run lint         # Vérification ESLint
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📱 Responsive Design
 
-## Deploy on Vercel
+- **Mobile First** : Design optimisé pour mobile
+- **Breakpoints** : sm (640px), md (768px), lg (1024px)
+- **Navigation** : Menu hamburger sur mobile
+- **Grilles** : Adaptatives selon la taille d'écran
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Déploiement
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Vercel (Recommandé)
+1. Connecter le repository GitHub
+2. Vercel détecte automatiquement Next.js
+3. Déploiement automatique à chaque push
+
+### Autres plateformes
+- **Netlify** : Compatible avec Next.js
+- **Railway** : Déploiement simple
+- **Docker** : Containerisation possible
+
+## 🔮 Prochaines étapes
+
+### Fonctionnalités à ajouter
+- [ ] Système d'authentification
+- [ ] Panier d'achat
+- [ ] Système de paiement
+- [ ] Gestion des utilisateurs
+- [ ] Dashboard admin
+- [ ] API backend
+- [ ] Base de données
+- [ ] Système de recherche avancé
+- [ ] Filtres dynamiques
+- [ ] Système de notation et avis
+
+### Améliorations techniques
+- [ ] Tests unitaires
+- [ ] Tests E2E
+- [ ] Optimisation des performances
+- [ ] SEO avancé
+- [ ] PWA
+- [ ] Internationalisation
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 👥 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+1. Fork le projet
+2. Créer une branche feature
+3. Commiter vos changements
+4. Pousser vers la branche
+5. Ouvrir une Pull Request
+
+## 📞 Support
+
+Pour toute question ou support :
+- **Email** : contact@woodpecker.com
+- **Issues** : Utiliser les GitHub Issues
+- **Documentation** : Voir la documentation Next.js
+
+---
+
+**Woodpecker** - Créez votre son unique 🎵
