@@ -1,0 +1,199 @@
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Upload, Music, Settings, Users, BarChart3, Plus } from 'lucide-react';
+import BeatUpload from '@/components/BeatUpload';
+import BeatManager from '@/components/BeatManager';
+import { Beat } from '@/types/beat';
+
+export default function AdminUploadPage() {
+  const [activeTab, setActiveTab] = useState<'upload' | 'manage' | 'stats'>('upload');
+  const [uploadedBeats, setUploadedBeats] = useState<Beat[]>([]);
+
+  const handleUploadSuccess = (beat: Beat) => {
+    setUploadedBeats(prev => [beat, ...prev]);
+  };
+
+  const handleUploadError = (error: string) => {
+    console.error('Erreur d\'upload:', error);
+  };
+
+  const tabs = [
+    { id: 'upload', label: 'Upload de Beats', icon: Upload },
+    { id: 'manage', label: 'Gestion des Beats', icon: Music },
+    { id: 'stats', label: 'Statistiques', icon: BarChart3 }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Administration
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Gestion de la plateforme Woodpecker Beats
+          </p>
+        </motion.div>
+
+        {/* Navigation des onglets */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex flex-wrap justify-center gap-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+                    activeTab === tab.id
+                      ? 'bg-purple-600 text-white shadow-lg'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Contenu des onglets */}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {activeTab === 'upload' && (
+            <div className="space-y-8">
+              {/* Section d'upload */}
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Plus className="w-6 h-6" />
+                  Upload d'un nouveau beat
+                </h2>
+                <BeatUpload
+                  onUploadSuccess={handleUploadSuccess}
+                  onUploadError={handleUploadError}
+                />
+              </div>
+
+              {/* Beats récemment uploadés */}
+              {uploadedBeats.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    Beats récemment uploadés
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {uploadedBeats.slice(0, 6).map((beat, index) => (
+                      <motion.div
+                        key={beat.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-white/10 backdrop-blur-lg rounded-lg p-4"
+                      >
+                        <h4 className="font-semibold text-white mb-2">{beat.title}</h4>
+                        <div className="text-sm text-gray-300 space-y-1">
+                          <div>{beat.genre} • {beat.bpm} BPM</div>
+                          <div>{beat.key} • {beat.duration}</div>
+                          <div className="text-purple-300 font-medium">{beat.price}€</div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'manage' && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <Music className="w-6 h-6" />
+                Gestion des Beats
+              </h2>
+              
+              <BeatManager
+                onEdit={(beat) => {
+                  console.log('Modifier le beat:', beat);
+                  // TODO: Implémenter la modification
+                }}
+                onDelete={(beatId) => {
+                  console.log('Beat supprimé:', beatId);
+                  // TODO: Rafraîchir la liste
+                }}
+                onToggleStatus={(beatId, isActive) => {
+                  console.log('Statut modifié:', beatId, isActive);
+                  // TODO: Rafraîchir la liste
+                }}
+              />
+            </div>
+          )}
+
+          {activeTab === 'stats' && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <BarChart3 className="w-6 h-6" />
+                Statistiques
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
+                  <div className="text-3xl font-bold text-purple-400 mb-2">0</div>
+                  <div className="text-gray-300">Total Beats</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
+                  <div className="text-3xl font-bold text-blue-400 mb-2">0</div>
+                  <div className="text-gray-300">Total Commandes</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
+                  <div className="text-3xl font-bold text-green-400 mb-2">0€</div>
+                  <div className="text-gray-300">Chiffre d'affaires</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
+                  <div className="text-3xl font-bold text-yellow-400 mb-2">0</div>
+                  <div className="text-gray-300">Utilisateurs</div>
+                </div>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
+                <h3 className="text-xl font-semibold text-white mb-4">Graphiques</h3>
+                <div className="text-center py-12 text-gray-400">
+                  <div className="text-4xl mb-2">📊</div>
+                  <p>Graphiques et visualisations à venir</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Navigation rapide */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-16 text-center"
+        >
+          <div className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-white/30">
+            <Settings className="w-5 h-5" />
+            <span>Retour à la page principale</span>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

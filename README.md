@@ -1,30 +1,52 @@
-# Woodpecker - MVP Next.js
+# Woodpecker - Plateforme de Vente de Beats
 
-Un MVP moderne inspiré de [Traplysse](https://traplysse.com/) construit avec Next.js, TypeScript et Tailwind CSS.
+Une plateforme moderne et sophistiquée pour Woodpecker, beatmaker professionnel, construite avec Next.js, TypeScript et Tailwind CSS.
 
-## 🚀 Fonctionnalités
+## 🎵 **À propos de Woodpecker**
 
-### Pages principales
-- **Page d'accueil** - Hero section avec statistiques et CTA
-- **Produits** - Catalogue avec filtres et recherche
+Woodpecker est un beatmaker talentueux qui crée des instrumentaux uniques pour rappeurs, chanteurs et producteurs. Cette plateforme lui permet de présenter et vendre ses beats de manière professionnelle.
+
+## 🚀 **Fonctionnalités principales**
+
+### **Pages principales**
+- **Page d'accueil** - Hero section avec présentation de Woodpecker et statistiques
+- **Beats** - Catalogue complet avec filtres, recherche et prévisualisation
 - **Kits** - Collection de kits de production musicale
 - **Contact** - Formulaire de contact et informations
 
-### Composants
-- Navigation responsive avec menu mobile
-- Hero section animée avec Framer Motion
-- Grille de produits avec filtres
-- Footer complet avec liens et réseaux sociaux
-- Design moderne et responsive
+### **Composants sophistiqués**
+- Navigation fixe avec effet glassmorphism et animations
+- Hero section avec parallaxe et éléments flottants animés
+- Grille de beats avec vue grille/liste et filtres avancés
+- Footer moderne avec animations et liens contextuels
+- Design responsive et accessible
 
-### Technologies
+### **Fonctionnalités pour beatmakers**
+- **Prévisualisation des beats** - Boutons play/pause interactifs
+- **Informations techniques** - BPM, tonalité, durée
+- **Filtres par genre** - Trap, Hip-Hop, Drill, Jazz, etc.
+- **Recherche avancée** - Par titre, genre, BPM
+- **Vue adaptative** - Grille ou liste selon préférence
+- **Tags descriptifs** - Caractéristiques de chaque beat
+
+### **API et base de données**
+- **API REST complète** - Gestion des beats et commandes
+- **Base de données PostgreSQL** - Stockage sécurisé et performant
+- **Prisma ORM** - Requêtes optimisées et type-safe
+- **Système de commandes** - Gestion complète des achats
+- **Statistiques et analytics** - Suivi des performances
+
+### **Technologies**
 - **Next.js 14** avec App Router
 - **TypeScript** pour la sécurité des types
-- **Tailwind CSS** pour le styling
-- **Framer Motion** pour les animations
+- **Tailwind CSS** pour le styling moderne
+- **Framer Motion** pour les animations fluides
 - **Lucide React** pour les icônes
+- **PostgreSQL** pour la base de données
+- **Prisma** comme ORM moderne
+- **Cloudinary** pour le stockage des fichiers audio et images
 
-## 🛠️ Installation
+## 🛠️ **Installation**
 
 1. **Cloner le projet**
    ```bash
@@ -37,106 +59,216 @@ Un MVP moderne inspiré de [Traplysse](https://traplysse.com/) construit avec Ne
    npm install
    ```
 
-3. **Lancer le serveur de développement**
+3. **Configuration de la base de données et du stockage**
+   ```bash
+   # Copier le fichier d'environnement
+   cp .env.example .env
+   
+   # Configurer votre DATABASE_URL dans .env
+   # Voir DATABASE.md pour plus de détails
+   
+   # Configurer Cloudinary (voir section Stockage ci-dessous)
+   ```
+
+4. **Initialiser la base de données**
+   ```bash
+   # Générer le client Prisma
+   npm run db:generate
+   
+   # Pousser le schéma vers la base
+   npm run db:push
+   
+   # Peupler avec des données de test
+   npm run db:seed
+   ```
+
+5. **Lancer le serveur de développement**
    ```bash
    npm run dev
    ```
 
-4. **Ouvrir dans le navigateur**
+6. **Ouvrir dans le navigateur**
    ```
    http://localhost:3000
    ```
 
-## 📁 Structure du projet
+## 📁 **Structure du projet**
 
 ```
 src/
 ├── app/                    # App Router Next.js
 │   ├── page.tsx          # Page d'accueil
-│   ├── prods/            # Page des produits
+│   ├── beats/            # Page des beats (principale)
 │   ├── kits/             # Page des kits
-│   └── contact/          # Page de contact
+│   ├── contact/          # Page de contact
+│   └── api/              # API Routes
+│       ├── beats/        # API des beats
+│       ├── orders/       # API des commandes
+│       └── test/         # Route de test
 ├── components/            # Composants réutilisables
-│   ├── Navigation.tsx    # Navigation principale
-│   ├── Hero.tsx          # Section hero
-│   ├── FeaturedProducts.tsx # Produits en vedette
-│   └── Footer.tsx        # Pied de page
-└── globals.css           # Styles globaux
+│   ├── Navigation.tsx    # Navigation fixe avec glassmorphism
+│   ├── Hero.tsx          # Section hero avec parallaxe
+│   ├── FeaturedProducts.tsx # Beats en vedette
+│   └── Footer.tsx        # Footer avec animations
+├── services/              # Services de base de données
+│   ├── beatService.ts    # Gestion des beats
+│   └── orderService.ts   # Gestion des commandes
+├── types/                 # Types TypeScript
+│   ├── beat.ts           # Types des beats
+│   └── order.ts          # Types des commandes
+├── config/                # Configuration
+│   ├── database.ts       # Config base de données
+│   ├── env.ts            # Variables d'environnement
+│   └── constants.ts      # Constantes de l'app
+└── lib/                   # Utilitaires
+    └── prisma.ts         # Client Prisma
 ```
 
-## 🎨 Design System
+## 🎨 **Design System**
 
-### Couleurs
-- **Primaire** : Purple (600-700)
-- **Secondaire** : Pink (600-700)
-- **Neutre** : Gray (50-900)
-- **Accent** : Yellow (400) pour les étoiles
+### **Identité visuelle**
+- **Logo** : Icône musicale avec animation de rotation continue
+- **Palette** : Purple (600-700) et Pink (600-700) avec accents
+- **Typographie** : Fonts bold pour les titres, medium pour le corps
 
-### Typographie
-- **Titres** : Font-bold, tailles 2xl-7xl
-- **Corps** : Font-medium, tailles sm-xl
-- **Navigation** : Font-semibold
+## 🔌 **API Routes**
 
-### Composants
-- **Cartes** : Rounded-2xl, shadow-lg, hover effects
-- **Boutons** : Rounded-full, gradients, hover animations
-- **Formulaires** : Rounded-lg, focus rings
+### **Beats API**
+- `GET /api/beats` - Liste des beats avec filtres et pagination
+- `GET /api/beats/[id]` - Beat spécifique par ID
+- `GET /api/beats/featured` - Beats en vedette
+- `GET /api/beats/genre/[genre]` - Beats par genre
+- `GET /api/beats/stats` - Statistiques des beats
+- `GET /api/beats/[id]/purchase-check` - Vérification d'achat
 
-## 🔧 Scripts disponibles
+### **Orders API**
+- `GET /api/orders` - Liste des commandes avec filtres
+- `POST /api/orders` - Créer une nouvelle commande
+- `GET /api/orders/[id]` - Commande spécifique
+- `PUT /api/orders/[id]` - Mettre à jour une commande
+- `PATCH /api/orders/[id]/actions` - Actions spéciales (annuler, rembourser)
+- `GET /api/orders/stats` - Statistiques des commandes
+- `GET /api/orders/customer/[email]` - Commandes par client
 
+### **Test API**
+- `GET /api/test` - Vérification du bon fonctionnement de l'API
+
+**Documentation complète** : Voir `API.md` pour plus de détails et d'exemples.
+
+## ☁️ **Stockage des fichiers**
+
+### **Configuration Cloudinary**
+
+La plateforme utilise **Cloudinary** pour le stockage sécurisé des fichiers audio et images.
+
+#### **Variables d'environnement requises**
 ```bash
-npm run dev          # Serveur de développement
-npm run build        # Build de production
-npm run start        # Serveur de production
-npm run lint         # Vérification ESLint
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-api-key"
+CLOUDINARY_API_SECRET="your-api-secret"
 ```
 
-## 📱 Responsive Design
+#### **Structure des dossiers**
+```
+woodpecker-beats/
+├── beats/
+│   ├── previews/     # Previews audio (30s, MP3)
+│   ├── masters/      # Fichiers masters (WAV)
+│   ├── stems/        # Archives de stems (ZIP)
+│   └── waveforms/    # Waveforms générés
+├── artwork/
+│   ├── beats/        # Artwork des beats
+│   ├── albums/       # Artwork des albums
+│   └── profiles/     # Photos de profil
+└── temp/             # Fichiers temporaires
+```
 
-- **Mobile First** : Design optimisé pour mobile
+#### **Formats supportés**
+- **Audio** : MP3, WAV, AIFF, FLAC
+- **Images** : JPG, JPEG, PNG, WebP
+- **Archives** : ZIP, RAR
+
+#### **Limites de fichiers**
+- **Audio** : 100MB max
+- **Images** : 10MB max
+- **Archives** : 500MB max
+
+#### **Transformations automatiques**
+- **Previews** : 30 secondes, qualité optimisée
+- **Artwork** : Redimensionnement automatique (300x300, 600x600, 1200x1200)
+- **Waveforms** : Génération automatique des visualisations audio
+- **Animations** : Transitions fluides, effets de survol, parallaxe
+
+### **Composants**
+- **Cartes** : Rounded-3xl, shadows dynamiques, effets 3D
+- **Boutons** : Gradients, hover effects, animations de scale
+- **Navigation** : Glassmorphism, backdrop-blur, transitions
+- **Formulaires** : Focus rings, validations, états interactifs
+
+## 🎵 **Fonctionnalités des beats**
+
+### **Informations affichées**
+- **Titre** du beat
+- **Genre** musical
+- **BPM** (beats par minute)
+- **Tonalité** (clé musicale)
+- **Durée** en minutes:secondes
+- **Prix** en euros
+- **Note** et nombre d'avis
+- **Tags** descriptifs
+
+### **Filtres disponibles**
+- **Par genre** : Trap, Hip-Hop, Drill, Jazz, Electronic, Boom Bap
+- **Par BPM** : Ranges prédéfinis
+- **Par tonalité** : Toutes les clés musicales
+- **Recherche textuelle** : Par titre ou description
+
+## 📱 **Responsive Design**
+
+- **Mobile First** : Optimisé pour tous les écrans
 - **Breakpoints** : sm (640px), md (768px), lg (1024px)
-- **Navigation** : Menu hamburger sur mobile
+- **Navigation** : Menu hamburger sur mobile avec animations
 - **Grilles** : Adaptatives selon la taille d'écran
+- **Touch friendly** : Interactions optimisées pour mobile
 
-## 🚀 Déploiement
+## 🚀 **Déploiement**
 
-### Vercel (Recommandé)
+### **Vercel (Recommandé)**
 1. Connecter le repository GitHub
 2. Vercel détecte automatiquement Next.js
 3. Déploiement automatique à chaque push
 
-### Autres plateformes
+### **Autres plateformes**
 - **Netlify** : Compatible avec Next.js
 - **Railway** : Déploiement simple
 - **Docker** : Containerisation possible
 
-## 🔮 Prochaines étapes
+## 🔮 **Prochaines étapes**
 
-### Fonctionnalités à ajouter
-- [ ] Système d'authentification
-- [ ] Panier d'achat
-- [ ] Système de paiement
-- [ ] Gestion des utilisateurs
-- [ ] Dashboard admin
-- [ ] API backend
-- [ ] Base de données
-- [ ] Système de recherche avancé
-- [ ] Filtres dynamiques
-- [ ] Système de notation et avis
+### **Fonctionnalités à ajouter**
+- [ ] **Lecteur audio intégré** pour prévisualisation
+- [ ] **Système d'authentification** utilisateur
+- [ ] **Panier d'achat** et gestion des commandes
+- [ ] **Système de paiement** (Stripe, PayPal)
+- [ ] **Gestion des licences** (exclusive, non-exclusive)
+- [ ] **Upload de beats** pour Woodpecker
+- [ ] **Système de notation et avis** clients
+- [ ] **Blog/News** pour partager des actualités
+- [ ] **Intégration sociale** (Instagram, YouTube)
 
-### Améliorations techniques
-- [ ] Tests unitaires
-- [ ] Tests E2E
-- [ ] Optimisation des performances
-- [ ] SEO avancé
-- [ ] PWA
-- [ ] Internationalisation
+### **Améliorations techniques**
+- [ ] **Tests unitaires** et E2E
+- [ ] **Optimisation des performances** (lazy loading)
+- [ ] **SEO avancé** pour les beats
+- [ ] **PWA** pour l'expérience mobile
+- [ ] **Internationalisation** (EN/FR)
+- [ ] **Analytics** et suivi des ventes
 
-## 📄 Licence
+## 📄 **Licence**
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 👥 Contribution
+## 👥 **Contribution**
 
 Les contributions sont les bienvenues ! N'hésitez pas à :
 1. Fork le projet
@@ -145,7 +277,7 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 4. Pousser vers la branche
 5. Ouvrir une Pull Request
 
-## 📞 Support
+## 📞 **Support**
 
 Pour toute question ou support :
 - **Email** : contact@woodpecker.com
@@ -154,4 +286,6 @@ Pour toute question ou support :
 
 ---
 
-**Woodpecker** - Créez votre son unique 🎵
+**Woodpecker** - Beatmaker professionnel 🎵
+
+*Créez votre son unique avec des beats originaux et authentiques*

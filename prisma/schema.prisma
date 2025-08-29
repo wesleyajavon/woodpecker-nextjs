@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Beat {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  genre       String
+  bpm         Int
+  key         String
+  duration    String // Format: "3:24"
+  price       Decimal  @db.Decimal(10, 2)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  tags        String[] // Array of tags like ["Dark", "Hard", "Underground"]
+  
+  // Audio files
+  previewUrl  String?  // URL for preview (30 seconds)
+  fullUrl     String?  // URL for full beat (after purchase)
+  stemsUrl    String?  // URL for stems (optional)
+  
+  // Metadata
+  isExclusive Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  featured    Boolean  @default(false)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  orders      Order[]
+  
+  // Indexes for better performance
+  @@index([genre])
+  @@index([bpm])
+  @@index([key])
+  @@index([price])
+  @@index([rating])
+  @@index([isActive])
+  @@index([featured])
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  
+  // Customer information
+  customerEmail String
+  customerName  String?
+  customerPhone String?
+  
+  // Order details
+  totalAmount   Decimal  @db.Decimal(10, 2)
+  currency      String   @default("EUR")
+  status        OrderStatus @default(PENDING)
+  
+  // Payment information
+  paymentMethod String?
+  paymentId     String?  // External payment provider ID
+  paidAt        DateTime?
+  
+  // License information
+  licenseType   LicenseType @default(NON_EXCLUSIVE)
+  usageRights  String[]    // Array of usage rights
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  beatId       String
+  beat         Beat     @relation(fields: [beatId], references: [id], onDelete: Cascade)
+  
+  // Indexes
+  @@index([customerEmail])
+  @@index([status])
+  @@index([createdAt])
+  @@index([beatId])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum LicenseType {
+  NON_EXCLUSIVE
+  EXCLUSIVE
+  CUSTOM
+}

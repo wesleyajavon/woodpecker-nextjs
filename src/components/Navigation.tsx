@@ -1,87 +1,197 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Search, User, ShoppingCart } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Search, User, ShoppingCart, Music, Sparkles } from 'lucide-react';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems = [
-    { name: 'Prods', href: '/prods' },
-    { name: 'Collections', href: '/collections' },
-    { name: 'Kits', href: '/kits' },
-    { name: 'Videos', href: '/videos' },
-    { name: 'Memberships', href: '/memberships' },
-    { name: 'Services', href: '/services' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Beats', href: '/beats', icon: Music },
+    { name: 'Collections', href: '/collections', icon: Sparkles },
+    { name: 'Kits', href: '/kits', icon: Music },
+    { name: 'Videos', href: '/videos', icon: Sparkles },
+    { name: 'Services', href: '/services', icon: Music },
+    { name: 'Contact', href: '/contact', icon: Sparkles },
+    { name: 'Admin', href: '/admin/upload', icon: Sparkles },
   ];
 
   return (
-    <nav className="bg-black text-white">
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20' 
+          : 'bg-transparent'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="text-2xl font-bold">
-            Woodpecker
-          </Link>
+        <div className="flex justify-between items-center h-20">
+          {/* Logo avec animation */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Music className="h-6 w-6 text-white" />
+                </div>
+                <motion.div
+                  className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                />
+              </div>
+              <span className={`text-2xl font-bold transition-colors ${
+                scrolled ? 'text-gray-900' : 'text-white'
+              }`}>
+                Woodpecker
+              </span>
+            </Link>
+          </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <Link
+          <div className="hidden lg:flex space-x-1">
+            {navItems.map((item, index) => (
+              <motion.div
                 key={item.name}
-                href={item.href}
-                className="hover:text-gray-300 transition-colors"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -2 }}
               >
-                {item.name}
-              </Link>
+                <Link
+                  href={item.href}
+                  className={`relative px-4 py-2 rounded-xl transition-all duration-300 group ${
+                    scrolled 
+                      ? 'text-gray-700 hover:text-purple-600 hover:bg-purple-50' 
+                      : 'text-white/90 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <item.icon className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {item.name}
+                  </span>
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                    initial={{ scaleX: 0 }}
+                    whileHover={{ scaleX: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Link>
+              </motion.div>
             ))}
           </div>
 
           {/* Right side actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+          <div className="hidden lg:flex items-center space-x-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`p-3 rounded-xl transition-all duration-300 ${
+                scrolled 
+                  ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-600' 
+                  : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm'
+              }`}
+            >
               <Search className="h-5 w-5" />
-            </button>
-            <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`p-3 rounded-xl transition-all duration-300 ${
+                scrolled 
+                  ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-600' 
+                  : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm'
+              }`}
+            >
               <User className="h-5 w-5" />
-            </button>
-            <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
+            >
               <ShoppingCart className="h-5 w-5" />
-            </button>
+              <motion.div
+                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1, type: "spring" }}
+              >
+                3
+              </motion.div>
+            </motion.button>
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
+          <div className="lg:hidden">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              className={`p-3 rounded-xl transition-all duration-300 ${
+                scrolled 
+                  ? 'bg-gray-100 text-gray-700' 
+                  : 'bg-white/10 text-white backdrop-blur-sm'
+              }`}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            </motion.button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="block px-3 py-2 hover:bg-gray-800 rounded-md transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="lg:hidden overflow-hidden"
+            >
+              <div className="py-6 space-y-3">
+                {navItems.map((item, index) => (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
+                        scrolled 
+                          ? 'text-gray-700 hover:text-purple-600 hover:bg-purple-50' 
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {item.name}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
