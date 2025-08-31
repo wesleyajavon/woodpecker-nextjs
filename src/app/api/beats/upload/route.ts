@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { beatUpload, handleUploadError, validateUploadedFiles } from '@/lib/upload';
+import { validateUploadedFiles } from '@/lib/upload';
 import { CloudinaryService, CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
 import { BeatService } from '@/services/beatService';
 import { CreateBeatInput } from '@/types/beat';
@@ -22,8 +22,7 @@ interface UploadedFiles {
   [key: string]: MulterFile[] | undefined;
 }
 
-// Configuration pour l'upload de beats
-const uploadMiddleware = beatUpload;
+
 
 export async function POST(request: NextRequest) {
   try {
