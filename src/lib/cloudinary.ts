@@ -189,7 +189,7 @@ export class CloudinaryService {
       
       // Gestion spécifique des erreurs Cloudinary
       if (error && typeof error === 'object' && 'http_code' in error) {
-        const cloudinaryError = error as any;
+        const cloudinaryError = error as { http_code: number; message: string };
         
         switch (cloudinaryError.http_code) {
           case 400:
@@ -293,7 +293,7 @@ export class CloudinaryService {
   // Génération d'une URL de transformation
   static generateTransformUrl(
     publicId: string,
-    transformations: Record<string, any>,
+    transformations: Record<string, string | number | boolean>,
     resourceType: 'image' | 'video' | 'raw' = 'image'
   ): string {
     return cloudinary.url(publicId, {

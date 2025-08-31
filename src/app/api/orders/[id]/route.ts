@@ -3,14 +3,14 @@ import { OrderService } from '@/services/orderService'
 import { UpdateOrderInput } from '@/types/order'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params
+    const { id } = await params
 
     if (!id) {
       return NextResponse.json(
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
 
     if (!id) {

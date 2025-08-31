@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Beat, BeatFilters, BeatSortOptions } from '@/types/beat';
+import { Beat } from '@/types/beat';
 
 interface UseBeatsReturn {
   beats: Beat[];

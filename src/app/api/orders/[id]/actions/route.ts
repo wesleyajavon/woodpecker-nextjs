@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { OrderService } from '@/services/orderService'
+import { Order } from '@/types/order'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
+
+// Type pour les résultats des actions sur les commandes
+type OrderActionResult = Order | { success: boolean; message: string } | null;
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { action } = body
 
@@ -27,7 +31,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    let result: any
+    let result: OrderActionResult = null;
     let message: string
 
     // Exécution de l'action demandée

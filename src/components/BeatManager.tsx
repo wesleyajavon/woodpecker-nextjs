@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Edit, Trash2, Eye, Play, Pause, Download, Star, Lock } from 'lucide-react';
+import { Edit, Trash2, Eye, Play, Pause, Star, Lock } from 'lucide-react';
 import { Beat } from '@/types/beat';
 
 interface BeatManagerProps {

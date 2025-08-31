@@ -1,10 +1,44 @@
 import { prisma } from '@/lib/prisma'
 import { Order, CreateOrderInput, UpdateOrderInput, OrderFilters, OrderSortOptions } from '@/types/order'
+// Import Decimal from Prisma
+import { Decimal } from '@prisma/client/runtime/library'
+
+// Type for Prisma Order result with Decimal totalAmount and beat with Decimal price
+type PrismaOrderResult = Omit<Order, 'totalAmount' | 'beat'> & {
+  totalAmount: Decimal
+  beat: Omit<Order['beat'], 'price'> & {
+    price: Decimal
+  }
+}
+
+// Type for the where clause in Prisma queries
+type OrderWhereClause = {
+  customerEmail?: { contains: string; mode: 'insensitive' }
+  status?: Order['status']
+  licenseType?: Order['licenseType']
+  createdAt?: {
+    gte?: Date
+    lte?: Date
+  }
+  beatId?: string
+}
 
 export class OrderService {
+  // Fonction utilitaire pour convertir les résultats Prisma
+  private static convertPrismaOrder(order: PrismaOrderResult): Order {
+    return {
+      ...order,
+      totalAmount: Number(order.totalAmount),
+      beat: {
+        ...order.beat,
+        price: Number(order.beat.price)
+      }
+    }
+  }
+
   // Create a new order
   static async createOrder(data: CreateOrderInput): Promise<Order> {
-    return await prisma.order.create({
+    const order = await prisma.order.create({
       data: {
         ...data,
         totalAmount: new Decimal(data.totalAmount),
@@ -16,6 +50,8 @@ export class OrderService {
         beat: true
       }
     })
+
+    return this.convertPrismaOrder(order as PrismaOrderResult)
   }
 
   // Get all orders with optional filters and sorting
@@ -25,7 +61,7 @@ export class OrderService {
     page: number = 1,
     limit: number = 20
   ): Promise<{ orders: Order[]; total: number; totalPages: number }> {
-    const where: any = {}
+    const where: OrderWhereClause = {}
 
     // Apply filters
     if (filters.customerEmail) {
@@ -67,7 +103,7 @@ export class OrderService {
     const totalPages = Math.ceil(total / limit)
 
     return {
-      orders,
+      orders: orders.map(order => this.convertPrismaOrder(order as PrismaOrderResult)),
       total,
       totalPages
     }
@@ -75,37 +111,43 @@ export class OrderService {
 
   // Get a single order by ID
   static async getOrderById(id: string): Promise<Order | null> {
-    return await prisma.order.findUnique({
+    const order = await prisma.order.findUnique({
       where: { id },
       include: {
         beat: true
       }
     })
+    
+    return order ? this.convertPrismaOrder(order as PrismaOrderResult) : null
   }
 
   // Get orders by customer email
   static async getOrdersByCustomer(email: string): Promise<Order[]> {
-    return await prisma.order.findMany({
+    const orders = await prisma.order.findMany({
       where: { customerEmail: email },
       orderBy: { createdAt: 'desc' },
       include: {
         beat: true
       }
     })
+    
+    return orders.map(order => this.convertPrismaOrder(order as PrismaOrderResult))
   }
 
   // Update order status
   static async updateOrderStatus(id: string, status: string): Promise<Order> {
-    return await prisma.order.update({
+    const order = await prisma.order.update({
       where: { id },
       data: { 
-        status: status as any,
+        status: status as 'PENDING' | 'PAID' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED',
         ...(status === 'PAID' ? { paidAt: new Date() } : {})
       },
       include: {
         beat: true
       }
     })
+    
+    return this.convertPrismaOrder(order as PrismaOrderResult)
   }
 
   // Update order payment information
@@ -114,7 +156,7 @@ export class OrderService {
     paymentMethod: string, 
     paymentId: string
   ): Promise<Order> {
-    return await prisma.order.update({
+    const order = await prisma.order.update({
       where: { id },
       data: {
         paymentMethod,
@@ -126,39 +168,47 @@ export class OrderService {
         beat: true
       }
     })
+    
+    return this.convertPrismaOrder(order as PrismaOrderResult)
   }
 
   // Update order
   static async updateOrder(id: string, data: UpdateOrderInput): Promise<Order> {
-    return await prisma.order.update({
+    const order = await prisma.order.update({
       where: { id },
       data,
       include: {
         beat: true
       }
     })
+    
+    return this.convertPrismaOrder(order as PrismaOrderResult)
   }
 
   // Cancel order
   static async cancelOrder(id: string): Promise<Order> {
-    return await prisma.order.update({
+    const order = await prisma.order.update({
       where: { id },
       data: { status: 'CANCELLED' },
       include: {
         beat: true
       }
     })
+    
+    return this.convertPrismaOrder(order as PrismaOrderResult)
   }
 
   // Refund order
   static async refundOrder(id: string): Promise<Order> {
-    return await prisma.order.update({
+    const order = await prisma.order.update({
       where: { id },
       data: { status: 'REFUNDED' },
       include: {
         beat: true
       }
     })
+    
+    return this.convertPrismaOrder(order as PrismaOrderResult)
   }
 
   // Get order statistics
@@ -187,22 +237,30 @@ export class OrderService {
 
     return {
       totalOrders,
-      totalRevenue: totalRevenue._sum.totalAmount || 0,
+      totalRevenue: totalRevenue._sum.totalAmount ? Number(totalRevenue._sum.totalAmount) : 0,
       pendingOrders,
       completedOrders,
-      monthlyRevenue
+      monthlyRevenue: monthlyRevenue.map(item => ({
+        ...item,
+        _sum: {
+          ...item._sum,
+          totalAmount: item._sum.totalAmount ? Number(item._sum.totalAmount) : 0
+        }
+      }))
     }
   }
 
   // Get orders by beat (for analytics)
   static async getOrdersByBeat(beatId: string): Promise<Order[]> {
-    return await prisma.order.findMany({
+    const orders = await prisma.order.findMany({
       where: { beatId },
       orderBy: { createdAt: 'desc' },
       include: {
         beat: true
       }
     })
+    
+    return orders.map(order => this.convertPrismaOrder(order as PrismaOrderResult))
   }
 
   // Check if customer has already purchased a beat
@@ -220,6 +278,3 @@ export class OrderService {
     return !!order
   }
 }
-
-// Import Decimal from Prisma
-import { Decimal } from '@prisma/client/runtime/library'

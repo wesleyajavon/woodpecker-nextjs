@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Music, Settings, Users, BarChart3, Plus } from 'lucide-react';
+import { Upload, Music, Settings, BarChart3, Plus } from 'lucide-react';
 import BeatUpload from '@/components/BeatUpload';
 import BeatManager from '@/components/BeatManager';
 import { Beat } from '@/types/beat';
 
 export default function AdminUploadPage() {
-  const [activeTab, setActiveTab] = useState<'upload' | 'manage' | 'stats'>('upload');
+  type TabId = 'upload' | 'manage' | 'stats';
+  
+  const [activeTab, setActiveTab] = useState<TabId>('upload');
   const [uploadedBeats, setUploadedBeats] = useState<Beat[]>([]);
 
   const handleUploadSuccess = (beat: Beat) => {
@@ -19,7 +21,7 @@ export default function AdminUploadPage() {
     console.error('Erreur d\'upload:', error);
   };
 
-  const tabs = [
+  const tabs: Array<{ id: TabId; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'upload', label: 'Upload de Beats', icon: Upload },
     { id: 'manage', label: 'Gestion des Beats', icon: Music },
     { id: 'stats', label: 'Statistiques', icon: BarChart3 }
@@ -55,7 +57,7 @@ export default function AdminUploadPage() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
                     activeTab === tab.id
                       ? 'bg-purple-600 text-white shadow-lg'
@@ -83,7 +85,7 @@ export default function AdminUploadPage() {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                   <Plus className="w-6 h-6" />
-                  Upload d'un nouveau beat
+                  Upload d&apos;un nouveau beat
                 </h2>
                 <BeatUpload
                   onUploadSuccess={handleUploadSuccess}
@@ -162,7 +164,7 @@ export default function AdminUploadPage() {
                 </div>
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
                   <div className="text-3xl font-bold text-green-400 mb-2">0€</div>
-                  <div className="text-gray-300">Chiffre d'affaires</div>
+                  <div className="text-gray-300">Chiffre d&apos;affaires</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
                   <div className="text-3xl font-bold text-yellow-400 mb-2">0</div>

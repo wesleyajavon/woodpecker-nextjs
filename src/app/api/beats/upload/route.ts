@@ -4,6 +4,24 @@ import { CloudinaryService, CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
 import { BeatService } from '@/services/beatService';
 import { CreateBeatInput } from '@/types/beat';
 
+// Types pour les fichiers uploadés via Multer
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
+
+interface UploadedFiles {
+  preview?: MulterFile[];
+  master?: MulterFile[];
+  stems?: MulterFile[];
+  artwork?: MulterFile[];
+  [key: string]: MulterFile[] | undefined;
+}
+
 // Configuration pour l'upload de beats
 const uploadMiddleware = beatUpload;
 
@@ -13,20 +31,27 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     
     // Extraction des fichiers
-    const files: any = {};
-    const fields: any = {};
+    const files: UploadedFiles = {};
+    const fields: Record<string, string> = {};
     
     for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
-        if (!files[key]) files[key] = [];
-        files[key].push({
+        // Convertir File en MulterFile
+        const multerFile: MulterFile = {
           fieldname: key,
           originalname: value.name,
           encoding: '7bit',
           mimetype: value.type,
           buffer: Buffer.from(await value.arrayBuffer()),
           size: value.size
-        });
+        };
+        
+        if (key === 'preview' || key === 'master' || key === 'stems' || key === 'artwork') {
+          if (!files[key]) {
+            files[key] = [];
+          }
+          files[key].push(multerFile);
+        }
       } else {
         fields[key] = value;
       }
@@ -42,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload des fichiers vers Cloudinary
-    const uploadResults: any = {};
+    const uploadResults: Record<string, { public_id: string; secure_url: string; resource_type: string }> = {};
 
     try {
       // Upload de la preview

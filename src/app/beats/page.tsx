@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Grid3X3, List, Play, Pause, Info, ShoppingCart, Star } from 'lucide-react';
+import { Search, Filter, Grid3X3, List, Play, Pause, ShoppingCart, Star } from 'lucide-react';
 import { useBeats } from '@/hooks/useBeats';
 
 export default function BeatsPage() {
@@ -437,7 +437,7 @@ export default function BeatsPage() {
           className="text-center mt-16 bg-white/10 backdrop-blur-lg rounded-2xl p-8"
         >
           <h2 className="text-3xl font-bold text-white mb-4">
-            Besoin d'un beat personnalisé ?
+            Besoin d&apos;un beat personnalisé ?
           </h2>
           <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
             Je peux créer un beat sur mesure selon vos besoins spécifiques. Contactez-moi pour discuter de votre projet.
@@ -450,7 +450,7 @@ export default function BeatsPage() {
               href="/upload-test"
               className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 border border-white/20 hover:border-white/30"
             >
-              Tester l'Upload
+              Tester l&apos;Upload
             </a>
           </div>
         </motion.div>

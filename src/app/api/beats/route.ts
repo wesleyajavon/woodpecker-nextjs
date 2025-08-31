@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     // Construction des options de tri
     const sort: BeatSortOptions = {
-      field: sortField,
+      field: sortField as 'title' | 'genre' | 'bpm' | 'price' | 'rating' | 'createdAt',
       order: sortOrder
     }
 

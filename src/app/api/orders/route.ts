@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { OrderService } from '@/services/orderService'
-import { OrderFilters, OrderSortOptions, CreateOrderInput } from '@/types/order'
+import { OrderFilters, OrderSortOptions, CreateOrderInput, OrderStatus, LicenseType } from '@/types/order'
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('dateFrom') ? new Date(searchParams.get('dateFrom')!) : undefined
     const dateTo = searchParams.get('dateTo') ? new Date(searchParams.get('dateTo')!) : undefined
     const beatId = searchParams.get('beatId') || undefined
-    const sortField = (searchParams.get('sortField') || 'createdAt') as keyof OrderSortOptions['field']
+    const sortField = (searchParams.get('sortField') || 'createdAt') as OrderSortOptions['field']
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc'
 
     // Validation des paramètres
@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
     // Construction des filtres
     const filters: OrderFilters = {
       customerEmail,
-      status: status as any,
-      licenseType: licenseType as any,
+      status: status as OrderStatus | undefined,
+      licenseType: licenseType as LicenseType | undefined,
       dateFrom,
       dateTo,
       beatId

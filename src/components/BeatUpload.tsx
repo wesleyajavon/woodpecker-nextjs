@@ -2,11 +2,13 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Music, Image, FileAudio, X, Check, AlertCircle } from 'lucide-react';
+import { Upload, Music, Image, FileAudio, X, AlertCircle } from 'lucide-react';
 import { BEAT_CONFIG } from '@/config/constants';
 
+import { Beat } from '@/types/beat';
+
 interface BeatUploadProps {
-  onUploadSuccess?: (beat: any) => void;
+  onUploadSuccess?: (beat: Beat) => void;
   onUploadError?: (error: string) => void;
 }
 
@@ -60,7 +62,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
   };
 
   // Gestion des changements de formulaire
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: keyof typeof formData, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setErrors(prev => prev.filter(error => !error.includes(field)));
   };
@@ -183,7 +185,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white/10 backdrop-blur-lg rounded-2xl">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">
-        Upload d'un nouveau beat
+        Upload d&apos;un nouveau beat
       </h2>
 
       {/* Affichage des erreurs */}
@@ -357,7 +359,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
               >
                 {uploadedFiles.artwork ? (
                   <div className="flex items-center gap-2 text-purple-300">
-                    <Image className="w-5 h-5" />
+                    <Image className="w-5 h-5" aria-label="Icône artwork" />
                     <span>{uploadedFiles.artwork.name}</span>
                     <div
                       onClick={(e) => {
@@ -372,7 +374,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 ) : (
                   <div className="flex items-center gap-2 text-gray-400">
                     <Upload className="w-5 h-5" />
-                    <span>Image d'artwork</span>
+                    <span>Image d&apos;artwork</span>
                   </div>
                 )}
               </div>

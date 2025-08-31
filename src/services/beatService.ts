@@ -1,16 +1,56 @@
 import { prisma } from '@/lib/prisma'
 import { Beat, CreateBeatInput, UpdateBeatInput, BeatFilters, BeatSortOptions } from '@/types/beat'
+// Import Decimal from Prisma
+import { Decimal } from '@prisma/client/runtime/library'
+
+// Type for Prisma Beat result with Decimal price
+type PrismaBeatResult = Omit<Beat, 'price'> & {
+  price: Decimal
+}
+
+// Type for the where clause in Prisma queries
+type BeatWhereClause = {
+  isActive?: boolean
+  genre?: string
+  bpm?: {
+    gte?: number
+    lte?: number
+  }
+  key?: string
+  price?: {
+    gte?: Decimal
+    lte?: Decimal
+  }
+  isExclusive?: boolean
+  featured?: boolean
+  OR?: Array<{
+    title?: { contains: string; mode: 'insensitive' }
+    description?: { contains: string; mode: 'insensitive' }
+    tags?: { hasSome: string[] }
+  }>
+}
 
 export class BeatService {
-  // Create a new beat
+  // Fonction utilitaire pour convertir les résultats Prisma
+  private static convertPrismaBeat(beat: PrismaBeatResult): Beat {
+    return {
+      ...beat,
+      price: Number(beat.price)
+    }
+  }
+
+  // Créer un nouveau beat
   static async createBeat(data: CreateBeatInput): Promise<Beat> {
-    return await prisma.beat.create({
+    const beat = await prisma.beat.create({
       data: {
         ...data,
         price: new Decimal(data.price)
       }
     })
+    
+    return this.convertPrismaBeat(beat as PrismaBeatResult)
   }
+    
 
   // Get all beats with optional filters and sorting
   static async getBeats(
@@ -19,7 +59,7 @@ export class BeatService {
     page: number = 1,
     limit: number = 12
   ): Promise<{ beats: Beat[]; total: number; totalPages: number }> {
-    const where: any = {
+    const where: BeatWhereClause = {
       isActive: true
     }
 
@@ -74,7 +114,7 @@ export class BeatService {
     const totalPages = Math.ceil(total / limit)
 
     return {
-      beats,
+      beats: beats.map(beat => this.convertPrismaBeat(beat as PrismaBeatResult)),
       total,
       totalPages
     }
@@ -82,14 +122,16 @@ export class BeatService {
 
   // Get a single beat by ID
   static async getBeatById(id: string): Promise<Beat | null> {
-    return await prisma.beat.findUnique({
+    const beat = await prisma.beat.findUnique({
       where: { id }
     })
+    
+    return beat ? this.convertPrismaBeat(beat as PrismaBeatResult) : null
   }
 
   // Get featured beats
   static async getFeaturedBeats(limit: number = 4): Promise<Beat[]> {
-    return await prisma.beat.findMany({
+    const beats = await prisma.beat.findMany({
       where: {
         featured: true,
         isActive: true
@@ -97,11 +139,13 @@ export class BeatService {
       orderBy: { rating: 'desc' },
       take: limit
     })
+    
+    return beats.map(beat => this.convertPrismaBeat(beat as PrismaBeatResult))
   }
 
   // Get beats by genre
   static async getBeatsByGenre(genre: string, limit: number = 8): Promise<Beat[]> {
-    return await prisma.beat.findMany({
+    const beats = await prisma.beat.findMany({
       where: {
         genre,
         isActive: true
@@ -109,28 +153,52 @@ export class BeatService {
       orderBy: { rating: 'desc' },
       take: limit
     })
+    
+    return beats.map(beat => this.convertPrismaBeat(beat as PrismaBeatResult))
   }
 
   // Update a beat
   static async updateBeat(id: string, data: UpdateBeatInput): Promise<Beat> {
-    const updateData: any = { ...data }
+    const { price, ...otherData } = data
     
-    if (data.price !== undefined) {
-      updateData.price = new Decimal(data.price)
+    // Create update data with proper typing
+    const updateData: {
+      title?: string
+      description?: string
+      genre?: string
+      bpm?: number
+      key?: string
+      duration?: string
+      price?: Decimal
+      tags?: string[]
+      previewUrl?: string
+      fullUrl?: string
+      stemsUrl?: string
+      isExclusive?: boolean
+      isActive?: boolean
+      featured?: boolean
+    } = { ...otherData }
+    
+    if (price !== undefined) {
+      updateData.price = new Decimal(price)
     }
 
-    return await prisma.beat.update({
+    const updatedBeat = await prisma.beat.update({
       where: { id },
       data: updateData
     })
+
+    return this.convertPrismaBeat(updatedBeat as PrismaBeatResult)
   }
 
   // Delete a beat (soft delete by setting isActive to false)
   static async deleteBeat(id: string): Promise<Beat> {
-    return await prisma.beat.update({
+    const deletedBeat = await prisma.beat.update({
       where: { id },
       data: { isActive: false }
     })
+
+    return this.convertPrismaBeat(deletedBeat as PrismaBeatResult)
   }
 
   // Update beat rating
@@ -148,13 +216,15 @@ export class BeatService {
     const newReviewCount = beat.reviewCount + 1
     const averageRating = totalRating / newReviewCount
 
-    return await prisma.beat.update({
+    const updatedBeat = await prisma.beat.update({
       where: { id },
       data: {
         rating: averageRating,
         reviewCount: newReviewCount
       }
     })
+
+    return this.convertPrismaBeat(updatedBeat as PrismaBeatResult)
   }
 
   // Get beats statistics
@@ -177,11 +247,8 @@ export class BeatService {
     return {
       totalBeats,
       totalGenres: totalGenres.length,
-      averagePrice: averagePrice._avg.price || 0,
-      totalRevenue: totalRevenue._sum.price || 0
+      averagePrice: averagePrice._avg.price ? Number(averagePrice._avg.price) : 0,
+      totalRevenue: totalRevenue._sum.price ? Number(totalRevenue._sum.price) : 0
     }
   }
 }
-
-// Import Decimal from Prisma
-import { Decimal } from '@prisma/client/runtime/library'

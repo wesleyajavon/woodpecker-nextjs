@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { BeatService } from '@/services/beatService'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     genre: string
-  }
+  }>
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { genre } = params
+    const { genre } = await params
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '8')
 

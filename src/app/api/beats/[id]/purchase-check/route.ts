@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { OrderService } from '@/services/orderService'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params
+    const { id } = await params
     const { searchParams } = new URL(request.url)
     const customerEmail = searchParams.get('email')
 

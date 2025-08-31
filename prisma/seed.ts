@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, OrderStatus, LicenseType } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 
 const prisma = new PrismaClient()
@@ -98,13 +98,13 @@ async function main() {
     {
       title: 'Street Poetry',
       description: 'Beat boom bap classique dans l\'esprit golden era',
-      genre: 'Boom Bap',
-      bpm: 90,
+      genre: 'Hip-Hop',
+      bpm: 130,
       key: 'G',
       duration: '3:30',
-      price: 22.99,
+      price: 31.99,
       rating: 4.9,
-      reviewCount: 41,
+      reviewCount: 52,
       tags: ['Boom Bap', 'Classic', 'Golden Era'],
       previewUrl: 'https://example.com/preview/street-poetry.mp3',
       fullUrl: 'https://example.com/full/street-poetry.wav',
@@ -115,12 +115,12 @@ async function main() {
       title: 'Neon Lights',
       description: 'Beat synthwave avec des influences 80s',
       genre: 'Synthwave',
-      bpm: 110,
+      bpm: 125,
       key: 'B',
-      duration: '3:58',
-      price: 31.99,
+      duration: '3:55',
+      price: 28.99,
       rating: 4.4,
-      reviewCount: 17,
+      reviewCount: 18,
       tags: ['Synthwave', '80s', 'Retro'],
       previewUrl: 'https://example.com/preview/neon-lights.mp3',
       fullUrl: 'https://example.com/full/neon-lights.wav',
@@ -165,11 +165,11 @@ async function main() {
       customerPhone: '+1234567890',
       totalAmount: 29.99,
       currency: 'EUR',
-      status: 'COMPLETED',
+      status: OrderStatus.COMPLETED,
       paymentMethod: 'Stripe',
       paymentId: 'pi_1234567890',
       paidAt: new Date('2024-01-15'),
-      licenseType: 'NON_EXCLUSIVE',
+      licenseType: LicenseType.NON_EXCLUSIVE,
       usageRights: ['Commercial Use', 'Streaming', 'Live Performance'],
       beatId: '1' // Will be updated after beats are created
     },
@@ -179,11 +179,11 @@ async function main() {
       customerPhone: '+0987654321',
       totalAmount: 34.99,
       currency: 'EUR',
-      status: 'PAID',
+      status: OrderStatus.PAID,
       paymentMethod: 'PayPal',
       paymentId: 'PAY-1234567890',
       paidAt: new Date('2024-01-20'),
-      licenseType: 'EXCLUSIVE',
+      licenseType: LicenseType.EXCLUSIVE,
       usageRights: ['Exclusive Rights', 'Commercial Use', 'Streaming', 'Live Performance'],
       beatId: '3' // Will be updated after beats are created
     }

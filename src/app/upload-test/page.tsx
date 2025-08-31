@@ -42,10 +42,10 @@ export default function UploadTestPage() {
           className="text-center mb-12"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Test d'Upload de Beats
+            Test d&apos;Upload de Beats
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Page de test pour vérifier le bon fonctionnement de l'upload vers Cloudinary
+            Page de test pour vérifier le bon fonctionnement de l&apos;upload vers Cloudinary
           </p>
         </motion.div>
 
@@ -186,10 +186,10 @@ export default function UploadTestPage() {
             <div>
               <h3 className="text-lg font-semibold text-white mb-4">✅ Tests à effectuer</h3>
               <ul className="space-y-2 text-gray-300">
-                <li>• Upload d'un fichier audio preview (MP3, WAV)</li>
-                <li>• Upload d'un fichier master (WAV, AIFF)</li>
-                <li>• Upload d'archives de stems (ZIP, RAR)</li>
-                <li>• Upload d'artwork (JPG, PNG, WebP)</li>
+                <li>• Upload d&apos;un fichier audio preview (MP3, WAV)</li>
+                <li>• Upload d&apos;un fichier master (WAV, AIFF)</li>
+                <li>• Upload d&apos;archives de stems (ZIP, RAR)</li>
+                <li>• Upload d&apos;artwork (JPG, PNG, WebP)</li>
                 <li>• Validation des champs du formulaire</li>
                 <li>• Gestion des erreurs de validation</li>
               </ul>

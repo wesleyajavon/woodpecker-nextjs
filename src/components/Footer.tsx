@@ -134,7 +134,7 @@ const Footer = () => {
               Produits
             </h3>
             <ul className="space-y-3">
-              {footerLinks.products.map((link, index) => (
+              {footerLinks.products.map((link) => (
                 <motion.li
                   key={link.name}
                   whileHover={{ x: 5 }}
@@ -159,7 +159,7 @@ const Footer = () => {
               Services
             </h3>
             <ul className="space-y-3">
-              {footerLinks.services.map((link, index) => (
+              {footerLinks.services.map((link) => (
                 <motion.li
                   key={link.name}
                   whileHover={{ x: 5 }}
@@ -184,7 +184,7 @@ const Footer = () => {
               Entreprise
             </h3>
             <ul className="space-y-3">
-              {footerLinks.company.map((link, index) => (
+              {footerLinks.company.map((link) => (
                 <motion.li
                   key={link.name}
                   whileHover={{ x: 5 }}
@@ -214,7 +214,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             {/* Social Links */}
             <div className="flex items-center gap-4">
-              {socialLinks.map((social, index) => (
+              {socialLinks.map((social) => (
                 <motion.a
                   key={social.label}
                   href={social.href}
@@ -230,7 +230,7 @@ const Footer = () => {
 
             {/* Legal Links */}
             <div className="flex flex-wrap gap-6 text-sm text-gray-400">
-              {footerLinks.legal.map((link, index) => (
+              {footerLinks.legal.map((link) => (
                 <motion.div
                   key={link.name}
                   whileHover={{ y: -2 }}

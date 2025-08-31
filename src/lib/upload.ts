@@ -16,7 +16,7 @@ export interface UploadedFile {
 const storage = multer.memoryStorage();
 
 // Validation des types de fichiers
-const fileFilter = (req: NextApiRequest, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (req: unknown, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Validation des fichiers audio
   if (file.fieldname === 'audio') {
     if (FILE_CONFIG.allowedAudioFormats.some(format => 
@@ -123,7 +123,7 @@ export const stemsUpload = multer({
 }).single('stems');
 
 // Middleware d'erreur pour Multer
-export const handleUploadError = (error: any, req: NextApiRequest, res: any, next: any) => {
+export const handleUploadError = (error: Error | multer.MulterError, req: NextApiRequest, res: { status: (code: number) => { json: (data: unknown) => unknown } }) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
@@ -156,23 +156,27 @@ export const handleUploadError = (error: any, req: NextApiRequest, res: any, nex
 };
 
 // Validation des fichiers uploadés
-export const validateUploadedFiles = (files: any, requiredFields: string[] = []) => {
+export const validateUploadedFiles = (files: Record<string, { fieldname: string; originalname: string; size: number } | { fieldname: string; originalname: string; size: number }[] | undefined>, requiredFields: string[] = []) => {
   const errors: string[] = [];
   
   // Vérification des champs requis
   for (const field of requiredFields) {
-    if (!files[field] || files[field].length === 0) {
+    const fieldFiles = files[field];
+    if (!fieldFiles || (Array.isArray(fieldFiles) && fieldFiles.length === 0)) {
       errors.push(`Le champ ${field} est requis`);
     }
   }
   
   // Vérification de la taille des fichiers
   for (const field in files) {
-    const fileArray = Array.isArray(files[field]) ? files[field] : [files[field]];
-    
-    for (const file of fileArray) {
-      if (file.size > FILE_CONFIG.maxAudioSize) {
-        errors.push(`Le fichier ${file.originalname} est trop volumineux`);
+    const fieldFiles = files[field];
+    if (fieldFiles) {
+      const fileArray = Array.isArray(fieldFiles) ? fieldFiles : [fieldFiles];
+      
+      for (const file of fileArray) {
+        if (file && file.size > FILE_CONFIG.maxAudioSize) {
+          errors.push(`Le fichier ${file.originalname} est trop volumineux`);
+        }
       }
     }
   }
