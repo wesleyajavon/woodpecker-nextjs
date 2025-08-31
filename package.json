@@ -12,23 +12,30 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-     "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "stripe:create-product": "tsx scripts/create-stripe-product.ts",
+    "stripe:test": "tsx scripts/test-stripe-import.ts",
+    "stripe:test-env": "tsx scripts/test-env.ts",
+    "stripe:run": "./scripts/run-stripe.sh"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
     "@types/multer": "^2.0.0",
     "cloudinary": "^2.7.0",
+    "dotenv": "^17.2.1",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.541.0",
     "multer": "^2.0.2",
     "next": "15.5.0",
     "prisma": "^6.15.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "stripe": "^18.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/dotenv": "^8.2.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
