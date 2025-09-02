@@ -121,6 +121,18 @@ export class OrderService {
     return order ? this.convertPrismaOrder(order as PrismaOrderResult) : null
   }
 
+  // Get order by payment ID (Stripe session ID)
+  static async getOrderByPaymentId(paymentId: string): Promise<Order | null> {
+    const order = await prisma.order.findFirst({
+      where: { paymentId },
+      include: {
+        beat: true
+      }
+    })
+    
+    return order ? this.convertPrismaOrder(order as PrismaOrderResult) : null
+  }
+
   // Get orders by customer email
   static async getOrdersByCustomer(email: string): Promise<Order[]> {
     const orders = await prisma.order.findMany({
