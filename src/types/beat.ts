@@ -10,6 +10,7 @@ export interface Beat {
   rating: number
   reviewCount: number
   tags: string[]
+  stripePriceId?: string | null
   previewUrl?: string | null
   fullUrl?: string | null
   stemsUrl?: string | null

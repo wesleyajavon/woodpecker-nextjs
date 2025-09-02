@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { Beat, CreateBeatInput, UpdateBeatInput, BeatFilters, BeatSortOptions } from '@/types/beat'
 // Import Decimal from Prisma
 import { Decimal } from '@prisma/client/runtime/library'
+import { createStripeProductForBeat } from '@/lib/stripe'
 
 // Type for Prisma Beat result with Decimal price
 type PrismaBeatResult = Omit<Beat, 'price'> & {
@@ -48,7 +49,32 @@ export class BeatService {
       }
     })
     
-    return this.convertPrismaBeat(beat as PrismaBeatResult)
+    const convertedBeat = this.convertPrismaBeat(beat as PrismaBeatResult)
+    
+    // Automatically create Stripe product for the new beat
+    try {
+      console.log(`🔄 Creating Stripe product for new beat: ${beat.title}`)
+      const stripeResult = await createStripeProductForBeat(convertedBeat)
+      
+      if (stripeResult.success) {
+        // Update the beat with the Stripe price ID
+        const updatedBeat = await prisma.beat.update({
+          where: { id: beat.id },
+          data: { stripePriceId: stripeResult.priceId }
+        })
+        
+        console.log(`✅ Stripe product created and linked to beat: ${beat.title}`)
+        return this.convertPrismaBeat(updatedBeat as PrismaBeatResult)
+      } else {
+        console.warn(`⚠️  Failed to create Stripe product for beat: ${beat.title}`, stripeResult.error || stripeResult.reason)
+        // Return the beat without Stripe integration - it can be created later
+        return convertedBeat
+      }
+    } catch (error) {
+      console.error(`❌ Error creating Stripe product for beat: ${beat.title}`, error)
+      // Return the beat without Stripe integration - it can be created later
+      return convertedBeat
+    }
   }
     
 

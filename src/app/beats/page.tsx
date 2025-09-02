@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Grid3X3, List, Play, Pause, ShoppingCart, Star } from 'lucide-react';
 import { useBeats } from '@/hooks/useBeats';
+import CheckoutButton from '@/components/CheckoutButton';
 
 export default function BeatsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -296,10 +297,12 @@ export default function BeatsPage() {
 
                         <div className="flex items-center justify-between">
                           <span className="text-2xl font-bold text-white">{formatPrice(beat.price)}</span>
-                          <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <ShoppingCart className="w-4 h-4" />
-                            Acheter
-                          </button>
+                          <CheckoutButton
+                            priceId={beat.stripePriceId || beat.id} // Use Stripe price ID if available, fallback to beat ID
+                            beatTitle={beat.title}
+                            price={beat.price}
+                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                          />
                         </div>
                       </div>
                     </>
@@ -351,10 +354,12 @@ export default function BeatsPage() {
                                 <div className="text-yellow-500 text-xs font-bold mt-1">EXCLUSIF</div>
                               )}
                             </div>
-                            <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2">
-                              <ShoppingCart className="w-4 h-4" />
-                              Acheter
-                            </button>
+                            <CheckoutButton
+                              priceId={beat.stripePriceId || beat.id} // Use Stripe price ID if available, fallback to beat ID
+                              beatTitle={beat.title}
+                              price={beat.price}
+                              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
+                            />
                           </div>
                         </div>
                       </div>

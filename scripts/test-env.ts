@@ -1,5 +1,9 @@
 #!/usr/bin/env tsx
 
+// Load environment variables
+import { config } from 'dotenv'
+config({ path: '.env.local' })
+
 async function main() {
   try {
     console.log('🚀 Testing environment variables...')

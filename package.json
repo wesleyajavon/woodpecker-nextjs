@@ -16,7 +16,9 @@
     "stripe:create-product": "tsx scripts/create-stripe-product.ts",
     "stripe:test": "tsx scripts/test-stripe-import.ts",
     "stripe:test-env": "tsx scripts/test-env.ts",
-    "stripe:run": "./scripts/run-stripe.sh"
+    "stripe:run": "./scripts/run-stripe.sh",
+    "stripe:create-beats": "tsx scripts/create-stripe-beats.ts",
+    "stripe:run-beats": "./scripts/run-stripe-beats.sh"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",

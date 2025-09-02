@@ -26,6 +26,9 @@ model Beat {
   reviewCount Int      @default(0)
   tags        String[] // Array of tags like ["Dark", "Hard", "Underground"]
   
+  // Stripe integration
+  stripePriceId String? // Stripe price ID for checkout
+  
   // Audio files
   previewUrl  String?  // URL for preview (30 seconds)
   fullUrl     String?  // URL for full beat (after purchase)
