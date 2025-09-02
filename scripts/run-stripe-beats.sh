@@ -12,3 +12,4 @@ fi
 # Run the Stripe beats script
 echo "🚀 Running Stripe beats script..."
 npx tsx scripts/create-stripe-beats.ts
+

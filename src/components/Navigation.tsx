@@ -24,7 +24,6 @@ const Navigation = () => {
     { name: 'Videos', href: '/videos', icon: Sparkles },
     { name: 'Services', href: '/services', icon: Music },
     { name: 'Contact', href: '/contact', icon: Sparkles },
-    { name: 'Admin', href: '/admin/upload', icon: Sparkles },
   ];
 
   return (
