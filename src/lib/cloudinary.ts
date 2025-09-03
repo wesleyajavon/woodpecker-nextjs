@@ -1,11 +1,27 @@
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 
-// Configuration de Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Configuration de Cloudinary - initialisation paresseuse
+let cloudinaryConfigured = false;
+
+function configureCloudinary() {
+  if (!cloudinaryConfigured) {
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+    if (!cloudName || !apiKey || !apiSecret) {
+      throw new Error('Variables d\'environnement Cloudinary manquantes. Vérifiez CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, et CLOUDINARY_API_SECRET.');
+    }
+
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+    });
+    
+    cloudinaryConfigured = true;
+  }
+}
 
 // Structure des dossiers Cloudinary
 export const CLOUDINARY_FOLDERS = {
@@ -119,6 +135,7 @@ export class CloudinaryService {
     } = {}
   ): Promise<CloudinaryResource> {
     try {
+      configureCloudinary();
       let result: UploadApiResponse;
       
       if (typeof file === 'string') {
@@ -126,22 +143,11 @@ export class CloudinaryService {
         result = await cloudinary.uploader.upload(file, {
           resource_type: options.resource_type || 'video',
           folder,
-          format: options.format || 'mp3',
-          quality: options.quality || 'auto:good',
-          duration: options.duration,
           overwrite: false,
           unique_filename: true,
           use_filename: true,
-          // Ajout de transformations asynchrones pour les gros fichiers
-          eager: [
-            {
-              format: options.format || 'mp3',
-              quality: options.quality || 'auto:good',
-              duration: options.duration
-            }
-          ],
-          eager_async: true,
-          eager_notification_url: process.env.CLOUDINARY_WEBHOOK_URL || undefined
+          // Pour les gros fichiers, on laisse Cloudinary gérer le format automatiquement
+          // Les transformations seront appliquées à la demande via des URLs de transformation
         });
       } else {
         // Upload depuis un Buffer
@@ -150,22 +156,11 @@ export class CloudinaryService {
             {
               resource_type: options.resource_type || 'video',
               folder,
-              format: options.format || 'mp3',
-              quality: options.quality || 'auto:good',
-              duration: options.duration,
               overwrite: false,
               unique_filename: true,
               use_filename: true,
-              // Ajout de transformations asynchrones pour les gros fichiers
-              eager: [
-                {
-                  format: options.format || 'mp3',
-                  quality: options.quality || 'auto:good',
-                  duration: options.duration
-                }
-              ],
-              eager_async: true,
-              eager_notification_url: process.env.CLOUDINARY_WEBHOOK_URL || undefined
+              // Pour les gros fichiers, on laisse Cloudinary gérer le format automatiquement
+              // Les transformations seront appliquées à la demande via des URLs de transformation
             },
             (error, result) => {
               if (error) reject(error);
@@ -226,6 +221,7 @@ export class CloudinaryService {
     } = {}
   ): Promise<CloudinaryResource> {
     try {
+      configureCloudinary();
       let result: UploadApiResponse;
       
       if (typeof file === 'string') {
@@ -281,6 +277,7 @@ export class CloudinaryService {
   // Suppression d'une ressource
   static async deleteResource(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<void> {
     try {
+      configureCloudinary();
       await cloudinary.uploader.destroy(publicId, {
         resource_type: resourceType
       });
@@ -296,9 +293,33 @@ export class CloudinaryService {
     transformations: Record<string, string | number | boolean>,
     resourceType: 'image' | 'video' | 'raw' = 'image'
   ): string {
+    configureCloudinary();
     return cloudinary.url(publicId, {
       ...transformations,
       resource_type: resourceType,
+      secure: true
+    });
+  }
+
+  // Génération d'une URL de preview audio (30 secondes)
+  static generateAudioPreviewUrl(publicId: string): string {
+    configureCloudinary();
+    return cloudinary.url(publicId, {
+      resource_type: 'video',
+      format: 'mp3',
+      quality: 'auto:low',
+      duration: 30, // 30 secondes pour la preview
+      secure: true
+    });
+  }
+
+  // Génération d'une URL de master audio (fichier complet)
+  static generateAudioMasterUrl(publicId: string): string {
+    configureCloudinary();
+    return cloudinary.url(publicId, {
+      resource_type: 'video',
+      format: 'wav',
+      quality: 'auto:best',
       secure: true
     });
   }
@@ -313,6 +334,7 @@ export class CloudinaryService {
       background?: string;
     } = {}
   ): Promise<string> {
+    configureCloudinary();
     const waveformUrl = cloudinary.url(publicId, {
       resource_type: 'video',
       transformation: [
@@ -338,6 +360,7 @@ export class CloudinaryService {
   // Récupération des informations d'une ressource
   static async getResourceInfo(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<CloudinaryResource> {
     try {
+      configureCloudinary();
       const result = await cloudinary.api.resource(publicId, {
         resource_type: resourceType
       });
@@ -361,6 +384,7 @@ export class CloudinaryService {
   // Nettoyage des fichiers temporaires
   static async cleanupTempFiles(): Promise<void> {
     try {
+      configureCloudinary();
       // Suppression des fichiers dans le dossier temp plus vieux de 24h
       const result = await cloudinary.api.delete_resources_by_prefix(CLOUDINARY_FOLDERS.TEMP, {
         resource_type: 'image'

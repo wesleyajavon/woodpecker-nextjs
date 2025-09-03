@@ -296,7 +296,7 @@ export default function BeatsPage() {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold text-white">{formatPrice(beat.price)}</span>
+                          {/* <span className="text-2xl font-bold text-white">{formatPrice(beat.price)}</span> */}
                           <CheckoutButton
                             priceId={beat.stripePriceId || beat.id} // Use Stripe price ID if available, fallback to beat ID
                             beatTitle={beat.title}
@@ -349,7 +349,7 @@ export default function BeatsPage() {
 
                           <div className="flex items-center gap-4 flex-shrink-0">
                             <div className="text-right">
-                              <span className="text-2xl font-bold text-white">{formatPrice(beat.price)}</span>
+                              {/* <span className="text-2xl font-bold text-white">{formatPrice(beat.price)}</span> */}
                               {beat.isExclusive && (
                                 <div className="text-yellow-500 text-xs font-bold mt-1">EXCLUSIF</div>
                               )}
