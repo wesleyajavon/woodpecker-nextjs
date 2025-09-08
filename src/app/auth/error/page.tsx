@@ -12,7 +12,7 @@ const errorMessages: Record<string, string> = {
 
 export default function AuthErrorPage() {
   const searchParams = useSearchParams()
-  const error = searchParams.get('error')
+  const error = searchParams?.get('error')
 
   const errorMessage = error ? errorMessages[error] || errorMessages.Default : errorMessages.Default
 
@@ -51,14 +51,14 @@ export default function AuthErrorPage() {
             variant="outline"
             className="w-full"
           >
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Button>
         </div>
 
         {error && (
           <div className="mt-4 p-4 bg-gray-100 rounded-md">
             <p className="text-xs text-gray-600">
-              Code d'erreur: <code className="font-mono">{error}</code>
+              Code d&apos;erreur: <code className="font-mono">{error}</code>
             </p>
           </div>
         )}

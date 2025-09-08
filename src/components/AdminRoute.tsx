@@ -76,13 +76,13 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
             Accès refusé
           </h2>
           <p className="text-gray-600">
-            Vous n'avez pas les permissions nécessaires pour accéder à cette page.
+            Vous n&apos;avez pas les permissions nécessaires pour accéder à cette page.
           </p>
           <button
             onClick={() => router.push('/')}
             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
           >
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </button>
         </div>
       </div>
@@ -91,4 +91,5 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
 
   return <>{children}</>
 }
+
 

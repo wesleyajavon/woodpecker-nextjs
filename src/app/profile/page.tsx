@@ -133,7 +133,7 @@ export default function ProfilePage() {
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Nom d'affichage
+                    Nom d&apos;affichage
                   </label>
                   <input
                     type="text"
@@ -147,7 +147,7 @@ export default function ProfilePage() {
 
                 <div>
                   <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                    URL de l'avatar
+                    URL de l&apos;avatar
                   </label>
                   <input
                     type="url"
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                     placeholder="https://example.com/avatar.jpg"
                   />
                   <p className="mt-1 text-sm text-gray-500">
-                    Laissez vide pour utiliser l'avatar par défaut
+                    Laissez vide pour utiliser l&apos;avatar par défaut
                   </p>
                 </div>
 
@@ -217,4 +217,5 @@ export default function ProfilePage() {
     </ProtectedRoute>
   )
 }
+
 

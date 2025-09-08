@@ -158,7 +158,7 @@ export class BeatService {
 
   // Get a single beat by ID
   static async getBeatById(id: string, userId?: string, isAdmin: boolean = false): Promise<Beat | null> {
-    const where: any = { id }
+    const where: { id: string; userId?: string } = { id }
     
     // Filter by user only if provided AND user is admin
     // Regular users and non-authenticated users can see all beats
@@ -175,7 +175,7 @@ export class BeatService {
 
   // Get featured beats
   static async getFeaturedBeats(limit: number = 4, userId?: string, isAdmin: boolean = false): Promise<Beat[]> {
-    const where: any = {
+    const where: BeatWhereClause = {
       featured: true,
       isActive: true
     }
@@ -197,7 +197,7 @@ export class BeatService {
 
   // Get beats by genre
   static async getBeatsByGenre(genre: string, limit: number = 8, userId?: string, isAdmin: boolean = false): Promise<Beat[]> {
-    const where: any = {
+    const where: BeatWhereClause = {
       genre,
       isActive: true
     }

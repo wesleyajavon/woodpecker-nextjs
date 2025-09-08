@@ -267,7 +267,7 @@ export async function createStripeProductForBeat(beat: {
     })
 
     // Set different prices based on beat characteristics
-    let priceAmount: number
+    // const priceAmount: number
     
     // if (beat.isExclusive) {
     //   // Exclusive beats are more expensive
@@ -277,7 +277,7 @@ export async function createStripeProductForBeat(beat: {
     //   priceAmount = 4999 // €49.99
     // } else {
     //   // Regular beats use the database price or default
-      priceAmount = Math.round((Number(beat.price) || 29.99) * 100)
+     const priceAmount = Math.round((Number(beat.price) || 29.99) * 100)
     // }
 
     // Create price for the product
