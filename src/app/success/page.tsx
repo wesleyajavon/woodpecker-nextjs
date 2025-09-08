@@ -5,11 +5,19 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Order } from '@/types/order'
 
+interface DownloadUrls {
+  master: string
+  stems?: string
+  expiresAt: string
+}
+
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams?.get('session_id')
   const [isLoading, setIsLoading] = useState(true)
   const [orderDetails, setOrderDetails] = useState<Order | null>(null)
+  const [downloadUrls, setDownloadUrls] = useState<DownloadUrls | null>(null)
+  const [isGeneratingDownload, setIsGeneratingDownload] = useState(false)
 
   useEffect(() => {
     if (sessionId) {
@@ -40,6 +48,39 @@ function SuccessContent() {
       setIsLoading(false)
     }
   }, [sessionId])
+
+  const generateDownloadUrls = async () => {
+    if (!orderDetails) return
+
+    setIsGeneratingDownload(true)
+    try {
+      const response = await fetch(`/api/download/beat/${orderDetails.beat.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: orderDetails.id,
+          customerEmail: orderDetails.customerEmail
+        })
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success) {
+          setDownloadUrls(result.data.downloadUrls)
+        } else {
+          console.error('Failed to generate download URLs:', result.error)
+        }
+      } else {
+        console.error('Failed to generate download URLs')
+      }
+    } catch (error) {
+      console.error('Error generating download URLs:', error)
+    } finally {
+      setIsGeneratingDownload(false)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -128,23 +169,86 @@ function SuccessContent() {
         </div>
         
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          Payment Successful!
+          Paiement réussi !
         </h1>
         
         <p className="text-gray-600 mb-6">
-          Thank you for your purchase! Your beat is now available for download.
+          Merci pour votre achat ! Votre beat est maintenant disponible au téléchargement.
         </p>
         
         {orderDetails && (
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-2">Order Details</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">Détails de la commande</h3>
             <div className="space-y-1 text-sm text-gray-600">
-              <p><span className="font-medium">Order ID:</span> {orderDetails.id}</p>
+              <p><span className="font-medium">ID de commande:</span> {orderDetails.id}</p>
               <p><span className="font-medium">Beat:</span> {orderDetails.beat.title}</p>
-              <p><span className="font-medium">Amount:</span> €{orderDetails.totalAmount.toFixed(2)}</p>
-              <p><span className="font-medium">Status:</span> {orderDetails.status}</p>
-              <p><span className="font-medium">License:</span> {orderDetails.licenseType}</p>
+              <p><span className="font-medium">Montant:</span> €{orderDetails.totalAmount.toFixed(2)}</p>
+              <p><span className="font-medium">Statut:</span> {orderDetails.status}</p>
+              <p><span className="font-medium">Licence:</span> {orderDetails.licenseType}</p>
             </div>
+          </div>
+        )}
+
+        {/* Section de téléchargement */}
+        {orderDetails && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Télécharger votre beat
+            </h3>
+            
+            {!downloadUrls ? (
+              <div className="text-center">
+                <p className="text-sm text-blue-700 mb-3">
+                  Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
+                </p>
+                <button
+                  onClick={generateDownloadUrls}
+                  disabled={isGeneratingDownload}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-blue-700">
+                  Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
+                </p>
+                
+                <div className="space-y-2">
+                  <a
+                    href={downloadUrls.master}
+                    download
+                    className="block w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors text-center"
+                  >
+                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3" />
+                    </svg>
+                    Télécharger le master (WAV)
+                  </a>
+                  
+                  {downloadUrls.stems && (
+                    <a
+                      href={downloadUrls.stems}
+                      download
+                      className="block w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors text-center"
+                    >
+                      <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3" />
+                      </svg>
+                      Télécharger les stems (ZIP)
+                    </a>
+                  )}
+                </div>
+                
+                <p className="text-xs text-blue-600">
+                  ⏰ Expire le {new Date(downloadUrls.expiresAt).toLocaleString('fr-FR')}
+                </p>
+              </div>
+            )}
           </div>
         )}
         
@@ -153,14 +257,14 @@ function SuccessContent() {
             href="/beats"
             className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
           >
-            Browse More Beats
+            Découvrir d&apos;autres beats
           </Link>
           
           <Link 
-            href="/dashboard"
+            href="/profile"
             className="block w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
           >
-            Go to Dashboard
+            Aller au profil
           </Link>
         </div>
       </div>

@@ -381,6 +381,63 @@ export class CloudinaryService {
     }
   }
 
+  // Génération d'une URL signée avec TTL
+  static generateSignedUrl(
+    publicId: string,
+    ttlMinutes: number = 30,
+    transformations: Record<string, string | number | boolean> = {},
+    resourceType: 'image' | 'video' | 'raw' = 'video'
+  ): string {
+    configureCloudinary();
+    
+    // Calcul du timestamp d'expiration
+    const expirationTime = Math.floor(Date.now() / 1000) + (ttlMinutes * 60);
+    
+    return cloudinary.url(publicId, {
+      ...transformations,
+      resource_type: resourceType,
+      secure: true,
+      sign_url: true,
+      expires_at: expirationTime
+    });
+  }
+
+  // Génération d'URLs signées pour les téléchargements de beats
+  static generateBeatDownloadUrls(
+    beatPublicId: string,
+    stemsPublicId?: string,
+    ttlMinutes: number = 30
+  ): {
+    master: string;
+    stems?: string;
+    expiresAt: Date;
+  } {
+    const expiresAt = new Date(Date.now() + (ttlMinutes * 60 * 1000));
+    
+    const masterUrl = this.generateSignedUrl(beatPublicId, ttlMinutes, {
+      format: 'wav',
+      quality: 'auto:best'
+    }, 'video');
+    
+    const result: {
+      master: string;
+      stems?: string;
+      expiresAt: Date;
+    } = {
+      master: masterUrl,
+      expiresAt
+    };
+    
+    if (stemsPublicId) {
+      result.stems = this.generateSignedUrl(stemsPublicId, ttlMinutes, {
+        format: 'zip',
+        quality: 'auto:best'
+      }, 'raw');
+    }
+    
+    return result;
+  }
+
   // Nettoyage des fichiers temporaires
   static async cleanupTempFiles(): Promise<void> {
     try {
