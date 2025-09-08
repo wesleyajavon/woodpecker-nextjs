@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Search, User, ShoppingCart, Music, Sparkles } from 'lucide-react';
+import AuthButton from './AuthButton';
+import UserMenu from './UserMenu';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,11 +32,10 @@ const Navigation = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20' 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+          ? 'bg-white/80 backdrop-blur-xl shadow-lg border-b border-white/20'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
@@ -54,9 +55,8 @@ const Navigation = () => {
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 />
               </div>
-              <span className={`text-2xl font-bold transition-colors ${
-                scrolled ? 'text-gray-900' : 'text-white'
-              }`}>
+              <span className={`text-2xl font-bold transition-colors ${scrolled ? 'text-gray-900' : 'text-white'
+                }`}>
                 Woodpecker
               </span>
             </Link>
@@ -74,11 +74,10 @@ const Navigation = () => {
               >
                 <Link
                   href={item.href}
-                  className={`relative px-4 py-2 rounded-xl transition-all duration-300 group ${
-                    scrolled 
-                      ? 'text-gray-700 hover:text-purple-600 hover:bg-purple-50' 
+                  className={`relative px-4 py-2 rounded-xl transition-all duration-300 group ${scrolled
+                      ? 'text-gray-700 hover:text-purple-600 hover:bg-purple-50'
                       : 'text-white/90 hover:text-white hover:bg-white/10'
-                  }`}
+                    }`}
                 >
                   <span className="flex items-center gap-2">
                     <item.icon className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -97,28 +96,24 @@ const Navigation = () => {
 
           {/* Right side actions */}
           <div className="hidden lg:flex items-center space-x-3">
+
+            <div className="flex items-center space-x-3">
+              <AuthButton />
+            </div>
+            
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`p-3 rounded-xl transition-all duration-300 ${
-                scrolled 
-                  ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-600' 
+              className={`p-3 rounded-xl transition-all duration-300 ${scrolled
+                  ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-600'
                   : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm'
-              }`}
+                }`}
             >
               <Search className="h-5 w-5" />
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`p-3 rounded-xl transition-all duration-300 ${
-                scrolled 
-                  ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-600' 
-                  : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm'
-              }`}
-            >
-              <User className="h-5 w-5" />
-            </motion.button>
+
+
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -142,11 +137,10 @@ const Navigation = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`p-3 rounded-xl transition-all duration-300 ${
-                scrolled 
-                  ? 'bg-gray-100 text-gray-700' 
+              className={`p-3 rounded-xl transition-all duration-300 ${scrolled
+                  ? 'bg-gray-100 text-gray-700'
                   : 'bg-white/10 text-white backdrop-blur-sm'
-              }`}
+                }`}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </motion.button>
@@ -173,11 +167,10 @@ const Navigation = () => {
                   >
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                        scrolled 
-                          ? 'text-gray-700 hover:text-purple-600 hover:bg-purple-50' 
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${scrolled
+                          ? 'text-gray-700 hover:text-purple-600 hover:bg-purple-50'
                           : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
+                        }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <item.icon className="h-5 w-5" />

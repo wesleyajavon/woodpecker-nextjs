@@ -28,7 +28,8 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
   const fetchBeats = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/beats?limit=100');
+      // Utiliser l'API admin pour récupérer uniquement les beats de l'admin connecté
+      const response = await fetch('/api/admin/beats?limit=100');
       
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des beats');

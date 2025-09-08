@@ -3,6 +3,9 @@ import { validateUploadedFiles } from '@/lib/upload';
 import { CloudinaryService, CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
 import { BeatService } from '@/services/beatService';
 import { CreateBeatInput } from '@/types/beat';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { getUserIdFromEmail } from '@/lib/userUtils';
 
 // Types pour les fichiers uploadés via Multer
 interface MulterFile {
@@ -26,6 +29,24 @@ interface UploadedFiles {
 
 export async function POST(request: NextRequest) {
   try {
+    // Vérification de l'authentification
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      );
+    }
+
+    // Récupération de l'ID utilisateur
+    const userId = await getUserIdFromEmail(session.user.email);
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Utilisateur non trouvé' },
+        { status: 404 }
+      );
+    }
+
     // Récupération des données de la requête
     const formData = await request.formData();
     
@@ -167,7 +188,7 @@ export async function POST(request: NextRequest) {
         featured: fields.featured === 'true'
       };
 
-      const newBeat = await BeatService.createBeat(beatData);
+      const newBeat = await BeatService.createBeat(beatData, userId);
 
       return NextResponse.json({
         success: true,

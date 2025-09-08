@@ -217,9 +217,9 @@ export default function FeaturedProducts() {
 
                 {/* Prix et CTA */}
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-white">
+                  {/* <span className="text-2xl font-bold text-white">
                     {formatPrice(beat.price)}
-                  </span>
+                  </span> */}
                   <CheckoutButton
                     priceId={beat.stripePriceId || beat.id} // Use Stripe price ID if available, fallback to beat ID
                     beatTitle={beat.title}

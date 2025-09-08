@@ -8,10 +8,32 @@ import { isUserAdmin } from '@/lib/roleUtils'
 
 export async function GET(request: NextRequest) {
   try {
-    // Récupération de la session utilisateur
+    // Vérification de l'authentification
     const session = await getServerSession(authOptions)
-    const userId = session?.user?.email ? await getUserIdFromEmail(session.user.email) : undefined
-    const isAdmin = session?.user?.email ? await isUserAdmin(session.user.email) : false
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      )
+    }
+
+    // Vérification du rôle admin
+    const isAdmin = await isUserAdmin(session.user.email)
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: 'Accès refusé. Rôle admin requis.' },
+        { status: 403 }
+      )
+    }
+
+    // Récupération de l'ID utilisateur (admin)
+    const userId = await getUserIdFromEmail(session.user.email)
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Utilisateur non trouvé' },
+        { status: 404 }
+      )
+    }
     
     const { searchParams } = new URL(request.url)
     
@@ -57,8 +79,8 @@ export async function GET(request: NextRequest) {
       order: sortOrder
     }
 
-    // Récupération des beats (filtrés par utilisateur seulement si admin)
-    const result = await BeatService.getBeats(filters, sort, page, limit, userId || undefined, isAdmin)
+    // Récupération des beats de l'admin (filtrés par utilisateur)
+    const result = await BeatService.getBeats(filters, sort, page, limit, userId, true)
 
     return NextResponse.json({
       success: true,
@@ -74,10 +96,11 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erreur lors de la récupération des beats:', error)
+    console.error('Erreur lors de la récupération des beats admin:', error)
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
     )
   }
 }
+

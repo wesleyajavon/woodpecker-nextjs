@@ -269,16 +269,16 @@ export async function createStripeProductForBeat(beat: {
     // Set different prices based on beat characteristics
     let priceAmount: number
     
-    if (beat.isExclusive) {
-      // Exclusive beats are more expensive
-      priceAmount = 9999 // €99.99
-    } else if (beat.featured) {
-      // Featured beats get premium pricing
-      priceAmount = 4999 // €49.99
-    } else {
-      // Regular beats use the database price or default
+    // if (beat.isExclusive) {
+    //   // Exclusive beats are more expensive
+    //   priceAmount = 9999 // €99.99
+    // } else if (beat.featured) {
+    //   // Featured beats get premium pricing
+    //   priceAmount = 4999 // €49.99
+    // } else {
+    //   // Regular beats use the database price or default
       priceAmount = Math.round((Number(beat.price) || 29.99) * 100)
-    }
+    // }
 
     // Create price for the product
     const price = await stripe.prices.create({

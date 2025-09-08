@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BeatService } from '@/services/beatService'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { getUserIdFromEmail } from '@/lib/userUtils'
+import { isUserAdmin } from '@/lib/roleUtils'
 
 interface RouteParams {
   params: Promise<{
@@ -18,8 +22,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Récupération du beat
-    const beat = await BeatService.getBeatById(id)
+    // Récupération de la session utilisateur
+    const session = await getServerSession(authOptions)
+    const userId = session?.user?.email ? await getUserIdFromEmail(session.user.email) : undefined
+    const isAdmin = session?.user?.email ? await isUserAdmin(session.user.email) : false
+
+    // Récupération du beat (filtré par utilisateur seulement si admin)
+    const beat = await BeatService.getBeatById(id, userId || undefined, isAdmin)
 
     if (!beat) {
       return NextResponse.json(

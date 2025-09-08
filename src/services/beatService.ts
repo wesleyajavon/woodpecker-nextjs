@@ -24,6 +24,7 @@ type BeatWhereClause = {
   }
   isExclusive?: boolean
   featured?: boolean
+  userId?: string
   OR?: Array<{
     title?: { contains: string; mode: 'insensitive' }
     description?: { contains: string; mode: 'insensitive' }
@@ -41,11 +42,12 @@ export class BeatService {
   }
 
   // Créer un nouveau beat
-  static async createBeat(data: CreateBeatInput): Promise<Beat> {
+  static async createBeat(data: CreateBeatInput, userId?: string): Promise<Beat> {
     const beat = await prisma.beat.create({
       data: {
         ...data,
-        price: new Decimal(data.price)
+        price: new Decimal(data.price),
+        userId
       }
     })
     
@@ -83,10 +85,18 @@ export class BeatService {
     filters: BeatFilters = {},
     sort: BeatSortOptions = { field: 'createdAt', order: 'desc' },
     page: number = 1,
-    limit: number = 12
+    limit: number = 12,
+    userId?: string,
+    isAdmin: boolean = false
   ): Promise<{ beats: Beat[]; total: number; totalPages: number }> {
     const where: BeatWhereClause = {
       isActive: true
+    }
+
+    // Filter by user only if provided AND user is admin
+    // Regular users and non-authenticated users see all beats
+    if (userId && isAdmin) {
+      where.userId = userId
     }
 
     // Apply filters
@@ -147,21 +157,37 @@ export class BeatService {
   }
 
   // Get a single beat by ID
-  static async getBeatById(id: string): Promise<Beat | null> {
+  static async getBeatById(id: string, userId?: string, isAdmin: boolean = false): Promise<Beat | null> {
+    const where: any = { id }
+    
+    // Filter by user only if provided AND user is admin
+    // Regular users and non-authenticated users can see all beats
+    if (userId && isAdmin) {
+      where.userId = userId
+    }
+    
     const beat = await prisma.beat.findUnique({
-      where: { id }
+      where
     })
     
     return beat ? this.convertPrismaBeat(beat as PrismaBeatResult) : null
   }
 
   // Get featured beats
-  static async getFeaturedBeats(limit: number = 4): Promise<Beat[]> {
+  static async getFeaturedBeats(limit: number = 4, userId?: string, isAdmin: boolean = false): Promise<Beat[]> {
+    const where: any = {
+      featured: true,
+      isActive: true
+    }
+    
+    // Filter by user only if provided AND user is admin
+    // Regular users and non-authenticated users can see all featured beats
+    if (userId && isAdmin) {
+      where.userId = userId
+    }
+    
     const beats = await prisma.beat.findMany({
-      where: {
-        featured: true,
-        isActive: true
-      },
+      where,
       orderBy: { rating: 'desc' },
       take: limit
     })
@@ -170,12 +196,20 @@ export class BeatService {
   }
 
   // Get beats by genre
-  static async getBeatsByGenre(genre: string, limit: number = 8): Promise<Beat[]> {
+  static async getBeatsByGenre(genre: string, limit: number = 8, userId?: string, isAdmin: boolean = false): Promise<Beat[]> {
+    const where: any = {
+      genre,
+      isActive: true
+    }
+    
+    // Filter by user only if provided AND user is admin
+    // Regular users and non-authenticated users can see all beats by genre
+    if (userId && isAdmin) {
+      where.userId = userId
+    }
+    
     const beats = await prisma.beat.findMany({
-      where: {
-        genre,
-        isActive: true
-      },
+      where,
       orderBy: { rating: 'desc' },
       take: limit
     })
@@ -184,8 +218,20 @@ export class BeatService {
   }
 
   // Update a beat
-  static async updateBeat(id: string, data: UpdateBeatInput): Promise<Beat> {
+  static async updateBeat(id: string, data: UpdateBeatInput, userId?: string): Promise<Beat> {
     const { price, ...otherData } = data
+    
+    // Check if beat belongs to user if userId is provided
+    if (userId) {
+      const existingBeat = await prisma.beat.findUnique({
+        where: { id },
+        select: { userId: true }
+      })
+      
+      if (!existingBeat || existingBeat.userId !== userId) {
+        throw new Error('Beat not found or access denied')
+      }
+    }
     
     // Create update data with proper typing
     const updateData: {
@@ -218,7 +264,19 @@ export class BeatService {
   }
 
   // Delete a beat (soft delete by setting isActive to false)
-  static async deleteBeat(id: string): Promise<Beat> {
+  static async deleteBeat(id: string, userId?: string): Promise<Beat> {
+    // Check if beat belongs to user if userId is provided
+    if (userId) {
+      const existingBeat = await prisma.beat.findUnique({
+        where: { id },
+        select: { userId: true }
+      })
+      
+      if (!existingBeat || existingBeat.userId !== userId) {
+        throw new Error('Beat not found or access denied')
+      }
+    }
+    
     const deletedBeat = await prisma.beat.update({
       where: { id },
       data: { isActive: false }
