@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 
@@ -10,7 +11,7 @@ const errorMessages: Record<string, string> = {
   Default: 'Une erreur inattendue s\'est produite.'
 }
 
-export default function AuthErrorPage() {
+function AuthErrorContent() {
   const searchParams = useSearchParams()
   const error = searchParams?.get('error')
 
@@ -64,6 +65,31 @@ export default function AuthErrorPage() {
         )}
       </div>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 text-gray-400">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
+          </div>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            Chargement...
+          </h2>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AuthErrorContent />
+    </Suspense>
   )
 }
 
