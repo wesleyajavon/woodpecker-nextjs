@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Edit, Trash2, Eye, Play, Pause, Star, Lock } from 'lucide-react';
+import Link from 'next/link';
 import { Beat } from '@/types/beat';
 
 interface BeatManagerProps {
@@ -254,13 +255,13 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
                 </button>
 
                 {/* Bouton voir */}
-                <button
-                  onClick={() => setSelectedBeat(beat)}
+                <Link
+                  href={`/admin/beats/${beat.id}`}
                   className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors"
                   title="Voir les détails"
                 >
                   <Eye className="w-4 h-4" />
-                </button>
+                </Link>
 
                 {/* Bouton modifier */}
                 <button

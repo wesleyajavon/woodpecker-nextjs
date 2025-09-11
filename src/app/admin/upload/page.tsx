@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { Upload, Music, Settings, BarChart3, Plus } from 'lucide-react';
 import BeatUpload from '@/components/BeatUpload';
 import BeatManager from '@/components/BeatManager';
@@ -191,10 +192,13 @@ export default function AdminUploadPage() {
             transition={{ delay: 0.8 }}
             className="mt-16 text-center"
           >
-            <div className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-white/30">
+            <Link 
+              href="/"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-white/30"
+            >
               <Settings className="w-5 h-5" />
               <span>Retour à la page principale</span>
-            </div>
+            </Link>
           </motion.div>
         </div>
       </div>

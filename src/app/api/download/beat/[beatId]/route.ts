@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CloudinaryService } from '@/lib/cloudinary'
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { isUserAdmin } from '@/lib/roleUtils'
 
 interface RouteParams {
   params: Promise<{
@@ -14,8 +17,71 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { searchParams } = new URL(request.url)
     const orderId = searchParams.get('orderId')
     const customerEmail = searchParams.get('customerEmail')
-    const type = searchParams.get('type') || 'master' // 'master' ou 'stems'
+    const type = searchParams.get('type') || 'master' // 'preview' | 'master' | 'stems'
+    const adminAccess = searchParams.get('admin') === 'true'
 
+    // Mode admin: accès direct aux fichiers sans commande
+    if (adminAccess) {
+      const session = await getServerSession(authOptions)
+      if (!session?.user?.email || !(await isUserAdmin(session.user.email))) {
+        return NextResponse.json({ error: 'Accès administrateur requis' }, { status: 403 })
+      }
+
+      // Récupérer le beat
+      const beat = await prisma.beat.findUnique({ where: { id: beatId } })
+      if (!beat) {
+        return NextResponse.json({ error: 'Beat non trouvé' }, { status: 404 })
+      }
+
+      // Extraction des public IDs depuis les URLs Cloudinary
+      const extractPublicId = (url: string): string | null => {
+        const match = url.match(/\/v\d+\/(.+)\.(mp3|wav|zip)$/)
+        return match ? match[1] : null
+      }
+
+      let downloadUrl: string | null = null
+      let filename: string
+
+      if (type === 'preview') {
+        const previewPublicId = beat.previewUrl ? extractPublicId(beat.previewUrl) : null
+        if (!previewPublicId) {
+          return NextResponse.json({ error: 'Preview indisponible' }, { status: 404 })
+        }
+        downloadUrl = CloudinaryService.generateSignedUrl(previewPublicId, 30, {
+          format: 'mp3',
+          quality: 'auto:low'
+        }, 'video')
+        filename = `${beat.title}_preview.mp3`
+      } else if (type === 'stems') {
+        const stemsPublicId = beat.stemsUrl ? extractPublicId(beat.stemsUrl) : null
+        if (!stemsPublicId) {
+          return NextResponse.json({ error: 'Stems indisponibles' }, { status: 404 })
+        }
+        downloadUrl = CloudinaryService.generateSignedUrl(stemsPublicId, 30, {
+          format: 'zip',
+          quality: 'auto:best'
+        }, 'raw')
+        filename = `${beat.title}_stems.zip`
+      } else {
+        const masterPublicId = beat.fullUrl ? extractPublicId(beat.fullUrl) : null
+        if (!masterPublicId) {
+          return NextResponse.json({ error: 'Master indisponible' }, { status: 404 })
+        }
+        downloadUrl = CloudinaryService.generateSignedUrl(masterPublicId, 30, {
+          format: 'wav',
+          quality: 'auto:best'
+        }, 'video')
+        filename = `${beat.title}_master.wav`
+      }
+
+      const response = NextResponse.redirect(downloadUrl)
+      response.headers.set('Content-Disposition', `attachment; filename="${filename}"`)
+      response.headers.set('Content-Type',
+        type === 'stems' ? 'application/zip' : type === 'preview' ? 'audio/mpeg' : 'audio/wav')
+      return response
+    }
+
+    // Mode client: nécessite une commande valide
     if (!beatId || !orderId || !customerEmail) {
       return NextResponse.json(
         { error: 'Beat ID, Order ID et email client requis' },
@@ -84,6 +150,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         quality: 'auto:best'
       }, 'raw')
       filename = `${order.beat.title}_stems.zip`
+    } else if (type === 'preview' && order.beat.previewUrl) {
+      const previewPublicId = extractPublicId(order.beat.previewUrl)
+      if (!previewPublicId) {
+        return NextResponse.json(
+          { error: 'Preview indisponible' },
+          { status: 404 }
+        )
+      }
+      downloadUrl = CloudinaryService.generateSignedUrl(previewPublicId, 30, {
+        format: 'mp3',
+        quality: 'auto:low'
+      }, 'video')
+      filename = `${order.beat.title}_preview.mp3`
     } else {
       downloadUrl = CloudinaryService.generateSignedUrl(masterPublicId, 30, {
         format: 'wav',
@@ -97,7 +176,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     
     // Ajout des headers pour forcer le téléchargement
     response.headers.set('Content-Disposition', `attachment; filename="${filename}"`)
-    response.headers.set('Content-Type', type === 'stems' ? 'application/zip' : 'audio/wav')
+    response.headers.set('Content-Type', type === 'stems' ? 'application/zip' : type === 'preview' ? 'audio/mpeg' : 'audio/wav')
     
     return response
 

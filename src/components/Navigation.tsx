@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Search, User, ShoppingCart, Music, Sparkles } from 'lucide-react';
+import { Menu, X, Search, User, ShoppingCart, Music, Sparkles, Upload } from 'lucide-react';
 import AuthButton from './AuthButton';
 import UserMenu from './UserMenu';
 
@@ -21,11 +21,10 @@ const Navigation = () => {
 
   const navItems = [
     { name: 'Beats', href: '/beats', icon: Music },
-    { name: 'Collections', href: '/collections', icon: Sparkles },
-    { name: 'Kits', href: '/kits', icon: Music },
     { name: 'Videos', href: '/videos', icon: Sparkles },
     { name: 'Services', href: '/services', icon: Music },
     { name: 'Contact', href: '/contact', icon: Sparkles },
+    { name: 'Admin', href: '/admin/upload', icon: Upload },
   ];
 
   return (
