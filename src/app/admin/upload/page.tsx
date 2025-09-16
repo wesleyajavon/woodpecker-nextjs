@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Upload, Music, Settings, BarChart3, Plus } from 'lucide-react';
 import BeatUpload from '@/components/BeatUpload';
 import BeatManager from '@/components/BeatManager';
+import AdminStats from '@/components/AdminStats';
 import AdminRoute from '@/components/AdminRoute';
 import { Beat } from '@/types/beat';
 
@@ -155,24 +156,7 @@ export default function AdminUploadPage() {
                   Statistiques
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
-                    <div className="text-3xl font-bold text-purple-400 mb-2">0</div>
-                    <div className="text-gray-300">Total Beats</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-2">0</div>
-                    <div className="text-gray-300">Total Commandes</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
-                    <div className="text-3xl font-bold text-green-400 mb-2">0€</div>
-                    <div className="text-gray-300">Chiffre d&apos;affaires</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center">
-                    <div className="text-3xl font-bold text-yellow-400 mb-2">0</div>
-                    <div className="text-gray-300">Utilisateurs</div>
-                  </div>
-                </div>
+                <AdminStats />
 
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
                   <h3 className="text-xl font-semibold text-white mb-4">Graphiques</h3>

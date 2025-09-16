@@ -87,10 +87,14 @@ export class BeatService {
     page: number = 1,
     limit: number = 12,
     userId?: string,
-    isAdmin: boolean = false
+    isAdmin: boolean = false,
+    includeInactive: boolean = false
   ): Promise<{ beats: Beat[]; total: number; totalPages: number }> {
-    const where: BeatWhereClause = {
-      isActive: true
+    const where: BeatWhereClause = {}
+    
+    // Only filter by isActive if not including inactive beats
+    if (!includeInactive) {
+      where.isActive = true
     }
 
     // Filter by user only if provided AND user is admin

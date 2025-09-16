@@ -29,15 +29,15 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
   const fetchBeats = async () => {
     try {
       setLoading(true);
-      // Utiliser l'API admin pour récupérer uniquement les beats de l'admin connecté
-      const response = await fetch('/api/admin/beats?limit=100');
-      
+      // Utiliser l'API admin pour récupérer tous les beats de l'admin connecté (actifs et inactifs)
+      const response = await fetch('/api/admin/beats?limit=100&includeInactive=true');
+
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des beats');
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         setBeats(result.data);
       } else {
@@ -54,7 +54,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
   const filteredBeats = beats.filter(beat => {
     const matchesGenre = filterGenre === 'Tous' || beat.genre === filterGenre;
     const matchesSearch = beat.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         beat.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      beat.description?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesGenre && matchesSearch;
   });
 
@@ -104,7 +104,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
       });
 
       if (response.ok) {
-        setBeats(prev => prev.map(beat => 
+        setBeats(prev => prev.map(beat =>
           beat.id === beatId ? { ...beat, isActive: !currentStatus } : beat
         ));
         onToggleStatus?.(beatId, !currentStatus);
@@ -203,11 +203,10 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
                       VEDETTE
                     </span>
                   )}
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    beat.isActive 
+                  <span className={`text-xs px-2 py-1 rounded-full ${beat.isActive
                       ? 'bg-green-500/20 text-green-300 border border-green-500/30'
                       : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}>
+                    }`}>
                     {beat.isActive ? 'Actif' : 'Inactif'}
                   </span>
                 </div>
@@ -242,7 +241,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
               {/* Actions */}
               <div className="flex items-center gap-2 ml-6">
-                {/* Bouton play/pause */}
+                {/* Bouton play/pause
                 <button
                   onClick={() => togglePlay(beat.id)}
                   className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
@@ -252,47 +251,41 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
                   ) : (
                     <Play className="w-4 h-4" />
                   )}
-                </button>
+                </button> */}
 
-                {/* Bouton voir */}
-                <Link
-                  href={`/admin/beats/${beat.id}`}
-                  className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors"
-                  title="Voir les détails"
-                >
-                  <Eye className="w-4 h-4" />
-                </Link>
+
+
 
                 {/* Bouton modifier */}
-                <button
-                  onClick={() => onEdit?.(beat)}
+
+                <Link
+                  href={`/admin/beats/${beat.id}`}
                   className="p-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors"
-                  title="Modifier"
+                  title="Voir les détails"
                 >
                   <Edit className="w-4 h-4" />
-                </button>
+                </Link>
 
                 {/* Bouton statut */}
                 <button
                   onClick={() => handleToggleStatus(beat.id, beat.isActive)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    beat.isActive
+                  className={`p-2 rounded-lg transition-colors ${beat.isActive
                       ? 'bg-red-500/20 hover:bg-red-500/30 text-red-300'
                       : 'bg-green-500/20 hover:bg-green-500/30 text-green-300'
-                  }`}
+                    }`}
                   title={beat.isActive ? 'Désactiver' : 'Activer'}
                 >
                   {beat.isActive ? <Lock className="w-4 h-4" /> : <Star className="w-4 h-4" />}
                 </button>
 
-                {/* Bouton supprimer */}
+                {/* Bouton supprimer
                 <button
                   onClick={() => handleDelete(beat.id)}
                   className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-colors"
                   title="Supprimer"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </button> */}
               </div>
             </div>
           </motion.div>
@@ -303,7 +296,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
       {filteredBeats.length === 0 && (
         <div className="text-center py-16">
           <div className="text-gray-400 text-lg mb-4">
-            {searchTerm || filterGenre !== 'Tous' 
+            {searchTerm || filterGenre !== 'Tous'
               ? 'Aucun beat trouvé avec ces critères'
               : 'Aucun beat disponible'
             }
