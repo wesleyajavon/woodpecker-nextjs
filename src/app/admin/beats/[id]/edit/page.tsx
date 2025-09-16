@@ -376,7 +376,7 @@ export default function BeatEditPage() {
                                         ) : (
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <Upload className="w-5 h-5" />
-                                                <span>Remplacer l'archive stems</span>
+                                                <span>Remplacer l&apos;archive stems</span>
                                             </div>
                                         )}
                                     </label>
@@ -445,7 +445,7 @@ export default function BeatEditPage() {
                         {/* Section des progrès et actions */}
                         <div className="space-y-6">
                             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                                <h3 className="text-xl font-semibold text-white mb-4">Progrès d'upload</h3>
+                                <h3 className="text-xl font-semibold text-white mb-4">Progrès d&apos;upload</h3>
 
                                 <div className="space-y-4">
                                     {uploadedFiles.preview && (

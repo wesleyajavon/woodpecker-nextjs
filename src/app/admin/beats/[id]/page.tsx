@@ -532,7 +532,7 @@ export default function BeatManagementPage() {
                   
                   {isEditing && <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
                     <p className="text-yellow-300 text-sm">
-                      💡 Le prix ne peut pas être modifié ici. Contactez l'administrateur pour changer le prix.
+                      💡 Le prix ne peut pas être modifié ici. Contactez l&apos;administrateur pour changer le prix.
                     </p>
                   </div>}
                 </div>
