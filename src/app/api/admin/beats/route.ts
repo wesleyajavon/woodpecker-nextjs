@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
     const priceMax = searchParams.get('priceMax') ? parseFloat(searchParams.get('priceMax')!) : undefined
     const isExclusive = searchParams.get('isExclusive') ? searchParams.get('isExclusive') === 'true' : undefined
     const featured = searchParams.get('featured') ? searchParams.get('featured') === 'true' : undefined
+    const includeInactive = searchParams.get('includeInactive') === 'true'
     const sortField = (searchParams.get('sortField') || 'createdAt') as keyof BeatSortOptions['field']
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc'
 
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Récupération des beats de l'admin (filtrés par utilisateur)
-    const result = await BeatService.getBeats(filters, sort, page, limit, userId, true)
+    const result = await BeatService.getBeats(filters, sort, page, limit, userId, true, includeInactive)
 
     return NextResponse.json({
       success: true,

@@ -7,6 +7,7 @@ import { Upload, Music, Settings, BarChart3, Plus } from 'lucide-react';
 import BeatUpload from '@/components/BeatUpload';
 import BeatManager from '@/components/BeatManager';
 import AdminStats from '@/components/AdminStats';
+import AdminStatsGraphics from '@/components/AdminStatsGraphics';
 import AdminRoute from '@/components/AdminRoute';
 import { Beat } from '@/types/beat';
 
@@ -158,13 +159,7 @@ export default function AdminUploadPage() {
 
                 <AdminStats />
 
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
-                  <h3 className="text-xl font-semibold text-white mb-4">Graphiques</h3>
-                  <div className="text-center py-12 text-gray-400">
-                    <div className="text-4xl mb-2">📊</div>
-                    <p>Graphiques et visualisations à venir</p>
-                  </div>
-                </div>
+                <AdminStatsGraphics />
               </div>
             )}
           </motion.div>
