@@ -167,12 +167,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         }
       }
 
-      if (existingBeat.artworkUrl) {
-        const artworkPublicId = extractPublicId(existingBeat.artworkUrl);
-        if (artworkPublicId) {
-          await CloudinaryService.deleteResource(artworkPublicId, 'image');
-        }
-      }
+      // if (existingBeat.artworkUrl) {
+      //   const artworkPublicId = extractPublicId(existingBeat.artworkUrl);
+      //   if (artworkPublicId) {
+      //     await CloudinaryService.deleteResource(artworkPublicId, 'image');
+      //   }
+      // }
     } catch (cloudinaryError) {
       console.error('Erreur lors de la suppression des fichiers Cloudinary:', cloudinaryError);
       // On continue même si la suppression Cloudinary échoue
