@@ -11,7 +11,7 @@ interface AddToCartButtonProps {
   beat: Beat
   className?: string
   size?: 'sm' | 'md' | 'lg'
-  variant?: 'default' | 'outline' | 'ghost'
+  variant?: 'primary' | 'outline' | 'ghost' | 'secondary' | undefined
   showIcon?: boolean
   showText?: boolean
 }
@@ -20,7 +20,7 @@ export default function AddToCartButton({
   beat, 
   className = '', 
   size = 'md',
-  variant = 'default',
+  variant = 'primary',
   showIcon = true,
   showText = true
 }: AddToCartButtonProps) {
@@ -75,7 +75,7 @@ export default function AddToCartButton({
       className={`${getSizeClasses()} ${className} ${
         isAdded 
           ? 'bg-green-500 hover:bg-green-600 text-white' 
-          : variant === 'default' 
+          : variant === 'primary' 
             ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white' 
             : ''
       } transition-all duration-300`}
