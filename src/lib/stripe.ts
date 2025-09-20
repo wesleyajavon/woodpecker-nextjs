@@ -339,3 +339,38 @@ export async function createCheckoutSession(priceId: string, successUrl: string,
     throw error
   }
 }
+
+// Helper function to create a multi-item checkout session
+export async function createMultiItemCheckoutSession(
+  items: Array<{ priceId: string; quantity: number; beatTitle: string }>,
+  successUrl: string,
+  cancelUrl: string
+) {
+  try {
+    const lineItems = items.map(item => ({
+      price: item.priceId,
+      quantity: item.quantity,
+    }))
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        item_count: items.length.toString(),
+        items: JSON.stringify(items.map(item => ({
+          priceId: item.priceId,
+          quantity: item.quantity,
+          title: item.beatTitle
+        }))),
+      },
+    })
+
+    return session
+  } catch (error) {
+    console.error('❌ Error creating multi-item checkout session:', error)
+    throw error
+  }
+}

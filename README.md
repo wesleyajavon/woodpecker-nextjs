@@ -36,6 +36,14 @@ Woodpecker est un beatmaker talentueux qui crée des instrumentaux uniques pour 
 - **Système de commandes** - Gestion complète des achats
 - **Statistiques et analytics** - Suivi des performances
 
+### **Système de panier et commandes** 🛒
+- **Panier multi-articles** - Ajout, suppression, modification des quantités
+- **Persistence locale** - Sauvegarde automatique dans localStorage
+- **Checkout Stripe** - Paiement sécurisé pour un ou plusieurs beats
+- **Commandes multi-articles** - Gestion des commandes complexes
+- **Téléchargements sécurisés** - Liens individuels pour chaque beat acheté
+- **Interface moderne** - Design responsive avec animations fluides
+
 ### **Technologies**
 - **Next.js 14** avec App Router
 - **TypeScript** pour la sécurité des types
@@ -155,6 +163,18 @@ src/
 
 **Documentation complète** : Voir `API.md` pour plus de détails et d'exemples.
 
+## 📚 **Documentation du système de panier**
+
+### **Documentation technique**
+- `CART_SYSTEM_DOCUMENTATION.md` - Documentation complète du système de panier
+- `CART_QUICK_REFERENCE.md` - Guide de référence rapide pour les développeurs
+- `CART_ARCHITECTURE.md` - Architecture technique détaillée
+
+### **Pages de test**
+- `/cart-test` - Interface de test complète pour le système de panier
+- `/cart` - Page de panier principale
+- `/success` - Page de confirmation de commande avec téléchargements
+
 ## ☁️ **Stockage des fichiers**
 
 ### **Configuration Cloudinary**
@@ -245,11 +265,16 @@ woodpecker-beats/
 
 ## 🔮 **Prochaines étapes**
 
+### **Fonctionnalités implémentées** ✅
+- [x] **Système de panier d'achat** - Multi-item cart avec persistence
+- [x] **Système de paiement** - Intégration Stripe complète
+- [x] **Gestion des commandes** - Single et multi-item orders
+- [x] **Système de téléchargement** - Liens sécurisés avec expiration
+- [x] **Interface utilisateur moderne** - Design responsive et animations
+
 ### **Fonctionnalités à ajouter**
 - [ ] **Lecteur audio intégré** pour prévisualisation
 - [ ] **Système d'authentification** utilisateur
-- [ ] **Panier d'achat** et gestion des commandes
-- [ ] **Système de paiement** (Stripe, PayPal)
 - [ ] **Gestion des licences** (exclusive, non-exclusive)
 - [ ] **Upload de beats** pour Woodpecker
 - [ ] **Système de notation et avis** clients

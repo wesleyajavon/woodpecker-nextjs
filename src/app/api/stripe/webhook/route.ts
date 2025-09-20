@@ -3,6 +3,9 @@ import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
 import { OrderService } from '@/services/orderService'
 import { BeatService } from '@/services/beatService'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,59 +57,141 @@ export async function POST(request: NextRequest) {
             expand: ['line_items', 'line_items.data.price.product']
           })
 
-          if (!fullSession.line_items?.data[0]) {
+          if (!fullSession.line_items?.data || fullSession.line_items.data.length === 0) {
             console.error('No line items found in session:', session.id)
             break
           }
 
-          const lineItem = fullSession.line_items.data[0]
-          const price = lineItem.price
-          const product = price?.product
+          const lineItems = fullSession.line_items.data
+          const isMultiItem = lineItems.length > 1
 
-          if (!product || typeof product === 'string' || product.deleted) {
-            console.error('Invalid or deleted product data in session:', session.id)
-            break
+          if (isMultiItem) {
+            // Handle multi-item order
+            console.log('Processing multi-item order with', lineItems.length, 'items')
+            
+            const orderItems = []
+            let totalAmount = 0
+
+            for (const lineItem of lineItems) {
+              const price = lineItem.price
+              const product = price?.product
+
+              if (!product || typeof product === 'string' || product.deleted) {
+                console.error('Invalid or deleted product data in line item:', lineItem.id)
+                continue
+              }
+
+              const beatId = product.metadata?.beat_id
+              if (!beatId) {
+                console.error('No beat_id found in product metadata:', product.id)
+                continue
+              }
+
+              const beat = await BeatService.getBeatById(beatId)
+              if (!beat) {
+                console.error('Beat not found:', beatId)
+                continue
+              }
+
+              const quantity = lineItem.quantity || 1
+              const unitPrice = (price.unit_amount || 0) / 100
+              const itemTotal = unitPrice * quantity
+              totalAmount += itemTotal
+
+              orderItems.push({
+                beatId,
+                quantity,
+                unitPrice,
+                totalPrice: itemTotal
+              })
+            }
+
+            if (orderItems.length === 0) {
+              console.error('No valid items found for multi-item order')
+              break
+            }
+
+            // Create multi-item order
+            const multiOrder = await prisma.multiItemOrder.create({
+              data: {
+                customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
+                customerName: fullSession.customer_details?.name || undefined,
+                customerPhone: fullSession.customer_details?.phone || undefined,
+                totalAmount,
+                currency: fullSession.currency?.toUpperCase() || 'EUR',
+                status: 'PAID',
+                paymentMethod: 'card',
+                paymentId: session.id,
+                sessionId: session.id,
+                paidAt: new Date(),
+                licenseType: 'NON_EXCLUSIVE',
+                usageRights: ['Non-exclusive rights', 'Commercial use', 'Streaming'],
+                items: {
+                  create: orderItems.map(item => ({
+                    beatId: item.beatId,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice,
+                    totalPrice: item.totalPrice
+                  }))
+                }
+              }
+            })
+
+            console.log('Multi-item order created successfully:', multiOrder.id)
+
+          } else {
+            // Handle single-item order (existing logic)
+            const lineItem = lineItems[0]
+            const price = lineItem.price
+            const product = price?.product
+
+            if (!product || typeof product === 'string' || product.deleted) {
+              console.error('Invalid or deleted product data in session:', session.id)
+              break
+            }
+
+            // Get the beat ID from the product metadata
+            console.log('Product metadata:', product.metadata)
+            const beatId = product.metadata?.beat_id
+            if (!beatId) {
+              console.error('No beat_id found in product metadata:', product.id)
+              console.error('Available metadata keys:', Object.keys(product.metadata || {}))
+              break
+            }
+            
+            console.log('Found beat_id:', beatId)
+
+            // Get the beat details
+            const beat = await BeatService.getBeatById(beatId)
+            if (!beat) {
+              console.error('Beat not found:', beatId)
+              break
+            }
+
+            // Create the order in the database
+            const orderData = {
+              customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
+              customerName: fullSession.customer_details?.name || undefined,
+              customerPhone: fullSession.customer_details?.phone || undefined,
+              totalAmount: (fullSession.amount_total || 0) / 100, // Convert from cents
+              currency: fullSession.currency?.toUpperCase() || 'EUR',
+              paymentMethod: 'card',
+              paymentId: session.id,
+              licenseType: beat.isExclusive ? 'EXCLUSIVE' as const : 'NON_EXCLUSIVE' as const,
+              usageRights: beat.isExclusive 
+                ? ['Exclusive rights', 'Commercial use', 'Streaming', 'Distribution']
+                : ['Non-exclusive rights', 'Commercial use', 'Streaming'],
+              beatId: beatId
+            }
+
+            const order = await OrderService.createOrder(orderData)
+            console.log('Order created successfully:', order.id)
           }
-
-          // Get the beat ID from the product metadata
-          console.log('Product metadata:', product.metadata)
-          const beatId = product.metadata?.beat_id
-          if (!beatId) {
-            console.error('No beat_id found in product metadata:', product.id)
-            console.error('Available metadata keys:', Object.keys(product.metadata || {}))
-            break
-          }
-          
-          console.log('Found beat_id:', beatId)
-
-          // Get the beat details
-          const beat = await BeatService.getBeatById(beatId)
-          if (!beat) {
-            console.error('Beat not found:', beatId)
-            break
-          }
-
-          // Create the order in the database
-          const orderData = {
-            customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
-            customerName: fullSession.customer_details?.name || undefined,
-            customerPhone: fullSession.customer_details?.phone || undefined,
-            totalAmount: (fullSession.amount_total || 0) / 100, // Convert from cents
-            currency: fullSession.currency?.toUpperCase() || 'EUR',
-            paymentMethod: 'card',
-            paymentId: session.id,
-            licenseType: beat.isExclusive ? 'EXCLUSIVE' as const : 'NON_EXCLUSIVE' as const,
-            usageRights: beat.isExclusive 
-              ? ['Exclusive rights', 'Commercial use', 'Streaming', 'Distribution']
-              : ['Non-exclusive rights', 'Commercial use', 'Streaming'],
-            beatId: beatId
-          }
-
-          const order = await OrderService.createOrder(orderData)
-          console.log('Order created successfully:', order.id)
 
         } catch (error) {
           console.error('Error processing checkout session:', error)
+        } finally {
+          await prisma.$disconnect()
         }
         
         break

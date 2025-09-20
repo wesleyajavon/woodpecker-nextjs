@@ -6,10 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Search, User, ShoppingCart, Music, Sparkles, Upload } from 'lucide-react';
 import AuthButton from './AuthButton';
 import UserMenu from './UserMenu';
+import { useCartCount } from '@/hooks/useCart';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const cartCount = useCartCount();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -113,21 +115,25 @@ const Navigation = () => {
 
 
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <motion.div
-                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 1, type: "spring" }}
+            <Link href="/cart">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
               >
-                3
-              </motion.div>
-            </motion.button>
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <motion.div
+                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </motion.div>
+                )}
+              </motion.button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -177,6 +183,30 @@ const Navigation = () => {
                     </Link>
                   </motion.div>
                 ))}
+                
+                {/* Cart Link for Mobile */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: navItems.length * 0.1 }}
+                >
+                  <Link
+                    href="/cart"
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${scrolled
+                        ? 'text-gray-700 hover:text-purple-600 hover:bg-purple-50'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    <span>Cart</span>
+                    {cartCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 ml-auto">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    )}
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
           )}

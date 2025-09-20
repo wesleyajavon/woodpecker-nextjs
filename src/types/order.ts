@@ -1,3 +1,5 @@
+import { Beat } from './beat'
+
 export type OrderStatus = 'PENDING' | 'PAID' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED'
 export type LicenseType = 'NON_EXCLUSIVE' | 'EXCLUSIVE' | 'CUSTOM'
 
@@ -20,6 +22,37 @@ export interface Order {
   beat: Beat
 }
 
+export interface MultiItemOrder {
+  id: string
+  customerEmail: string
+  customerName?: string | null
+  customerPhone?: string | null
+  totalAmount: number
+  currency: string
+  status: OrderStatus
+  paymentMethod?: string | null
+  paymentId?: string | null
+  paidAt?: Date | null
+  licenseType: LicenseType
+  usageRights: string[]
+  createdAt: Date
+  updatedAt: Date
+  items: OrderItem[]
+  sessionId?: string
+}
+
+export interface OrderItem {
+  id: string
+  orderId: string
+  beatId: string
+  beat: Beat
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface CreateOrderInput {
   customerEmail: string
   customerName?: string
@@ -31,6 +64,24 @@ export interface CreateOrderInput {
   licenseType?: LicenseType
   usageRights?: string[]
   beatId: string
+}
+
+export interface CreateMultiItemOrderInput {
+  customerEmail: string
+  customerName?: string
+  customerPhone?: string
+  totalAmount: number
+  currency?: string
+  paymentMethod?: string
+  paymentId?: string
+  licenseType?: LicenseType
+  usageRights?: string[]
+  items: Array<{
+    beatId: string
+    quantity: number
+    unitPrice: number
+  }>
+  sessionId?: string
 }
 
 export interface UpdateOrderInput {
@@ -56,12 +107,4 @@ export interface OrderFilters {
 export interface OrderSortOptions {
   field: 'createdAt' | 'totalAmount' | 'status' | 'customerEmail'
   order: 'asc' | 'desc'
-}
-
-// Import Beat type to avoid circular dependencies
-interface Beat {
-  id: string
-  title: string
-  genre: string
-  price: number
 }

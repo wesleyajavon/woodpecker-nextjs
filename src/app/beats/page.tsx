@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Search, Filter, Grid3X3, List, Play, Pause, ShoppingCart, Star } from 'lucide-react';
 import { useBeats } from '@/hooks/useBeats';
 import CheckoutButton from '@/components/CheckoutButton';
+import AddToCartButton from '@/components/AddToCartButton';
 
 export default function BeatsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -296,13 +297,21 @@ export default function BeatsPage() {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          {/* <span className="text-2xl font-bold text-white">{formatPrice(beat.price)}</span> */}
-                          <CheckoutButton
-                            priceId={beat.stripePriceId || beat.id} // Use Stripe price ID if available, fallback to beat ID
-                            beatTitle={beat.title}
-                            price={beat.price}
-                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-                          />
+                          {/* <span className="text-2xl font-bold text-white">€{beat.price.toFixed(2)}</span> */}
+                          <div className="flex items-center gap-2">
+                            <AddToCartButton
+                              beat={beat}
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30"
+                            />
+                            <CheckoutButton
+                              priceId={beat.stripePriceId || beat.id}
+                              beatTitle={beat.title}
+                              price={beat.price}
+                              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                            />
+                          </div>
                         </div>
                       </div>
                     </>
@@ -349,17 +358,25 @@ export default function BeatsPage() {
 
                           <div className="flex items-center gap-4 flex-shrink-0">
                             <div className="text-right">
-                              {/* <span className="text-2xl font-bold text-white">{formatPrice(beat.price)}</span> */}
+                              {/* <span className="text-2xl font-bold text-white">€{beat.price.toFixed(2)}</span> */}
                               {beat.isExclusive && (
                                 <div className="text-yellow-500 text-xs font-bold mt-1">EXCLUSIF</div>
                               )}
                             </div>
-                            <CheckoutButton
-                              priceId={beat.stripePriceId || beat.id} // Use Stripe price ID if available, fallback to beat ID
-                              beatTitle={beat.title}
-                              price={beat.price}
-                              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
-                            />
+                            <div className="flex items-center gap-2">
+                              <AddToCartButton
+                                beat={beat}
+                                size="md"
+                                variant="outline"
+                                className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30"
+                              />
+                              <CheckoutButton
+                                priceId={beat.stripePriceId || beat.id}
+                                beatTitle={beat.title}
+                                price={beat.price}
+                                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>

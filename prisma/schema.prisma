@@ -45,6 +45,7 @@ model Beat {
   
   // Relations
   orders      Order[]
+  orderItems  OrderItem[]
   userId      String?  // Optional user relation
   user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   
@@ -97,6 +98,69 @@ model Order {
   @@index([createdAt])
   @@index([beatId])
   @@index([userId])
+}
+
+model MultiItemOrder {
+  id          String   @id @default(cuid())
+  
+  // Customer information
+  customerEmail String
+  customerName  String?
+  customerPhone String?
+  
+  // Order details
+  totalAmount   Decimal  @db.Decimal(10, 2)
+  currency      String   @default("EUR")
+  status        OrderStatus @default(PENDING)
+  
+  // Payment information
+  paymentMethod String?
+  paymentId     String?  // External payment provider ID
+  paidAt        DateTime?
+  sessionId     String?  // Stripe session ID for multi-item orders
+  
+  // License information
+  licenseType   LicenseType @default(NON_EXCLUSIVE)
+  usageRights  String[]    // Array of usage rights
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  items        OrderItem[]
+  userId       String?  // Optional user relation
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Indexes
+  @@index([customerEmail])
+  @@index([status])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@index([userId])
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  
+  // Item details
+  quantity    Int
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  totalPrice  Decimal  @db.Decimal(10, 2)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  orderId     String
+  order       MultiItemOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  beatId      String
+  beat        Beat     @relation(fields: [beatId], references: [id], onDelete: Cascade)
+  
+  // Indexes
+  @@index([orderId])
+  @@index([beatId])
 }
 
 enum OrderStatus {
@@ -154,6 +218,7 @@ model User {
   accounts Account[]
   sessions Session[]
   orders   Order[]
+  multiItemOrders MultiItemOrder[]
   beats    Beat[]
 }
 

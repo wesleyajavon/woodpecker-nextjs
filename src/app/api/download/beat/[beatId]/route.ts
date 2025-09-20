@@ -90,7 +90,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Vérification que la commande existe et appartient au client
-    const order = await prisma.order.findFirst({
+    // First try single order
+    let order = await prisma.order.findFirst({
       where: {
         id: orderId,
         customerEmail: customerEmail,
@@ -100,6 +101,35 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         beat: true
       }
     })
+
+    // If not found, try multi-item order
+    if (!order) {
+      const multiOrder = await prisma.multiItemOrder.findFirst({
+        where: {
+          id: orderId,
+          customerEmail: customerEmail,
+        },
+        include: {
+          items: {
+            include: {
+              beat: true
+            }
+          }
+        }
+      })
+
+      if (multiOrder) {
+        // Find the specific beat in the multi-item order
+        const orderItem = multiOrder.items.find(item => item.beatId === beatId)
+        if (orderItem) {
+          order = {
+            id: multiOrder.id,
+            customerEmail: multiOrder.customerEmail,
+            beat: orderItem.beat
+          } as any
+        }
+      }
+    }
 
     if (!order) {
       return NextResponse.json(
@@ -203,7 +233,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Vérification que la commande existe et appartient au client
-    const order = await prisma.order.findFirst({
+    // First try single order
+    let order = await prisma.order.findFirst({
       where: {
         id: orderId,
         customerEmail: customerEmail,
@@ -213,6 +244,35 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         beat: true
       }
     })
+
+    // If not found, try multi-item order
+    if (!order) {
+      const multiOrder = await prisma.multiItemOrder.findFirst({
+        where: {
+          id: orderId,
+          customerEmail: customerEmail,
+        },
+        include: {
+          items: {
+            include: {
+              beat: true
+            }
+          }
+        }
+      })
+
+      if (multiOrder) {
+        // Find the specific beat in the multi-item order
+        const orderItem = multiOrder.items.find(item => item.beatId === beatId)
+        if (orderItem) {
+          order = {
+            id: multiOrder.id,
+            customerEmail: multiOrder.customerEmail,
+            beat: orderItem.beat
+          } as any
+        }
+      }
+    }
 
     if (!order) {
       return NextResponse.json(

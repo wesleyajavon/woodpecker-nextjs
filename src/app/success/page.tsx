@@ -3,11 +3,26 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Order } from '@/types/order'
+import { motion } from 'framer-motion'
+import { Download, Music, Clock, Tag, Star } from 'lucide-react'
+import { Order, MultiItemOrder } from '@/types/order'
 
 interface DownloadUrls {
   master: string
   stems?: string
+  expiresAt: string
+}
+
+interface BeatDownloadUrls {
+  beatId: string
+  beatTitle: string
+  downloadUrls: DownloadUrls
+}
+
+interface MultiOrderDownloadData {
+  orderId: string
+  customerEmail: string
+  beats: BeatDownloadUrls[]
   expiresAt: string
 }
 
@@ -16,20 +31,38 @@ function SuccessContent() {
   const sessionId = searchParams?.get('session_id')
   const [isLoading, setIsLoading] = useState(true)
   const [orderDetails, setOrderDetails] = useState<Order | null>(null)
+  const [multiOrderDetails, setMultiOrderDetails] = useState<MultiItemOrder | null>(null)
   const [downloadUrls, setDownloadUrls] = useState<DownloadUrls | null>(null)
+  const [multiOrderDownloads, setMultiOrderDownloads] = useState<MultiOrderDownloadData | null>(null)
   const [isGeneratingDownload, setIsGeneratingDownload] = useState(false)
+  const [isMultiItemOrder, setIsMultiItemOrder] = useState(false)
 
   useEffect(() => {
     if (sessionId) {
-      // Fetch real order details from the database using the session ID
+      // Try to fetch multi-item order first, then fallback to single order
       const fetchOrderDetails = async () => {
         try {
+          // First try multi-item order
+          const multiResponse = await fetch(`/api/orders/multi-payment/${sessionId}`)
+          
+          if (multiResponse.ok) {
+            const multiResult = await multiResponse.json()
+            if (multiResult.success) {
+              setMultiOrderDetails(multiResult.data)
+              setIsMultiItemOrder(true)
+              setIsLoading(false)
+              return
+            }
+          }
+
+          // Fallback to single order
           const response = await fetch(`/api/orders/payment/${sessionId}`)
           
           if (response.ok) {
             const result = await response.json()
             if (result.success) {
               setOrderDetails(result.data)
+              setIsMultiItemOrder(false)
             } else {
               console.error('Failed to fetch order:', result.error)
             }
@@ -82,6 +115,38 @@ function SuccessContent() {
     }
   }
 
+  const generateMultiOrderDownloadUrls = async () => {
+    if (!multiOrderDetails) return
+
+    setIsGeneratingDownload(true)
+    try {
+      const response = await fetch(`/api/download/multi-order/${multiOrderDetails.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerEmail: multiOrderDetails.customerEmail
+        })
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success) {
+          setMultiOrderDownloads(result.data)
+        } else {
+          console.error('Failed to generate multi-order download URLs:', result.error)
+        }
+      } else {
+        console.error('Failed to generate multi-order download URLs')
+      }
+    } catch (error) {
+      console.error('Error generating multi-order download URLs:', error)
+    } finally {
+      setIsGeneratingDownload(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -121,7 +186,7 @@ function SuccessContent() {
     )
   }
 
-  if (!orderDetails) {
+  if (!orderDetails && !multiOrderDetails) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -158,115 +223,276 @@ function SuccessContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-        <div className="mb-6">
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-            <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-        </div>
-        
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          Paiement réussi !
-        </h1>
-        
-        <p className="text-gray-600 mb-6">
-          Merci pour votre achat ! Votre beat est maintenant disponible au téléchargement.
-        </p>
-        
-        {orderDetails && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-2">Détails de la commande</h3>
-            <div className="space-y-1 text-sm text-gray-600">
-              <p><span className="font-medium">ID de commande:</span> {orderDetails.id}</p>
-              <p><span className="font-medium">Beat:</span> {orderDetails.beat.title}</p>
-              <p><span className="font-medium">Montant:</span> €{orderDetails.totalAmount.toFixed(2)}</p>
-              <p><span className="font-medium">Statut:</span> {orderDetails.status}</p>
-              <p><span className="font-medium">Licence:</span> {orderDetails.licenseType}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Section de téléchargement */}
-        {orderDetails && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-xl overflow-hidden"
+        >
+          {/* Header */}
+          <div className="bg-gradient-to-r from-green-500 to-green-600 px-8 py-12 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-white mb-6"
+            >
+              <svg className="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Télécharger votre beat
-            </h3>
+            </motion.div>
             
-            {!downloadUrls ? (
-              <div className="text-center">
-                <p className="text-sm text-blue-700 mb-3">
-                  Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
-                </p>
-                <button
-                  onClick={generateDownloadUrls}
-                  disabled={isGeneratingDownload}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-sm text-blue-700">
-                  Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
-                </p>
+            <h1 className="text-3xl font-bold text-white mb-4">
+              Paiement réussi !
+            </h1>
+            
+            <p className="text-green-100 text-lg">
+              {isMultiItemOrder 
+                ? `Merci pour votre achat ! Vos ${multiOrderDetails?.items.length || 0} beats sont maintenant disponibles au téléchargement.`
+                : 'Merci pour votre achat ! Votre beat est maintenant disponible au téléchargement.'
+              }
+            </p>
+          </div>
+
+          {/* Order Details */}
+          <div className="p-8">
+            {isMultiItemOrder && multiOrderDetails ? (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Détails de la commande</h2>
                 
-                <div className="space-y-2">
-                  <a
-                    href={downloadUrls.master}
-                    download
-                    className="block w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors text-center"
-                  >
-                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3" />
-                    </svg>
-                    Télécharger le master (WAV)
-                  </a>
-                  
-                  {downloadUrls.stems && (
-                    <a
-                      href={downloadUrls.stems}
-                      download
-                      className="block w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors text-center"
-                    >
-                      <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3" />
-                      </svg>
-                      Télécharger les stems (ZIP)
-                    </a>
-                  )}
+                <div className="bg-gray-50 rounded-xl p-6 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-gray-700">ID de commande:</span>
+                      <p className="text-gray-900 font-mono">{multiOrderDetails.id}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Email:</span>
+                      <p className="text-gray-900">{multiOrderDetails.customerEmail}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Montant total:</span>
+                      <p className="text-gray-900 text-lg font-semibold">€{multiOrderDetails.totalAmount}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Statut:</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {multiOrderDetails.status}
+                      </span>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Beats List */}
+                <div className="space-y-4 mb-8">
+                  <h3 className="text-xl font-semibold text-gray-900">Beats achetés</h3>
+                  {multiOrderDetails.items.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900">{item.beat.title}</h4>
+                          <div className="flex items-center space-x-4 mt-1 text-sm text-gray-500">
+                            <span className="flex items-center">
+                              <Music className="h-4 w-4 mr-1" />
+                              {item.beat.genre}
+                            </span>
+                            <span>{(item.beat as any).bpm} BPM</span>
+                            <span>{(item.beat as any).key}</span>
+                            <span className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {(item.beat as any).duration}
+                            </span>
+                            {(item.beat as any).isExclusive && (
+                              <span className="flex items-center text-purple-600">
+                                <Tag className="h-4 w-4 mr-1" />
+                                Exclusive
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-gray-900">€{(item.unitPrice * item.quantity).toFixed(2)}</p>
+                          <p className="text-sm text-gray-500">€{item.unitPrice} × {item.quantity}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            ) : orderDetails && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Détails de la commande</h2>
                 
-                <p className="text-xs text-blue-600">
-                  ⏰ Expire le {new Date(downloadUrls.expiresAt).toLocaleString('fr-FR')}
-                </p>
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-gray-700">ID de commande:</span>
+                      <p className="text-gray-900 font-mono">{orderDetails.id}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Beat:</span>
+                      <p className="text-gray-900">{orderDetails.beat.title}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Montant:</span>
+                      <p className="text-gray-900 text-lg font-semibold">€{orderDetails.totalAmount.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Statut:</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {orderDetails.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
+
+            {/* Download Section */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+              <h3 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
+                <Download className="w-6 h-6 mr-2" />
+                Télécharger vos beats
+              </h3>
+              
+              {isMultiItemOrder ? (
+                // Multi-item downloads
+                !multiOrderDownloads ? (
+                  <div className="text-center">
+                    <p className="text-blue-700 mb-4">
+                      Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
+                    </p>
+                    <button
+                      onClick={generateMultiOrderDownloadUrls}
+                      disabled={isGeneratingDownload}
+                      className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                    >
+                      {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <p className="text-blue-700">
+                      Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
+                    </p>
+                    
+                    <div className="space-y-4">
+                      {multiOrderDownloads.beats.map((beatDownload, index) => (
+                        <motion.div
+                          key={beatDownload.beatId}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-white rounded-lg p-4 border border-blue-200"
+                        >
+                          <h4 className="font-semibold text-gray-900 mb-3">{beatDownload.beatTitle}</h4>
+                          
+                          <div className="space-y-2">
+                            <a
+                              href={beatDownload.downloadUrls.master}
+                              download
+                              className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-center font-medium"
+                            >
+                              <Download className="w-4 h-4 inline mr-2" />
+                              Télécharger le master (WAV)
+                            </a>
+                            
+                            {beatDownload.downloadUrls.stems && (
+                              <a
+                                href={beatDownload.downloadUrls.stems}
+                                download
+                                className="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors text-center font-medium"
+                              >
+                                <Download className="w-4 h-4 inline mr-2" />
+                                Télécharger les stems (ZIP)
+                              </a>
+                            )}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                    
+                    <p className="text-xs text-blue-600 text-center">
+                      ⏰ Expire le {new Date(multiOrderDownloads.expiresAt).toLocaleString('fr-FR')}
+                    </p>
+                  </div>
+                )
+              ) : (
+                // Single item downloads
+                !downloadUrls ? (
+                  <div className="text-center">
+                    <p className="text-blue-700 mb-4">
+                      Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
+                    </p>
+                    <button
+                      onClick={generateDownloadUrls}
+                      disabled={isGeneratingDownload}
+                      className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                    >
+                      {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-blue-700">
+                      Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
+                    </p>
+                    
+                    <div className="space-y-2">
+                      <a
+                        href={downloadUrls.master}
+                        download
+                        className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-center font-medium"
+                      >
+                        <Download className="w-4 h-4 inline mr-2" />
+                        Télécharger le master (WAV)
+                      </a>
+                      
+                      {downloadUrls.stems && (
+                        <a
+                          href={downloadUrls.stems}
+                          download
+                          className="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors text-center font-medium"
+                        >
+                          <Download className="w-4 h-4 inline mr-2" />
+                          Télécharger les stems (ZIP)
+                        </a>
+                      )}
+                    </div>
+                    
+                    <p className="text-xs text-blue-600 text-center">
+                      ⏰ Expire le {new Date(downloadUrls.expiresAt).toLocaleString('fr-FR')}
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link 
+                href="/beats"
+                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-center font-semibold"
+              >
+                Découvrir d&apos;autres beats
+              </Link>
+              
+              <Link 
+                href="/profile"
+                className="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors text-center font-semibold"
+              >
+                Aller au profil
+              </Link>
+            </div>
           </div>
-        )}
-        
-        <div className="space-y-3">
-          <Link 
-            href="/beats"
-            className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Découvrir d&apos;autres beats
-          </Link>
-          
-          <Link 
-            href="/profile"
-            className="block w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
-          >
-            Aller au profil
-          </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
   )
