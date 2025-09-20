@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Edit, Trash2, Eye, Play, Pause, Star, Lock } from 'lucide-react';
+import { Edit, Trash2, Eye, Play, Pause, Star, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Beat } from '@/types/beat';
 
@@ -20,11 +20,18 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
   const [filterGenre, setFilterGenre] = useState('Tous');
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Récupération des beats
   useEffect(() => {
     fetchBeats();
   }, []);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterGenre]);
 
   const fetchBeats = async () => {
     try {
@@ -57,6 +64,24 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
       beat.description?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesGenre && matchesSearch;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredBeats.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedBeats = filteredBeats.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+  };
 
   // Gestion de la lecture
   const togglePlay = (beatId: string) => {
@@ -173,6 +198,20 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
             ))}
           </select>
 
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value={5} className="bg-gray-800 text-white">5 par page</option>
+            <option value={10} className="bg-gray-800 text-white">10 par page</option>
+            <option value={25} className="bg-gray-800 text-white">25 par page</option>
+            <option value={50} className="bg-gray-800 text-white">50 par page</option>
+          </select>
+
           <div className="text-sm text-gray-300">
             {filteredBeats.length} beat{filteredBeats.length > 1 ? 's' : ''} trouvé{filteredBeats.length > 1 ? 's' : ''}
           </div>
@@ -181,7 +220,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
       {/* Liste des beats */}
       <div className="space-y-4">
-        {filteredBeats.map((beat) => (
+        {paginatedBeats.map((beat) => (
           <motion.div
             key={beat.id}
             initial={{ opacity: 0, y: 20 }}
@@ -291,6 +330,69 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
           </motion.div>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {filteredBeats.length > 0 && (
+        <div className="flex items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+          <div className="flex items-center gap-4">
+            <span className="text-gray-300 text-sm">
+              Affichage de {startIndex + 1} à {Math.min(endIndex, filteredBeats.length)} sur {filteredBeats.length} beats
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {/* Previous button */}
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Précédent
+            </button>
+
+            {/* Page numbers */}
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => goToPage(pageNum)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === pageNum
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next button */}
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Suivant
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Message si aucun beat trouvé */}
       {filteredBeats.length === 0 && (

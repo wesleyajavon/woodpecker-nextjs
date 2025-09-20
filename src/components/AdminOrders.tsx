@@ -12,7 +12,9 @@ import {
   CreditCard, 
   Package,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Order, MultiItemOrder } from '@/types/order';
 
@@ -31,6 +33,8 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
   const [sortBy, setSortBy] = useState<'date' | 'amount' | 'status'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
     fetchOrders();
@@ -39,6 +43,10 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
   useEffect(() => {
     filterAndSortOrders();
   }, [orders, searchTerm, filterType, sortBy, sortOrder]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, sortBy, sortOrder]);
 
   const fetchOrders = async () => {
     try {
@@ -147,6 +155,24 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -159,7 +185,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
     <div className={`space-y-6 ${className}`}>
       {/* Filters and Search */}
       <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -202,6 +228,21 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             {sortOrder === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             {sortOrder === 'asc' ? 'Croissant' : 'Décroissant'}
           </button>
+
+          {/* Items per page */}
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value={5}>5 par page</option>
+            <option value={10}>10 par page</option>
+            <option value={25}>25 par page</option>
+            <option value={50}>50 par page</option>
+          </select>
         </div>
       </div>
 
@@ -213,7 +254,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             <p className="text-gray-300 text-lg">Aucune commande trouvée</p>
           </div>
         ) : (
-          filteredOrders.map((order, index) => (
+          paginatedOrders.map((order, index) => (
             <motion.div
               key={order.id}
               initial={{ opacity: 0, y: 20 }}
@@ -367,6 +408,69 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
           ))
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {filteredOrders.length > 0 && (
+        <div className="flex items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+          <div className="flex items-center gap-4">
+            <span className="text-gray-300 text-sm">
+              Affichage de {startIndex + 1} à {Math.min(endIndex, filteredOrders.length)} sur {filteredOrders.length} commandes
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {/* Previous button */}
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Précédent
+            </button>
+
+            {/* Page numbers */}
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => goToPage(pageNum)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === pageNum
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next button */}
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Suivant
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

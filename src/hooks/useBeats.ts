@@ -13,6 +13,7 @@ interface UseBeatsReturn {
   filterByGenre: (genre: string) => void;
   changePage: (page: number) => void;
   resetFilters: () => void;
+  updateLimit: (newLimit: number) => void;
 }
 
 export const useBeats = (
@@ -27,6 +28,7 @@ export const useBeats = (
   const [totalBeats, setTotalBeats] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('Tous');
+  const [limit, setLimit] = useState(initialLimit);
 
   const fetchBeats = useCallback(async (
     page: number = 1,
@@ -39,7 +41,7 @@ export const useBeats = (
 
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: initialLimit.toString()
+        limit: limit.toString()
       });
 
       if (search) params.append('search', search);
@@ -67,7 +69,7 @@ export const useBeats = (
     } finally {
       setLoading(false);
     }
-  }, [initialLimit]);
+  }, [limit]);
 
   const searchBeats = useCallback((search: string) => {
     setSearchTerm(search);
@@ -94,6 +96,12 @@ export const useBeats = (
     fetchBeats(1);
   }, [fetchBeats]);
 
+  const updateLimit = useCallback((newLimit: number) => {
+    setLimit(newLimit);
+    setCurrentPage(1);
+    fetchBeats(1, searchTerm, selectedGenre);
+  }, [fetchBeats, searchTerm, selectedGenre]);
+
   // Chargement initial
   useEffect(() => {
     fetchBeats(initialPage);
@@ -110,6 +118,7 @@ export const useBeats = (
     searchBeats,
     filterByGenre,
     changePage,
-    resetFilters
+    resetFilters,
+    updateLimit
   };
 };
