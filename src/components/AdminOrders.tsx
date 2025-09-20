@@ -48,13 +48,13 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
         fetch('/api/orders/multi')
       ]);
 
-      const singleOrders = singleOrdersResponse.ok ? await singleOrdersResponse.json() : [];
-      const multiOrders = multiOrdersResponse.ok ? await multiOrdersResponse.json() : [];
+      const singleOrdersData = singleOrdersResponse.ok ? await singleOrdersResponse.json() : { data: [] };
+      const multiOrdersData = multiOrdersResponse.ok ? await multiOrdersResponse.json() : { data: [] };
 
       // Combine and normalize orders
       const allOrders = [
-        ...(singleOrders.data || []).map((order: any) => ({ ...order, type: 'single' as const })),
-        ...(multiOrders.data || []).map((order: any) => ({ ...order, type: 'multi' as const }))
+        ...(singleOrdersData.data || []).map((order: Order) => ({ ...order, type: 'single' as const })),
+        ...(multiOrdersData.data || []).map((order: MultiItemOrder) => ({ ...order, type: 'multi' as const }))
       ];
 
       setOrders(allOrders);
@@ -84,7 +84,8 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
 
     // Sort orders
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: string | number | Date;
+      let bValue: string | number | Date;
 
       switch (sortBy) {
         case 'date':
