@@ -16,13 +16,15 @@ import {
 } from 'lucide-react';
 import { Order, MultiItemOrder } from '@/types/order';
 
+type OrderWithType = (Order & { type: 'single' }) | (MultiItemOrder & { type: 'multi' });
+
 interface AdminOrdersProps {
   className?: string;
 }
 
 export default function AdminOrders({ className = '' }: AdminOrdersProps) {
-  const [orders, setOrders] = useState<(Order | MultiItemOrder)[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<(Order | MultiItemOrder)[]>([]);
+  const [orders, setOrders] = useState<OrderWithType[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<OrderWithType[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'single' | 'multi'>('all');
@@ -114,8 +116,8 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
     setFilteredOrders(filtered);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
