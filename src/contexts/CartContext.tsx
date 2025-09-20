@@ -129,7 +129,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (savedCart) {
           const parsedCart = JSON.parse(savedCart)
           // Convert date strings back to Date objects
-          const itemsWithDates = parsedCart.items.map((item: any) => ({
+          const itemsWithDates = parsedCart.items.map((item: CartItem) => ({
             ...item,
             addedAt: new Date(item.addedAt),
           }))

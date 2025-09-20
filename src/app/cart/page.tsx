@@ -112,7 +112,7 @@ export default function CartPage() {
               
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
               <p className="text-lg text-gray-600 mb-8">
-                Looks like you haven't added any beats to your cart yet. 
+                Looks like you haven&apos;t added any beats to your cart yet. 
                 Start building your music collection!
               </p>
               

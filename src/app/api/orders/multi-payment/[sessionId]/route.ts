@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { MultiItemOrder } from '@/types/order'
+import { MultiItemOrder, OrderStatus, LicenseType } from '@/types/order'
+
+interface OrderItemWithPartialBeat {
+  id: string
+  orderId: string
+  beatId: string
+  beat: {
+    id: string
+    title: string
+    genre: string
+    bpm: number
+    key: string
+    duration: string
+    price: any // Prisma Decimal type
+    isExclusive: boolean
+    featured: boolean
+    fullUrl: string | null
+    stemsUrl: string | null
+  }
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  createdAt: Date
+  updatedAt: Date
+}
 
 const prisma = new PrismaClient()
 
@@ -53,19 +77,19 @@ export async function GET(
       )
     }
 
-    // Convert to MultiItemOrder type
-    const multiItemOrder: MultiItemOrder = {
+    // Convert to MultiItemOrder type with partial beat data
+    const multiItemOrder: Omit<MultiItemOrder, 'items'> & { items: OrderItemWithPartialBeat[] } = {
       id: order.id,
       customerEmail: order.customerEmail,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
-      totalAmount: order.totalAmount,
+      totalAmount: Number(order.totalAmount),
       currency: order.currency,
-      status: order.status as any,
+      status: order.status as OrderStatus,
       paymentMethod: order.paymentMethod,
       paymentId: order.paymentId,
       paidAt: order.paidAt,
-      licenseType: order.licenseType as any,
+      licenseType: order.licenseType as LicenseType,
       usageRights: order.usageRights,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
@@ -75,8 +99,8 @@ export async function GET(
         beatId: item.beatId,
         beat: item.beat,
         quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       })),

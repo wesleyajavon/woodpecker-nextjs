@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Download, Music, Clock, Tag, Star } from 'lucide-react'
 import { Order, MultiItemOrder } from '@/types/order'
+import { Beat } from '@/types/beat'
 
 interface DownloadUrls {
   master: string
@@ -303,13 +304,13 @@ function SuccessContent() {
                               <Music className="h-4 w-4 mr-1" />
                               {item.beat.genre}
                             </span>
-                            <span>{(item.beat as any).bpm} BPM</span>
-                            <span>{(item.beat as any).key}</span>
+                            <span>{(item.beat as Beat).bpm} BPM</span>
+                            <span>{(item.beat as Beat).key}</span>
                             <span className="flex items-center">
                               <Clock className="h-4 w-4 mr-1" />
-                              {(item.beat as any).duration}
+                              {(item.beat as Beat).duration}
                             </span>
-                            {(item.beat as any).isExclusive && (
+                            {(item.beat as Beat).isExclusive && (
                               <span className="flex items-center text-purple-600">
                                 <Tag className="h-4 w-4 mr-1" />
                                 Exclusive

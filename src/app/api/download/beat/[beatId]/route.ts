@@ -4,11 +4,27 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { isUserAdmin } from '@/lib/roleUtils'
+import { Beat } from '@/types/beat'
 
 interface RouteParams {
   params: Promise<{
     beatId: string
   }>
+}
+
+interface OrderWithBeat {
+  id: string
+  customerEmail: string
+  licenseType?: string
+  totalAmount?: any // Prisma Decimal type
+  beat: {
+    id: string
+    title: string
+    fullUrl: string | null
+    stemsUrl: string | null
+    previewUrl: string | null
+    [key: string]: any // Allow additional properties from Prisma
+  }
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -91,7 +107,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Vérification que la commande existe et appartient au client
     // First try single order
-    let order = await prisma.order.findFirst({
+    let order: OrderWithBeat | null = await prisma.order.findFirst({
       where: {
         id: orderId,
         customerEmail: customerEmail,
@@ -126,7 +142,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             id: multiOrder.id,
             customerEmail: multiOrder.customerEmail,
             beat: orderItem.beat
-          } as any
+          }
         }
       }
     }
@@ -234,7 +250,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Vérification que la commande existe et appartient au client
     // First try single order
-    let order = await prisma.order.findFirst({
+    let order: OrderWithBeat | null = await prisma.order.findFirst({
       where: {
         id: orderId,
         customerEmail: customerEmail,
@@ -269,7 +285,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             id: multiOrder.id,
             customerEmail: multiOrder.customerEmail,
             beat: orderItem.beat
-          } as any
+          }
         }
       }
     }
