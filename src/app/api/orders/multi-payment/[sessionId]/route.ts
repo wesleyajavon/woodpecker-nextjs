@@ -13,7 +13,7 @@ interface OrderItemWithPartialBeat {
     bpm: number
     key: string
     duration: string
-    price: any // Prisma Decimal type
+    price: unknown // Prisma Decimal type
     isExclusive: boolean
     featured: boolean
     fullUrl: string | null

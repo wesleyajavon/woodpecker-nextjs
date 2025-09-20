@@ -16,14 +16,14 @@ interface OrderWithBeat {
   id: string
   customerEmail: string
   licenseType?: string
-  totalAmount?: any // Prisma Decimal type
+  totalAmount?: unknown // Prisma Decimal type
   beat: {
     id: string
     title: string
     fullUrl: string | null
     stemsUrl: string | null
     previewUrl: string | null
-    [key: string]: any // Allow additional properties from Prisma
+    [key: string]: unknown // Allow additional properties from Prisma
   }
 }
 
@@ -355,7 +355,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         order: {
           id: order.id,
           licenseType: order.licenseType,
-          totalAmount: order.totalAmount
+          totalAmount: order.totalAmount ? Number(order.totalAmount) : undefined
         }
       }
     })
