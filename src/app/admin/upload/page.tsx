@@ -3,16 +3,17 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Upload, Music, Settings, BarChart3, Plus } from 'lucide-react';
+import { Upload, Music, Settings, BarChart3, Plus, ShoppingBag } from 'lucide-react';
 import BeatUpload from '@/components/BeatUpload';
 import BeatManager from '@/components/BeatManager';
 import AdminStats from '@/components/AdminStats';
 import AdminStatsGraphics from '@/components/AdminStatsGraphics';
+import AdminOrders from '@/components/AdminOrders';
 import AdminRoute from '@/components/AdminRoute';
 import { Beat } from '@/types/beat';
 
 export default function AdminUploadPage() {
-  type TabId = 'upload' | 'manage' | 'stats';
+  type TabId = 'upload' | 'manage' | 'stats' | 'orders';
 
   const [activeTab, setActiveTab] = useState<TabId>('upload');
   const [uploadedBeats, setUploadedBeats] = useState<Beat[]>([]);
@@ -28,6 +29,7 @@ export default function AdminUploadPage() {
   const tabs: Array<{ id: TabId; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'upload', label: 'Upload de Beats', icon: Upload },
     { id: 'manage', label: 'Gestion des Beats', icon: Music },
+    { id: 'orders', label: 'Commandes', icon: ShoppingBag },
     { id: 'stats', label: 'Statistiques', icon: BarChart3 }
   ];
 
@@ -150,6 +152,17 @@ export default function AdminUploadPage() {
               </div>
             )}
 
+            {activeTab === 'orders' && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <ShoppingBag className="w-6 h-6" />
+                  Commandes
+                </h2>
+
+                <AdminOrders />
+              </div>
+            )}
+
             {activeTab === 'stats' && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
@@ -158,7 +171,6 @@ export default function AdminUploadPage() {
                 </h2>
 
                 <AdminStats />
-
                 <AdminStatsGraphics />
               </div>
             )}

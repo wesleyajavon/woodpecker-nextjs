@@ -21,22 +21,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch single orders with beat information
-    const orders = await prisma.order.findMany({
+    // Fetch multi-item orders with items and beat information
+    const orders = await prisma.multiItemOrder.findMany({
       include: {
-        beat: {
-          select: {
-            id: true,
-            title: true,
-            genre: true,
-            bpm: true,
-            key: true,
-            duration: true,
-            price: true,
-            isExclusive: true,
-            featured: true,
-            fullUrl: true,
-            stemsUrl: true
+        items: {
+          include: {
+            beat: {
+              select: {
+                id: true,
+                title: true,
+                genre: true,
+                bpm: true,
+                key: true,
+                duration: true,
+                price: true,
+                isExclusive: true,
+                featured: true,
+                fullUrl: true,
+                stemsUrl: true
+              }
+            }
           }
         }
       },
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error('Error fetching multi-item orders:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

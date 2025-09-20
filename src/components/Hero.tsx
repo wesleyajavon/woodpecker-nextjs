@@ -78,7 +78,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
+          className="inline-flex items-center mt-20 gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
         >
           <Sparkles className="h-5 w-5 text-yellow-400" />
           <span className="text-sm font-medium">Nouveau : Pack Trap 2024</span>

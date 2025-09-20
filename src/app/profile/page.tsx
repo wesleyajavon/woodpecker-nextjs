@@ -87,128 +87,163 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen bg-gray-800 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-700 shadow-xl rounded-2xl overflow-hidden">
+            <div className="px-6 py-8 sm:px-8 sm:py-10">
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-400 mx-auto mb-4"></div>
+                  <p className="text-gray-300">Chargement du profil...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-8">
-              <div className="flex items-center space-x-6 mb-8">
-                <Avatar
-                  src={user?.image}
-                  name={user?.name ?? ''}
-                  email={user?.email}
-                  size="xl"
-                  showName={false}
-                />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {user?.name || 'Utilisateur'}
-                  </h1>
-                  <p className="text-gray-600">{user?.email}</p>
-                  <p className="text-sm text-gray-500">
-                    Membre depuis {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
-                  </p>
+      <div className="min-h-screen bg-gray-800 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gray-700 shadow-xl rounded-2xl overflow-hidden">
+            <div className="px-6 py-8 sm:px-8 sm:py-10">
+              {/* Header Section */}
+              <div className="text-center mb-8">
+                <div className="flex justify-center mb-6">
+                  <Avatar
+                    src={user?.image}
+                    name={user?.name ?? ''}
+                    email={user?.email}
+                    size="xl"
+                    showName={false}
+                  />
                 </div>
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  {user?.name || 'Utilisateur'}
+                </h1>
+                <p className="text-lg text-gray-300 mb-2">{user?.email}</p>
+                <p className="text-sm text-gray-400">
+                  Membre depuis {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
+                </p>
               </div>
 
               {error && (
-                <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                <div className="mb-6 bg-red-900/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="mb-6 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md">
+                <div className="mb-6 bg-green-900/20 border border-green-500/30 text-green-300 px-4 py-3 rounded-lg">
                   {success}
                 </div>
               )}
 
-              <form onSubmit={handleUpdateProfile} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Nom d&apos;affichage
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Votre nom d'affichage"
-                  />
-                </div>
+              {/* Profile Edit Form */}
+              <div className="bg-gray-600 rounded-xl p-6 mb-8">
+                <h2 className="text-xl font-semibold text-white mb-6">Modifier le profil</h2>
+                <form onSubmit={handleUpdateProfile} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                        Nom d&apos;affichage
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 border border-gray-500 text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors placeholder-gray-400"
+                        placeholder="Votre nom d'affichage"
+                      />
+                    </div>
 
-                <div>
-                  <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                    URL de l&apos;avatar
-                  </label>
-                  <input
-                    type="url"
-                    id="image"
-                    value={formData.image}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="https://example.com/avatar.jpg"
-                  />
-                  <p className="mt-1 text-sm text-gray-500">
-                    Laissez vide pour utiliser l&apos;avatar par défaut
-                  </p>
-                </div>
+                    <div>
+                      <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-2">
+                        URL de l&apos;avatar
+                      </label>
+                      <input
+                        type="url"
+                        id="image"
+                        value={formData.image}
+                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                        className="w-full px-4 py-3 bg-gray-700 border border-gray-500 text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors placeholder-gray-400"
+                        placeholder="https://example.com/avatar.jpg"
+                      />
+                      <p className="mt-2 text-sm text-gray-400">
+                        Laissez vide pour utiliser l&apos;avatar par défaut
+                      </p>
+                    </div>
+                  </div>
 
-                <div className="flex justify-end space-x-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => router.back()}
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={updating}
-                  >
-                    {updating ? 'Mise à jour...' : 'Mettre à jour'}
-                  </Button>
-                </div>
-              </form>
+                  <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                    {/* <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.back()}
+                      className="w-full sm:w-auto text-white"
+                    >
+                      Annuler
+                    </Button> */}
+                    <Button
+                      type="submit"
+                      disabled={updating}
+                      className="w-full sm:w-auto"
+                    >
+                      {updating ? 'Mise à jour...' : 'Mettre à jour'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
 
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+              {/* Account Information */}
+              <div className="bg-gray-600 border border-gray-500 rounded-xl p-6">
+                <h3 className="text-xl font-semibold text-white mb-6">
                   Informations du compte
                 </h3>
-                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Email</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <dt className="text-sm font-medium text-gray-300 mb-1">Email</dt>
+                      <dd className="text-sm text-white break-all">{user?.email}</dd>
+                    </div>
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <dt className="text-sm font-medium text-gray-300 mb-1">Email vérifié</dt>
+                      <dd className="text-sm">
+                        {user?.emailVerified ? (
+                          <span className="inline-flex items-center text-green-600">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            Vérifié
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center text-red-600">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                            Non vérifié
+                          </span>
+                        )}
+                      </dd>
+                    </div>
                   </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Email vérifié</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {user?.emailVerified ? (
-                        <span className="text-green-600">✓ Vérifié</span>
-                      ) : (
-                        <span className="text-red-600">✗ Non vérifié</span>
-                      )}
-                    </dd>
+                  <div className="space-y-4">
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <dt className="text-sm font-medium text-gray-300 mb-1">ID utilisateur</dt>
+                      <dd className="text-sm text-white font-mono break-all">{user?.id}</dd>
+                    </div>
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <dt className="text-sm font-medium text-gray-300 mb-1">Dernière mise à jour</dt>
+                      <dd className="text-sm text-white">
+                        {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString('fr-FR') : 'N/A'}
+                      </dd>
+                    </div>
                   </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">ID utilisateur</dt>
-                    <dd className="mt-1 text-sm text-gray-900 font-mono">{user?.id}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Dernière mise à jour</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString('fr-FR') : 'N/A'}
-                    </dd>
-                  </div>
-                </dl>
+                </div>
               </div>
             </div>
           </div>

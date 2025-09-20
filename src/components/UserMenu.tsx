@@ -7,7 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { User, Settings, LogOut, ShoppingBag } from 'lucide-react'
 import Avatar from './Avatar'
 
-export default function UserMenu() {
+interface UserMenuProps {
+  scrolled?: boolean
+}
+
+export default function UserMenu({ scrolled = false }: UserMenuProps) {
   const { data: session } = useSession()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
@@ -39,22 +43,22 @@ export default function UserMenu() {
         setIsOpen(false)
       }
     },
-    {
-      icon: ShoppingBag,
-      label: 'Mes commandes',
-      onClick: () => {
-        router.push('/orders')
-        setIsOpen(false)
-      }
-    },
-    {
-      icon: Settings,
-      label: 'Paramètres',
-      onClick: () => {
-        router.push('/settings')
-        setIsOpen(false)
-      }
-    },
+    // {
+    //   icon: ShoppingBag,
+    //   label: 'Mes commandes',
+    //   onClick: () => {
+    //     router.push('/orders')
+    //     setIsOpen(false)
+    //   }
+    // },
+    // {
+    //   icon: Settings,
+    //   label: 'Paramètres',
+    //   onClick: () => {
+    //     router.push('/settings')
+    //     setIsOpen(false)
+    //   }
+    // },
     {
       icon: LogOut,
       label: 'Déconnexion',
@@ -70,7 +74,11 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        className={`flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 ${
+          scrolled 
+            ? 'hover:bg-gray-100' 
+            : 'hover:bg-white/10'
+        }`}
       >
         <Avatar
           src={session.user.image}
@@ -79,7 +87,11 @@ export default function UserMenu() {
           size="sm"
           showName={false}
         />
-        <span className="text-sm font-medium text-gray-700 hidden sm:block">
+        <span className={`text-sm font-medium hidden sm:block transition-colors duration-300 ${
+          scrolled 
+            ? 'text-gray-700' 
+            : 'text-white/90'
+        }`}>
           {session.user.name || session.user.email}
         </span>
       </button>

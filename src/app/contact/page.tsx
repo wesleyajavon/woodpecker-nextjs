@@ -52,29 +52,29 @@ const ContactPage = () => {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-50">      
+    <main className="min-h-screen bg-gray-800 pt-20 pb-12">      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4">
             Contactez-nous
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Nous sommes là pour vous aider. N&apos;hésitez pas à nous contacter pour toute question.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="bg-gray-700 rounded-2xl shadow-lg p-8 border border-gray-600">
+            <h2 className="text-2xl font-bold text-white mb-6">
               Envoyez-nous un message
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                     Nom complet *
                   </label>
                   <input
@@ -84,13 +84,13 @@ const ContactPage = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-gray-400"
                     placeholder="Votre nom"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                     Email *
                   </label>
                   <input
@@ -100,14 +100,14 @@ const ContactPage = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-3 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-gray-400"
                     placeholder="votre@email.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
                   Sujet *
                 </label>
                 <select
@@ -116,7 +116,7 @@ const ContactPage = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                 >
                   <option value="">Sélectionnez un sujet</option>
                   <option value="support">Support technique</option>
@@ -127,7 +127,7 @@ const ContactPage = () => {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
                   Message *
                 </label>
                 <textarea
@@ -137,7 +137,7 @@ const ContactPage = () => {
                   onChange={handleChange}
                   required
                   rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none"
+                  className="w-full px-4 py-3 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none placeholder-gray-400"
                   placeholder="Décrivez votre demande..."
                 />
               </div>
@@ -155,10 +155,10 @@ const ContactPage = () => {
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-white mb-6">
                 Informations de contact
               </h2>
-              <p className="text-gray-600 mb-8">
+              <p className="text-gray-300 mb-8">
                 Notre équipe est disponible pour répondre à toutes vos questions sur nos produits et services.
               </p>
             </div>
@@ -166,17 +166,17 @@ const ContactPage = () => {
             <div className="space-y-6">
               {contactInfo.map((info, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg flex items-center justify-center">
-                    <info.icon className="h-6 w-6 text-purple-600" />
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-lg flex items-center justify-center border border-purple-500/30">
+                    <info.icon className="h-6 w-6 text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">
+                    <h3 className="font-semibold text-white mb-1">
                       {info.title}
                     </h3>
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-white font-medium">
                       {info.details}
                     </p>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-400 text-sm">
                       {info.description}
                     </p>
                   </div>
@@ -185,37 +185,37 @@ const ContactPage = () => {
             </div>
 
             {/* FAQ Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="bg-gray-700 rounded-2xl shadow-lg p-6 border border-gray-600">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 Questions fréquentes
               </h3>
               <div className="space-y-3">
                 <details className="group">
-                  <summary className="flex justify-between items-center font-medium text-gray-700 cursor-pointer list-none">
+                  <summary className="flex justify-between items-center font-medium text-gray-300 cursor-pointer list-none">
                     Comment télécharger mes achats ?
                     <span className="transition group-open:rotate-180">▼</span>
                   </summary>
-                  <p className="text-gray-600 mt-3">
+                  <p className="text-gray-400 mt-3">
                     Après votre achat, vous recevrez un email avec un lien de téléchargement direct.
                   </p>
                 </details>
                 
                 <details className="group">
-                  <summary className="flex justify-between items-center font-medium text-gray-700 cursor-pointer list-none">
+                  <summary className="flex justify-between items-center font-medium text-gray-300 cursor-pointer list-none">
                     Quels formats de fichiers supportez-vous ?
                     <span className="transition group-open:rotate-180">▼</span>
                   </summary>
-                  <p className="text-gray-600 mt-3">
+                  <p className="text-gray-400 mt-3">
                     Nous supportons tous les formats audio courants : WAV, MP3, AIFF, FLAC.
                   </p>
                 </details>
                 
                 <details className="group">
-                  <summary className="flex justify-between items-center font-medium text-gray-700 cursor-pointer list-none">
+                  <summary className="flex justify-between items-center font-medium text-gray-300 cursor-pointer list-none">
                     Puis-je obtenir un remboursement ?
                     <span className="transition group-open:rotate-180">▼</span>
                   </summary>
-                  <p className="text-gray-600 mt-3">
+                  <p className="text-gray-400 mt-3">
                     Oui, nous offrons une garantie de remboursement de 30 jours.
                   </p>
                 </details>
@@ -225,7 +225,7 @@ const ContactPage = () => {
         </div>
       </div>
 
-      <Footer />
+
     </main>
   );
 };

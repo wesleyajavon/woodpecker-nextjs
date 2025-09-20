@@ -99,19 +99,10 @@ const Navigation = () => {
           <div className="hidden lg:flex items-center space-x-3">
 
             <div className="flex items-center space-x-3">
-              <AuthButton />
+              <AuthButton scrolled={scrolled} />
             </div>
             
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`p-3 rounded-xl transition-all duration-300 ${scrolled
-                  ? 'bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-600'
-                  : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm'
-                }`}
-            >
-              <Search className="h-5 w-5" />
-            </motion.button>
+
 
 
 

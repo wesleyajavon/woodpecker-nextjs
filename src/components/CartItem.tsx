@@ -48,8 +48,8 @@ export default function CartItem({ item }: CartItemProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       transition={{ duration: 0.3 }}
-      className={`bg-white rounded-xl border border-gray-200 p-4 shadow-sm transition-all duration-300 ${
-        isRemoving ? 'opacity-50 scale-95' : 'hover:shadow-md'
+      className={`bg-gray-600 rounded-xl border border-gray-500 p-4 shadow-sm transition-all duration-300 ${
+        isRemoving ? 'opacity-50 scale-95' : 'hover:shadow-md hover:shadow-gray-900/20'
       }`}
     >
       <div className="flex items-start space-x-4">
@@ -57,15 +57,15 @@ export default function CartItem({ item }: CartItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">
+              <h3 className="text-lg font-semibold text-white truncate">
                 {item.beat.title}
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-300 mt-1">
                 {item.beat.genre} • {item.beat.bpm} BPM • {item.beat.key}
               </p>
               
               {/* Beat Details */}
-              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-400">
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
                   <span>{formatDuration(item.beat.duration)}</span>
@@ -75,7 +75,7 @@ export default function CartItem({ item }: CartItemProps) {
                   <span>{item.beat.rating.toFixed(1)} ⭐</span>
                 </div>
                 {item.beat.isExclusive && (
-                  <div className="flex items-center space-x-1 text-purple-600">
+                  <div className="flex items-center space-x-1 text-purple-400">
                     <Tag className="h-4 w-4" />
                     <span className="font-medium">Exclusive</span>
                   </div>
@@ -85,10 +85,10 @@ export default function CartItem({ item }: CartItemProps) {
             
             {/* Price */}
             <div className="text-right">
-              <div className="text-xl font-bold text-gray-900">
+              <div className="text-xl font-bold text-white">
                 €{(item.beat.price * item.quantity).toFixed(2)}
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-400">
                 €{item.beat.price.toFixed(2)} each
               </div>
             </div>
@@ -97,19 +97,19 @@ export default function CartItem({ item }: CartItemProps) {
       </div>
 
       {/* Quantity Controls */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-500">
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => handleQuantityChange(item.quantity - 1)}
             disabled={isRemoving}
-            className="h-8 w-8 p-0 rounded-full"
+            className="h-8 w-8 p-0 rounded-full bg-gray-700 border-gray-500 text-white hover:bg-gray-600 hover:text-white"
           >
             <Minus className="h-4 w-4" />
           </Button>
           
-          <span className="text-lg font-medium text-gray-900 min-w-[2rem] text-center">
+          <span className="text-lg font-medium text-white min-w-[2rem] text-center">
             {item.quantity}
           </span>
           
@@ -118,7 +118,7 @@ export default function CartItem({ item }: CartItemProps) {
             size="sm"
             onClick={() => handleQuantityChange(item.quantity + 1)}
             disabled={isRemoving}
-            className="h-8 w-8 p-0 rounded-full"
+            className="h-8 w-8 p-0 rounded-full bg-gray-700 border-gray-500 text-white hover:bg-gray-600 hover:text-white"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -129,7 +129,7 @@ export default function CartItem({ item }: CartItemProps) {
           size="sm"
           onClick={handleRemove}
           disabled={isRemoving}
-          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-500/50"
         >
           <Trash2 className="h-4 w-4 mr-1" />
           Remove

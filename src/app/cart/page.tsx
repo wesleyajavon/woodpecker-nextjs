@@ -69,24 +69,24 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-800 pt-20 pb-12">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gray-700 border-b border-gray-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <Link href="/beats">
-                <Button variant="outline" size="sm" className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" className="flex items-center space-x-2 bg-gray-600 border-gray-500 text-white hover:bg-gray-500 hover:text-white">
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back to Beats</span>
                 </Button>
               </Link>
               
               <div className="flex items-center space-x-3">
-                <ShoppingCart className="h-6 w-6 text-purple-600" />
-                <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
+                <ShoppingCart className="h-6 w-6 text-purple-400" />
+                <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
                 {cart.totalItems > 0 && (
-                  <span className="bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                  <span className="bg-purple-600 text-purple-100 text-sm font-medium px-2.5 py-0.5 rounded-full">
                     {cart.totalItems} {cart.totalItems === 1 ? 'item' : 'items'}
                   </span>
                 )}
@@ -106,12 +106,12 @@ export default function CartPage() {
             className="text-center py-16"
           >
             <div className="max-w-md mx-auto">
-              <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div className="bg-gray-700 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <ShoppingCart className="h-12 w-12 text-gray-400" />
               </div>
               
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
-              <p className="text-lg text-gray-600 mb-8">
+              <h2 className="text-3xl font-bold text-white mb-4">Your cart is empty</h2>
+              <p className="text-lg text-gray-300 mb-8">
                 Looks like you haven&apos;t added any beats to your cart yet. 
                 Start building your music collection!
               </p>
@@ -124,7 +124,7 @@ export default function CartPage() {
                   </Button>
                 </Link>
                 
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-400 mt-2">
                   Discover our collection of premium beats from talented producers
                 </div>
               </div>
@@ -140,16 +140,18 @@ export default function CartPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Cart Items ({cart.totalItems})
-                  </h2>
-                </div>
-                
-                <div className="space-y-4">
-                  {cart.items.map((item) => (
-                    <CartItem key={item.beat.id} item={item} />
-                  ))}
+                <div className="bg-gray-700 rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-white">
+                      Cart Items ({cart.totalItems})
+                    </h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {cart.items.map((item) => (
+                      <CartItem key={item.beat.id} item={item} />
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -169,12 +171,12 @@ export default function CartPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
         >
-          <div className="bg-white rounded-xl p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Processing Checkout</h3>
-            <p className="text-gray-600">Please wait while we prepare your order...</p>
+          <div className="bg-gray-700 rounded-xl p-8 text-center border border-gray-600">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-white mb-2">Processing Checkout</h3>
+            <p className="text-gray-300">Please wait while we prepare your order...</p>
           </div>
         </motion.div>
       )}

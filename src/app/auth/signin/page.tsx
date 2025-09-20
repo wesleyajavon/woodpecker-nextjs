@@ -54,28 +54,41 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Connexion à votre compte
-          </h2>
-        </div>
-
-        <div className="mt-8 space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-              {error}
+    <div className="min-h-screen bg-gray-800 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto">
+        <div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
+          <div className="px-8 py-10">
+            <div className="text-center mb-8">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Bienvenue
+              </h2>
+              <p className="text-gray-600">
+                Connectez-vous à votre compte Woodpecker
+              </p>
             </div>
-          )}
 
-          {/* OAuth Providers */}
-          <div className="space-y-3">
-            <Button
-              onClick={() => handleOAuthSignIn('github')}
-              disabled={isLoading}
-              className="w-full flex justify-center items-center space-x-2 bg-gray-900 hover:bg-gray-800 text-white"
-            >
+            <div className="space-y-6">
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {error}
+                </div>
+              )}
+
+              {/* OAuth Providers */}
+              <div className="space-y-3">
+                <Button
+                  onClick={() => handleOAuthSignIn('github')}
+                  disabled={isLoading}
+                  className="w-full flex justify-center items-center space-x-3 bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg transition-all duration-300 hover:shadow-lg"
+                >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -83,14 +96,14 @@ export default function SignInPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              <span>Continuer avec GitHub</span>
-            </Button>
+                  <span className="font-medium">Continuer avec GitHub</span>
+                </Button>
 
-            <Button
-              onClick={() => handleOAuthSignIn('google')}
-              disabled={isLoading}
-              className="w-full flex justify-center items-center space-x-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700"
-            >
+                <Button
+                  onClick={() => handleOAuthSignIn('google')}
+                  disabled={isLoading}
+                  className="w-full flex justify-center items-center space-x-3 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 py-3 rounded-lg transition-all duration-300 hover:shadow-lg"
+                >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -109,46 +122,55 @@ export default function SignInPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span>Continuer avec Google</span>
-            </Button>
+                  <span className="font-medium text-black">Continuer avec Google</span>
+                </Button>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-gray-500 font-medium">Ou</span>
+                </div>
+              </div>
+
+              {/* Email Sign In */}
+              <form className="space-y-6" onSubmit={handleEmailSignIn}>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Adresse email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors placeholder-gray-400"
+                    placeholder="Votre adresse email"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-300 hover:shadow-lg"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Envoi en cours...
+                    </div>
+                  ) : (
+                    'Se connecter par email'
+                  )}
+                </Button>
+              </form>
+            </div>
           </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">Ou</span>
-            </div>
-          </div>
-
-          {/* Email Sign In */}
-          <form className="space-y-6" onSubmit={handleEmailSignIn}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Adresse email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Votre adresse email"
-              />
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? 'Envoi en cours...' : 'Se connecter par email'}
-            </Button>
-          </form>
         </div>
       </div>
     </div>
