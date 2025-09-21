@@ -65,7 +65,7 @@ export async function POST(
       const beat = item.beat
       
       // Generate secure download URLs for each beat
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
       const masterUrl = `${baseUrl}/api/download/beat/${beat.id}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=master`
       
       let stemsUrl: string | undefined

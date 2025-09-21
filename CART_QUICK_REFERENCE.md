@@ -165,7 +165,7 @@ const response = await fetch(`/api/download/multi-order/${orderId}`, {
 
 ### Environment Variables
 ```env
-NEXT_PUBLIC_BASE_URL=http://localhost:3002
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 STRIPE_SECRET_KEY=sk_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
