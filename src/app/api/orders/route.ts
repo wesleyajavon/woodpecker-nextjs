@@ -11,18 +11,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user from database to check role
+    // Get user from database to check role and get user ID
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { role: true }
+      select: { id: true, role: true }
     });
 
     if (!user || user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch single orders with beat information
+    // Fetch single orders with beat information, filtered by admin user's beats
     const orders = await prisma.order.findMany({
+      where: {
+        beat: {
+          userId: user.id
+        }
+      },
       include: {
         beat: {
           select: {
