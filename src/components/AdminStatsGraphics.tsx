@@ -89,30 +89,30 @@ export default function AdminStatsGraphics() {
   }
 
   // Calculate additional metrics for visualizations
-  const averageOrderValue = stats.totalOrders > 0 ? stats.totalRevenue / stats.totalOrders : 0;
-  const conversionRate = stats.uniqueCustomers > 0 ? (stats.totalOrders / stats.uniqueCustomers) * 100 : 0;
+  const averageOrderValue = (stats?.totalOrders || 0) > 0 ? (stats?.totalRevenue || 0) / (stats?.totalOrders || 1) : 0;
+  const conversionRate = (stats?.uniqueCustomers || 0) > 0 ? ((stats?.totalOrders || 0) / (stats?.uniqueCustomers || 1)) * 100 : 0;
 
   // Data for pie chart (revenue distribution simulation)
   const pieChartData = [
-    { label: 'Beats Premium', value: Math.round(stats.totalRevenue * 0.6), color: 'bg-purple-500' },
-    { label: 'Beats Standard', value: Math.round(stats.totalRevenue * 0.3), color: 'bg-blue-500' },
-    { label: 'Beats Gratuits', value: Math.round(stats.totalRevenue * 0.1), color: 'bg-green-500' }
+    { label: 'Beats Premium', value: Math.round((stats?.totalRevenue || 0) * 0.6), color: 'bg-purple-500' },
+    { label: 'Beats Standard', value: Math.round((stats?.totalRevenue || 0) * 0.3), color: 'bg-blue-500' },
+    { label: 'Beats Gratuits', value: Math.round((stats?.totalRevenue || 0) * 0.1), color: 'bg-green-500' }
   ];
 
   // Data for bar chart (monthly simulation)
   const barChartData = [
-    { month: 'Jan', beats: Math.floor(stats.totalBeats * 0.1), orders: Math.floor(stats.totalOrders * 0.08) },
-    { month: 'Fév', beats: Math.floor(stats.totalBeats * 0.12), orders: Math.floor(stats.totalOrders * 0.1) },
-    { month: 'Mar', beats: Math.floor(stats.totalBeats * 0.15), orders: Math.floor(stats.totalOrders * 0.12) },
-    { month: 'Avr', beats: Math.floor(stats.totalBeats * 0.18), orders: Math.floor(stats.totalOrders * 0.15) },
-    { month: 'Mai', beats: Math.floor(stats.totalBeats * 0.2), orders: Math.floor(stats.totalOrders * 0.2) },
-    { month: 'Juin', beats: Math.floor(stats.totalBeats * 0.25), orders: Math.floor(stats.totalOrders * 0.35) },
-    { month: 'Juil', beats: Math.floor(stats.totalBeats * 0.3), orders: Math.floor(stats.totalOrders * 0.4) },
-    { month: 'Août', beats: Math.floor(stats.totalBeats * 0.35), orders: Math.floor(stats.totalOrders * 0.45) },
-    { month: 'Sep', beats: Math.floor(stats.totalBeats * 0.4), orders: Math.floor(stats.totalOrders * 0.5) }
+    { month: 'Jan', beats: Math.floor((stats?.totalBeats || 0) * 0.1), orders: Math.floor((stats?.totalOrders || 0) * 0.08) },
+    { month: 'Fév', beats: Math.floor((stats?.totalBeats || 0) * 0.12), orders: Math.floor((stats?.totalOrders || 0) * 0.1) },
+    { month: 'Mar', beats: Math.floor((stats?.totalBeats || 0) * 0.15), orders: Math.floor((stats?.totalOrders || 0) * 0.12) },
+    { month: 'Avr', beats: Math.floor((stats?.totalBeats || 0) * 0.18), orders: Math.floor((stats?.totalOrders || 0) * 0.15) },
+    { month: 'Mai', beats: Math.floor((stats?.totalBeats || 0) * 0.2), orders: Math.floor((stats?.totalOrders || 0) * 0.2) },
+    { month: 'Juin', beats: Math.floor((stats?.totalBeats || 0) * 0.25), orders: Math.floor((stats?.totalOrders || 0) * 0.35) },
+    { month: 'Juil', beats: Math.floor((stats?.totalBeats || 0) * 0.3), orders: Math.floor((stats?.totalOrders || 0) * 0.4) },
+    { month: 'Août', beats: Math.floor((stats?.totalBeats || 0) * 0.35), orders: Math.floor((stats?.totalOrders || 0) * 0.45) },
+    { month: 'Sep', beats: Math.floor((stats?.totalBeats || 0) * 0.4), orders: Math.floor((stats?.totalOrders || 0) * 0.5) }
   ];
 
-  const maxValue = Math.max(...barChartData.map(d => Math.max(d.beats, d.orders)));
+  const maxValue = barChartData.length > 0 ? Math.max(...barChartData.map(d => Math.max(d.beats, d.orders))) : 1;
 
   return (
     <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
@@ -137,12 +137,15 @@ export default function AdminStatsGraphics() {
               <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
                 {pieChartData.map((segment, index) => {
                   const total = pieChartData.reduce((sum, item) => sum + item.value, 0);
-                  const percentage = (segment.value / total) * 100;
+                  const percentage = total > 0 ? (segment.value / total) * 100 : 0;
                   const circumference = 2 * Math.PI * 45;
                   const strokeDasharray = `${(percentage / 100) * circumference} ${circumference}`;
                   const strokeDashoffset = pieChartData.slice(0, index).reduce((offset, item) => {
                     return offset - ((item.value / total) * circumference);
                   }, 0);
+                  
+                  // Ensure no NaN values
+                  const safeStrokeDashoffset = isNaN(strokeDashoffset) ? 0 : strokeDashoffset;
                   
                   return (
                     <circle
@@ -154,11 +157,11 @@ export default function AdminStatsGraphics() {
                       stroke="currentColor"
                       strokeWidth="8"
                       strokeDasharray={strokeDasharray}
-                      strokeDashoffset={strokeDashoffset}
+                      strokeDashoffset={safeStrokeDashoffset}
                       className={`${segment.color.replace('bg-', 'text-')} transition-all duration-1000`}
                       style={{
                         strokeDasharray: strokeDasharray,
-                        strokeDashoffset: strokeDashoffset
+                        strokeDashoffset: safeStrokeDashoffset
                       }}
                     />
                   );
