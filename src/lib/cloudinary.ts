@@ -28,13 +28,7 @@ export const CLOUDINARY_FOLDERS = {
   BEATS: {
     PREVIEWS: 'woodpecker-beats/beats/previews',
     MASTERS: 'woodpecker-beats/beats/masters',
-    STEMS: 'woodpecker-beats/beats/stems',
     WAVEFORMS: 'woodpecker-beats/beats/waveforms'
-  },
-  ARTWORK: {
-    BEATS: 'woodpecker-beats/artwork/beats',
-    ALBUMS: 'woodpecker-beats/artwork/albums',
-    PROFILES: 'woodpecker-beats/artwork/profiles'
   },
   TEMP: 'woodpecker-beats/temp'
 } as const;
@@ -65,11 +59,6 @@ export const TRANSFORMATIONS = {
       format: 'wav',
       eager_async: true
     },
-    STEM: {
-      quality: 'auto:best',
-      format: 'wav',
-      eager_async: true
-    }
   },
   IMAGE: {
     THUMBNAIL: {
@@ -209,70 +198,6 @@ export class CloudinaryService {
     }
   }
 
-  // Upload d'une image
-  static async uploadImage(
-    file: Buffer | string,
-    folder: string,
-    options: {
-      width?: number;
-      height?: number;
-      crop?: string;
-      quality?: string;
-    } = {}
-  ): Promise<CloudinaryResource> {
-    try {
-      configureCloudinary();
-      let result: UploadApiResponse;
-      
-      if (typeof file === 'string') {
-        // Upload depuis une URL
-        result = await cloudinary.uploader.upload(file, {
-          folder,
-          width: options.width,
-          height: options.height,
-          crop: options.crop || 'fill',
-          quality: options.quality || 'auto:good',
-          overwrite: false,
-          unique_filename: true,
-          use_filename: true
-        });
-      } else {
-        // Upload depuis un Buffer
-        result = await new Promise<UploadApiResponse>((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder,
-              width: options.width,
-              height: options.height,
-              crop: options.crop || 'fill',
-              quality: options.quality || 'auto:good',
-              overwrite: false,
-              unique_filename: true,
-              use_filename: true
-            },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve(result!);
-            }
-          );
-          uploadStream.end(file);
-        });
-      }
-
-      return {
-        public_id: result.public_id,
-        secure_url: result.secure_url,
-        format: result.format,
-        resource_type: result.resource_type,
-        bytes: result.bytes,
-        width: result.width,
-        height: result.height
-      };
-    } catch (error) {
-      console.error('Erreur lors de l\'upload image:', error);
-      throw new Error('Échec de l\'upload image');
-    }
-  }
 
   // Suppression d'une ressource
   static async deleteResource(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<void> {
@@ -405,11 +330,9 @@ export class CloudinaryService {
   // Génération d'URLs signées pour les téléchargements de beats
   static generateBeatDownloadUrls(
     beatPublicId: string,
-    stemsPublicId?: string,
     ttlMinutes: number = 30
   ): {
     master: string;
-    stems?: string;
     expiresAt: Date;
   } {
     const expiresAt = new Date(Date.now() + (ttlMinutes * 60 * 1000));
@@ -419,23 +342,10 @@ export class CloudinaryService {
       quality: 'auto:best'
     }, 'video');
     
-    const result: {
-      master: string;
-      stems?: string;
-      expiresAt: Date;
-    } = {
+    return {
       master: masterUrl,
       expiresAt
     };
-    
-    if (stemsPublicId) {
-      result.stems = this.generateSignedUrl(stemsPublicId, ttlMinutes, {
-        format: 'zip',
-        quality: 'auto:best'
-      }, 'raw');
-    }
-    
-    return result;
   }
 
   // Nettoyage des fichiers temporaires

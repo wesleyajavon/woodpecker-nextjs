@@ -13,7 +13,6 @@ export interface Beat {
   stripePriceId?: string | null
   previewUrl?: string | null
   fullUrl?: string | null
-  stemsUrl?: string | null
   isExclusive: boolean
   isActive: boolean
   featured: boolean
@@ -32,7 +31,6 @@ export interface CreateBeatInput {
   tags: string[]
   previewUrl?: string
   fullUrl?: string
-  stemsUrl?: string
   isExclusive?: boolean
   featured?: boolean
 }
@@ -48,7 +46,6 @@ export interface UpdateBeatInput {
   tags?: string[]
   previewUrl?: string
   fullUrl?: string
-  stemsUrl?: string
   isExclusive?: boolean
   isActive?: boolean
   featured?: boolean

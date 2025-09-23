@@ -20,8 +20,6 @@ interface MulterFile {
 interface UploadedFiles {
   preview?: MulterFile[];
   master?: MulterFile[];
-  stems?: MulterFile[];
-  artwork?: MulterFile[];
   [key: string]: MulterFile[] | undefined;
 }
 
@@ -66,7 +64,7 @@ export async function POST(request: NextRequest) {
           size: value.size
         };
         
-        if (key === 'preview' || key === 'master' || key === 'stems' || key === 'artwork') {
+        if (key === 'preview' || key === 'master') {
           if (!files[key]) {
             files[key] = [];
           }
@@ -123,33 +121,6 @@ export async function POST(request: NextRequest) {
         console.log('Master upload completed successfully');
       }
 
-      // Upload des stems (optionnel)
-      if (files.stems && files.stems[0]) {
-        const stemsFile = files.stems[0];
-        uploadResults.stems = await CloudinaryService.uploadAudio(
-          stemsFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.STEMS,
-          {
-            resource_type: 'raw',
-            format: 'zip'
-          }
-        );
-      }
-
-      // Upload de l'artwork (optionnel)
-      if (files.artwork && files.artwork[0]) {
-        const artworkFile = files.artwork[0];
-        uploadResults.artwork = await CloudinaryService.uploadImage(
-          artworkFile.buffer,
-          CLOUDINARY_FOLDERS.ARTWORK.BEATS,
-          {
-            width: 800,
-            height: 800,
-            crop: 'fill',
-            quality: 'auto:good'
-          }
-        );
-      }
 
     } catch (uploadError) {
       console.error('Erreur lors de l\'upload vers Cloudinary:', uploadError);
@@ -191,7 +162,6 @@ export async function POST(request: NextRequest) {
         tags: fields.tags ? JSON.parse(fields.tags) : [],
         previewUrl: uploadResults.preview?.secure_url,
         fullUrl: uploadResults.master?.secure_url,
-        stemsUrl: uploadResults.stems?.secure_url,
         isExclusive: fields.isExclusive === 'true',
         featured: fields.featured === 'true'
       };

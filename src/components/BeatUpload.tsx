@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Music, Image, FileAudio, X, AlertCircle } from 'lucide-react';
+import { Upload, Music, FileAudio, X, AlertCircle } from 'lucide-react';
 import { BEAT_CONFIG } from '@/config/constants';
 
 import { Beat } from '@/types/beat';
@@ -15,23 +15,17 @@ interface BeatUploadProps {
 interface UploadProgress {
   preview: number;
   master: number;
-  stems: number;
-  artwork: number;
 }
 
 export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({
     preview: 0,
-    master: 0,
-    stems: 0,
-    artwork: 0
+    master: 0
   });
   const [uploadedFiles, setUploadedFiles] = useState<{
     preview?: File;
     master?: File;
-    stems?: File;
-    artwork?: File;
   }>({});
   const [formData, setFormData] = useState({
     title: '',
@@ -50,9 +44,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
   const fileInputRefs = {
     preview: useRef<HTMLInputElement>(null),
-    master: useRef<HTMLInputElement>(null),
-    stems: useRef<HTMLInputElement>(null),
-    artwork: useRef<HTMLInputElement>(null)
+    master: useRef<HTMLInputElement>(null)
   };
 
   // Gestion des fichiers sélectionnés
@@ -110,7 +102,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     if (!validateForm()) return;
 
     setIsUploading(true);
-    setUploadProgress({ preview: 0, master: 0, stems: 0, artwork: 0 });
+    setUploadProgress({ preview: 0, master: 0 });
 
     try {
       const formDataToSend = new FormData();
@@ -118,8 +110,6 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       // Ajout des fichiers
       if (uploadedFiles.preview) formDataToSend.append('preview', uploadedFiles.preview);
       if (uploadedFiles.master) formDataToSend.append('master', uploadedFiles.master);
-      if (uploadedFiles.stems) formDataToSend.append('stems', uploadedFiles.stems);
-      if (uploadedFiles.artwork) formDataToSend.append('artwork', uploadedFiles.artwork);
 
       // Ajout des données du formulaire
       Object.entries(formData).forEach(([key, value]) => {
@@ -134,9 +124,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => ({
           preview: Math.min(prev.preview + 10, 100),
-          master: Math.min(prev.master + 8, 100),
-          stems: Math.min(prev.stems + 5, 100),
-          artwork: Math.min(prev.artwork + 12, 100)
+          master: Math.min(prev.master + 8, 100)
         }));
       }, 200);
 
@@ -170,7 +158,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           featured: false
         });
         setUploadedFiles({});
-        setUploadProgress({ preview: 0, master: 0, stems: 0, artwork: 0 });
+        setUploadProgress({ preview: 0, master: 0 });
       }
 
     } catch (error) {
@@ -258,10 +246,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             )}
           </div>
 
-          {/* Master Audio (Optionnel) */}
+          {/* Master Audio */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Master Audio (optionnel)
+              Master Audio <span className="text-red-400">*</span>
             </label>
             <div className="relative">
               <input
@@ -299,87 +287,6 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             </div>
           </div>
 
-          {/* Stems (Optionnel) */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Stems (optionnel)
-            </label>
-            <div className="relative">
-              <input
-                ref={fileInputRefs.stems}
-                type="file"
-                accept=".zip,.rar"
-                onChange={(e) => e.target.files?.[0] && handleFileSelect('stems', e.target.files[0])}
-                className="hidden"
-              />
-              <div
-                onClick={() => fileInputRefs.stems.current?.click()}
-                className="w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
-              >
-                {uploadedFiles.stems ? (
-                  <div className="flex items-center gap-2 text-purple-300">
-                    <FileAudio className="w-5 h-5" />
-                    <span>{uploadedFiles.stems.name}</span>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUploadedFiles(prev => ({ ...prev, stems: undefined }));
-                      }}
-                      className="ml-auto text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Upload className="w-5 h-5" />
-                    <span>Archive ZIP des stems</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Artwork (Optionnel) */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Artwork (optionnel)
-            </label>
-            <div className="relative">
-              <input
-                ref={fileInputRefs.artwork}
-                type="file"
-                accept=".jpg,.jpeg,.png,.webp"
-                onChange={(e) => e.target.files?.[0] && handleFileSelect('artwork', e.target.files[0])}
-                className="hidden"
-              />
-              <div
-                onClick={() => fileInputRefs.artwork.current?.click()}
-                className="w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
-              >
-                {uploadedFiles.artwork ? (
-                  <div className="flex items-center gap-2 text-purple-300">
-                    <Image className="w-5 h-5" aria-label="Icône artwork" />
-                    <span>{uploadedFiles.artwork.name}</span>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUploadedFiles(prev => ({ ...prev, artwork: undefined }));
-                      }}
-                      className="ml-auto text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Upload className="w-5 h-5" />
-                    <span>Image d&apos;artwork</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Section des informations */}

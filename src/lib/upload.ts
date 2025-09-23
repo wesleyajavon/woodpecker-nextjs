@@ -69,58 +69,13 @@ export const beatUpload = multer({
   fileFilter,
   limits: {
     fileSize: FILE_CONFIG.maxAudioSize,
-    files: 5
+    files: 2
   }
 }).fields([
   { name: 'preview', maxCount: 1 },
-  { name: 'master', maxCount: 1 },
-  { name: 'stems', maxCount: 1 },
-  { name: 'artwork', maxCount: 1 }
+  { name: 'master', maxCount: 1 }
 ]);
 
-// Configuration pour l'upload d'artwork
-export const artworkUpload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (file.fieldname === 'artwork') {
-      if (FILE_CONFIG.allowedImageFormats.some(format => 
-        file.originalname.toLowerCase().endsWith(format)
-      )) {
-        cb(null, true);
-      } else {
-        cb(new Error('Format d\'image non supporté'));
-      }
-    } else {
-      cb(new Error('Type de fichier non supporté'));
-    }
-  },
-  limits: {
-    fileSize: FILE_CONFIG.maxImageSize,
-    files: 1
-  }
-}).single('artwork');
-
-// Configuration pour l'upload de stems
-export const stemsUpload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (file.fieldname === 'stems') {
-      if (FILE_CONFIG.allowedArchiveFormats.some(format => 
-        file.originalname.toLowerCase().endsWith(format)
-      )) {
-        cb(null, true);
-      } else {
-        cb(new Error('Format d\'archive non supporté'));
-      }
-    } else {
-      cb(new Error('Type de fichier non supporté'));
-    }
-  },
-  limits: {
-    fileSize: FILE_CONFIG.maxArchiveSize,
-    files: 1
-  }
-}).single('stems');
 
 // Middleware d'erreur pour Multer
 export const handleUploadError = (error: Error | multer.MulterError, req: NextApiRequest, res: { status: (code: number) => { json: (data: unknown) => unknown } }) => {
