@@ -256,7 +256,7 @@ const Footer = () => {
             className="text-center mt-12 pt-8 border-t border-white/10"
           >
             <p className="text-gray-400">
-              © 2024 Woodpecker. Tous droits réservés.
+              © 2025 Wesley Ajavon. Tous droits réservés.
             </p>
             <p className="text-gray-500 text-sm mt-2">
               Créé avec ❤️ pour la communauté musicale

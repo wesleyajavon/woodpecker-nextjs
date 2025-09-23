@@ -35,6 +35,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Configuration pour les API routes avec timeout étendu
+  serverExternalPackages: ['cloudinary'],
 };
 
 export default nextConfig;

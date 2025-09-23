@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       // Upload de la preview
       if (files.preview && files.preview[0]) {
         const previewFile = files.preview[0];
+        console.log(`Starting preview upload: ${previewFile.originalname} (${previewFile.size} bytes)`);
         uploadResults.preview = await CloudinaryService.uploadAudio(
           previewFile.buffer,
           CLOUDINARY_FOLDERS.BEATS.PREVIEWS,
@@ -103,11 +104,13 @@ export async function POST(request: NextRequest) {
             duration: 30 // 30 secondes pour la preview
           }
         );
+        console.log('Preview upload completed successfully');
       }
 
       // Upload du master (optionnel)
       if (files.master && files.master[0]) {
         const masterFile = files.master[0];
+        console.log(`Starting master upload: ${masterFile.originalname} (${masterFile.size} bytes)`);
         uploadResults.master = await CloudinaryService.uploadAudio(
           masterFile.buffer,
           CLOUDINARY_FOLDERS.BEATS.MASTERS,
@@ -117,6 +120,7 @@ export async function POST(request: NextRequest) {
             quality: 'auto:best'
           }
         );
+        console.log('Master upload completed successfully');
       }
 
       // Upload des stems (optionnel)
@@ -149,6 +153,9 @@ export async function POST(request: NextRequest) {
 
     } catch (uploadError) {
       console.error('Erreur lors de l\'upload vers Cloudinary:', uploadError);
+      console.error('Type d\'erreur:', typeof uploadError);
+      console.error('Message d\'erreur:', uploadError instanceof Error ? uploadError.message : 'Unknown error');
+      console.error('Stack trace:', uploadError instanceof Error ? uploadError.stack : 'No stack trace');
       
       // Nettoyage des fichiers déjà uploadés en cas d'erreur
       for (const result of Object.values(uploadResults)) {
@@ -166,7 +173,8 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         error: 'Échec de l\'upload vers Cloudinary',
-        details: uploadError instanceof Error ? uploadError.message : 'Erreur inconnue'
+        details: uploadError instanceof Error ? uploadError.message : 'Erreur inconnue',
+        type: typeof uploadError
       }, { status: 500 });
     }
 
@@ -231,9 +239,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Configuration pour gérer les erreurs Multer
+// Configuration pour gérer les gros fichiers
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+  maxDuration: 300, // 5 minutes pour les gros fichiers audio
 };
