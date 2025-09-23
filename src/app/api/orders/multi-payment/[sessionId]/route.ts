@@ -17,7 +17,6 @@ interface OrderItemWithPartialBeat {
     isExclusive: boolean
     featured: boolean
     fullUrl: string | null
-    stemsUrl: string | null
   }
   quantity: number
   unitPrice: number
@@ -62,7 +61,6 @@ export async function GET(
                 isExclusive: true,
                 featured: true,
                 fullUrl: true,
-                stemsUrl: true,
               }
             }
           }

@@ -249,7 +249,6 @@ export class BeatService {
       tags?: string[]
       previewUrl?: string
       fullUrl?: string
-      stemsUrl?: string
       isExclusive?: boolean
       isActive?: boolean
       featured?: boolean

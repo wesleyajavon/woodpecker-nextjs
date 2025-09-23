@@ -41,20 +41,13 @@ woodpecker-beats/
 ├── beats/
 │   ├── previews/     # Previews audio (30s, MP3, qualité optimisée)
 │   ├── masters/      # Fichiers masters (WAV, qualité maximale)
-│   ├── stems/        # Archives de stems (ZIP, RAR)
 │   └── waveforms/    # Waveforms générés automatiquement
-├── artwork/
-│   ├── beats/        # Artwork des beats individuels
-│   ├── albums/       # Artwork des albums/compilations
-│   └── profiles/     # Photos de profil des utilisateurs
 └── temp/             # Fichiers temporaires (nettoyage automatique)
 ```
 
 ### **Conventions de nommage**
 
 - **Beats** : `{genre}_{bpm}_{key}_{timestamp}`
-- **Artwork** : `{type}_{id}_{timestamp}`
-- **Stems** : `{beat_id}_stems_{timestamp}`
 
 ## **🎵 Gestion des fichiers audio**
 
@@ -155,21 +148,11 @@ POST /api/beats/upload
 **Fichiers acceptés :**
 - `preview` (requis) : Fichier audio preview
 - `master` (optionnel) : Fichier audio master
-- `stems` (optionnel) : Archive de stems
-- `artwork` (optionnel) : Image d'artwork
 
 **Données du formulaire :**
 - `title`, `description`, `genre`, `bpm`, `key`, `duration`
 - `price`, `tags`, `isExclusive`, `featured`
 
-### **2. Upload d'artwork**
-```
-POST /api/artwork/upload
-```
-
-**Paramètres :**
-- `artwork` : Fichier image
-- `folder` : Dossier de destination (optionnel)
 
 ## **📊 Gestion des ressources**
 

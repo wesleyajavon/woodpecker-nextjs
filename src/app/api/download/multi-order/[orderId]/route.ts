@@ -5,7 +5,6 @@ const prisma = new PrismaClient()
 
 interface DownloadUrls {
   master: string
-  stems?: string
   expiresAt: string
 }
 
@@ -67,18 +66,12 @@ export async function POST(
       // Generate secure download URLs for each beat
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
       const masterUrl = `${baseUrl}/api/download/beat/${beat.id}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=master`
-      
-      let stemsUrl: string | undefined
-      if (beat.stemsUrl) {
-        stemsUrl = `${baseUrl}/api/download/beat/${beat.id}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=stems`
-      }
 
       beatDownloadUrls.push({
         beatId: beat.id,
         beatTitle: beat.title,
         downloadUrls: {
           master: masterUrl,
-          stems: stemsUrl,
           expiresAt: expiresAt.toISOString(),
         }
       })

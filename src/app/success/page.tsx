@@ -11,7 +11,6 @@ import { useSession } from 'next-auth/react'
 
 interface DownloadUrls {
   master: string
-  stems?: string
   expiresAt: string
 }
 
@@ -407,16 +406,6 @@ function SuccessContent() {
                               Télécharger le master (WAV)
                             </a>
                             
-                            {beatDownload.downloadUrls.stems && (
-                              <a
-                                href={beatDownload.downloadUrls.stems}
-                                download
-                                className="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors text-center font-medium"
-                              >
-                                <Download className="w-4 h-4 inline mr-2" />
-                                Télécharger les stems (ZIP)
-                              </a>
-                            )}
                           </div>
                         </motion.div>
                       ))}
@@ -458,16 +447,6 @@ function SuccessContent() {
                     Télécharger le master (WAV)
                   </a>
                   
-                  {downloadUrls.stems && (
-                    <a
-                      href={downloadUrls.stems}
-                      download
-                          className="block w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors text-center font-medium"
-                    >
-                          <Download className="w-4 h-4 inline mr-2" />
-                      Télécharger les stems (ZIP)
-                    </a>
-                  )}
                 </div>
                 
                     <p className="text-xs text-blue-400 text-center">

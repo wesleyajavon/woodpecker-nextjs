@@ -118,14 +118,8 @@ ffmpeg -f lavfi -i "sine=frequency=440:duration=120" -acodec pcm_s16le test_mast
 ### **Fichiers images**
 
 #### **Test JPG Artwork**
-```bash
-# Créer une image de test
-convert -size 800x800 xc:purple -pointsize 72 -fill white -gravity center -annotate +0+0 "TEST" test_artwork.jpg
-```
 **Vérifications** :
-- Upload réussi vers `woodpecker-beats/artwork/beats/`
-- Transformations automatiques :
-  - Thumbnail 300x300
+- Upload réussi vers `woodpecker-beats/beats/`
   - Medium 600x600
   - Large 1200x1200
 - URLs de transformation générées
@@ -208,8 +202,6 @@ npm run dev
 ### **Fonctionnalités de base**
 - [ ] Upload de preview audio
 - [ ] Upload de master audio
-- [ ] Upload de stems
-- [ ] Upload d'artwork
 - [ ] Validation des champs
 - [ ] Gestion des erreurs
 - [ ] Messages de succès

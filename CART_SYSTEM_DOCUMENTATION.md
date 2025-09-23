@@ -256,7 +256,6 @@ graph TD
       beatTitle: string
       downloadUrls: {
         master: string
-        stems?: string
         expiresAt: string
       }
     }>
@@ -271,7 +270,7 @@ graph TD
 **Query Parameters**:
 - `orderId`: Order ID
 - `customerEmail`: Customer email
-- `type`: 'master' | 'stems' | 'preview'
+- `type`: 'master' | 'preview'
 
 ## 🔧 Stripe Integration
 

@@ -60,7 +60,6 @@ model Beat {
   tags        String[]
   previewUrl  String?
   fullUrl     String?
-  stemsUrl    String?
   isExclusive Boolean  @default(false)
   isActive    Boolean  @default(true)
   featured    Boolean  @default(false)

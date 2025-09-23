@@ -463,24 +463,6 @@ export default function BeatManagementPage() {
                     </div>
                   )}
                   
-                  {/* {beat.stemsUrl && (
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Music className="w-5 h-5 text-blue-400" />
-                        <span className="text-white">Stems (ZIP)</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const url = `/api/download/beat/${beat.id}?type=stems&admin=true`
-                          window.location.href = url
-                        }}
-                        className="text-blue-400 hover:text-blue-300"
-                        title="Télécharger les stems"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )} */}
                 </div>
               </div>
             </motion.div>

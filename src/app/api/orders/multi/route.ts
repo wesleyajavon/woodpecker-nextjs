@@ -51,8 +51,7 @@ export async function GET(request: NextRequest) {
                 price: true,
                 isExclusive: true,
                 featured: true,
-                fullUrl: true,
-                stemsUrl: true
+                fullUrl: true
               }
             }
           }

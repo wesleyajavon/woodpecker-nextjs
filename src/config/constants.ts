@@ -124,17 +124,13 @@ export const FILE_CONFIG = {
   // Types de fichiers acceptés
   allowedAudioFormats: ['.mp3', '.wav', '.aiff', '.flac'],
   allowedImageFormats: ['.jpg', '.jpeg', '.png', '.webp'],
-  allowedArchiveFormats: ['.zip', '.rar'],
-  
   // Tailles maximales
   maxAudioSize: 200 * 1024 * 1024, // 200MB (augmenté pour les gros fichiers)
   maxImageSize: 20 * 1024 * 1024,  // 20MB (augmenté pour les images haute résolution)
-  maxArchiveSize: 1 * 1024 * 1024 * 1024, // 1GB (augmenté pour les stems complets)
   
   // Qualités audio
   previewQuality: '128kbps',
-  fullQuality: '320kbps',
-  stemsQuality: '24bit/48kHz'
+  fullQuality: '320kbps'
 }
 
 export const API_CONFIG = {

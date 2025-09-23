@@ -37,16 +37,6 @@ const fileFilter = (req: unknown, file: Express.Multer.File, cb: multer.FileFilt
       cb(new Error('Format d\'image non supporté'));
     }
   }
-  // Validation des archives (stems)
-  else if (file.fieldname === 'archive') {
-    if (FILE_CONFIG.allowedArchiveFormats.some(format => 
-      file.originalname.toLowerCase().endsWith(format)
-    )) {
-      cb(null, true);
-    } else {
-      cb(new Error('Format d\'archive non supporté'));
-    }
-  }
   // Fichier non reconnu
   else {
     cb(new Error('Type de fichier non supporté'));

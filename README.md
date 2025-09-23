@@ -194,28 +194,18 @@ woodpecker-beats/
 ├── beats/
 │   ├── previews/     # Previews audio (30s, MP3)
 │   ├── masters/      # Fichiers masters (WAV)
-│   ├── stems/        # Archives de stems (ZIP)
 │   └── waveforms/    # Waveforms générés
-├── artwork/
-│   ├── beats/        # Artwork des beats
-│   ├── albums/       # Artwork des albums
-│   └── profiles/     # Photos de profil
 └── temp/             # Fichiers temporaires
 ```
 
 #### **Formats supportés**
 - **Audio** : MP3, WAV, AIFF, FLAC
-- **Images** : JPG, JPEG, PNG, WebP
-- **Archives** : ZIP, RAR
 
 #### **Limites de fichiers**
 - **Audio** : 100MB max
-- **Images** : 10MB max
-- **Archives** : 500MB max
 
 #### **Transformations automatiques**
 - **Previews** : 30 secondes, qualité optimisée
-- **Artwork** : Redimensionnement automatique (300x300, 600x600, 1200x1200)
 - **Waveforms** : Génération automatique des visualisations audio
 - **Animations** : Transitions fluides, effets de survol, parallaxe
 

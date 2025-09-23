@@ -188,8 +188,6 @@ export default function UploadTestPage() {
               <ul className="space-y-2 text-gray-300">
                 <li>• Upload d&apos;un fichier audio preview (MP3, WAV)</li>
                 <li>• Upload d&apos;un fichier master (WAV, AIFF)</li>
-                <li>• Upload d&apos;archives de stems (ZIP, RAR)</li>
-                <li>• Upload d&apos;artwork (JPG, PNG, WebP)</li>
                 <li>• Validation des champs du formulaire</li>
                 <li>• Gestion des erreurs de validation</li>
               </ul>

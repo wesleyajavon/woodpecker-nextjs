@@ -21,7 +21,6 @@ interface OrderWithBeat {
     id: string
     title: string
     fullUrl: string | null
-    stemsUrl: string | null
     previewUrl: string | null
     [key: string]: unknown // Allow additional properties from Prisma
   }
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { searchParams } = new URL(request.url)
     const orderId = searchParams.get('orderId')
     const customerEmail = searchParams.get('customerEmail')
-    const type = searchParams.get('type') || 'master' // 'preview' | 'master' | 'stems'
+    const type = searchParams.get('type') || 'master' // 'preview' | 'master'
     const adminAccess = searchParams.get('admin') === 'true'
 
     // Mode admin: accès direct aux fichiers sans commande
@@ -51,7 +50,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
       // Extraction des public IDs depuis les URLs Cloudinary
       const extractPublicId = (url: string): string | null => {
-        const match = url.match(/\/v\d+\/(.+)\.(mp3|wav|zip)$/)
+        const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
         return match ? match[1] : null
       }
 
@@ -68,16 +67,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           quality: 'auto:low'
         }, 'video')
         filename = `${beat.title}_preview.mp3`
-      } else if (type === 'stems') {
-        const stemsPublicId = beat.stemsUrl ? extractPublicId(beat.stemsUrl) : null
-        if (!stemsPublicId) {
-          return NextResponse.json({ error: 'Stems indisponibles' }, { status: 404 })
-        }
-        downloadUrl = CloudinaryService.generateSignedUrl(stemsPublicId, 30, {
-          format: 'zip',
-          quality: 'auto:best'
-        }, 'raw')
-        filename = `${beat.title}_stems.zip`
       } else {
         const masterPublicId = beat.fullUrl ? extractPublicId(beat.fullUrl) : null
         if (!masterPublicId) {
@@ -93,7 +82,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       const response = NextResponse.redirect(downloadUrl)
       response.headers.set('Content-Disposition', `attachment; filename="${filename}"`)
       response.headers.set('Content-Type',
-        type === 'stems' ? 'application/zip' : type === 'preview' ? 'audio/mpeg' : 'audio/wav')
+        type === 'preview' ? 'audio/mpeg' : 'audio/wav')
       return response
     }
 
@@ -172,7 +161,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Extraction des public IDs depuis les URLs Cloudinary
     const extractPublicId = (url: string): string | null => {
-      const match = url.match(/\/v\d+\/(.+)\.(mp3|wav|zip)$/)
+      const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
       return match ? match[1] : null
     }
 
@@ -184,19 +173,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    const stemsPublicId = order.beat.stemsUrl ? extractPublicId(order.beat.stemsUrl) : null
-
     // Génération de l'URL de téléchargement appropriée
     let downloadUrl: string
     let filename: string
 
-    if (type === 'stems' && stemsPublicId) {
-      downloadUrl = CloudinaryService.generateSignedUrl(stemsPublicId, 30, {
-        format: 'zip',
-        quality: 'auto:best'
-      }, 'raw')
-      filename = `${order.beat.title}_stems.zip`
-    } else if (type === 'preview' && order.beat.previewUrl) {
+    if (type === 'preview' && order.beat.previewUrl) {
       const previewPublicId = extractPublicId(order.beat.previewUrl)
       if (!previewPublicId) {
         return NextResponse.json(
@@ -222,7 +203,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     
     // Ajout des headers pour forcer le téléchargement
     response.headers.set('Content-Disposition', `attachment; filename="${filename}"`)
-    response.headers.set('Content-Type', type === 'stems' ? 'application/zip' : type === 'preview' ? 'audio/mpeg' : 'audio/wav')
+    response.headers.set('Content-Type', type === 'preview' ? 'audio/mpeg' : 'audio/wav')
     
     return response
 
@@ -315,7 +296,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Extraction des public IDs depuis les URLs Cloudinary
     const extractPublicId = (url: string): string | null => {
-      const match = url.match(/\/v\d+\/(.+)\.(mp3|wav|zip)$/)
+      const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
       return match ? match[1] : null
     }
 
@@ -327,13 +308,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    const stemsPublicId = order.beat.stemsUrl ? extractPublicId(order.beat.stemsUrl) : null
-
     // Génération des URLs de téléchargement direct
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
     const downloadUrls = {
       master: `${baseUrl}/api/download/beat/${beatId}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=master`,
-      stems: stemsPublicId ? `${baseUrl}/api/download/beat/${beatId}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=stems` : null,
       expiresAt: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes
     }
 
@@ -349,7 +327,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
         downloadUrls: {
           master: downloadUrls.master,
-          stems: downloadUrls.stems,
           expiresAt: downloadUrls.expiresAt
         },
         order: {
