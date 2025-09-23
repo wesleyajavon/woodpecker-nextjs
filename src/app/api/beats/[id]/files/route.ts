@@ -24,8 +24,6 @@ interface MulterFile {
 interface UploadedFiles {
   preview?: MulterFile[];
   master?: MulterFile[];
-  stems?: MulterFile[];
-  artwork?: MulterFile[];
   [key: string]: MulterFile[] | undefined;
 }
 
@@ -86,7 +84,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           size: value.size
         };
         
-        if (key === 'preview' || key === 'master' || key === 'stems' || key === 'artwork') {
+        if (key === 'preview' || key === 'master') {
           if (!files[key]) {
             files[key] = [];
           }
@@ -103,6 +101,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       // Upload de la preview
       if (files.preview && files.preview[0]) {
         const previewFile = files.preview[0];
+        console.log(`Starting preview update: ${previewFile.originalname} (${previewFile.size} bytes) - will be cropped to 30 seconds`);
         uploadResults.preview = await CloudinaryService.uploadAudio(
           previewFile.buffer,
           CLOUDINARY_FOLDERS.BEATS.PREVIEWS,
@@ -110,10 +109,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
             resource_type: 'video',
             format: 'mp3',
             quality: 'auto:low',
-            duration: 30 // 30 secondes pour la preview
+            crop_duration: 30 // Couper à 30 secondes pour la preview
           }
         );
         updateData.previewUrl = uploadResults.preview.secure_url;
+        console.log('Preview update completed successfully - cropped to 30 seconds');
       }
 
       // Upload du master (optionnel)
@@ -131,35 +131,6 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         updateData.fullUrl = uploadResults.master.secure_url;
       }
 
-      // Upload des stems (optionnel)
-      if (files.stems && files.stems[0]) {
-        const stemsFile = files.stems[0];
-        uploadResults.stems = await CloudinaryService.uploadAudio(
-          stemsFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.STEMS,
-          {
-            resource_type: 'raw',
-            format: 'zip'
-          }
-        );
-        updateData.stemsUrl = uploadResults.stems.secure_url;
-      }
-
-      // Upload de l'artwork (optionnel)
-      if (files.artwork && files.artwork[0]) {
-        const artworkFile = files.artwork[0];
-        uploadResults.artwork = await CloudinaryService.uploadImage(
-          artworkFile.buffer,
-          CLOUDINARY_FOLDERS.ARTWORK.BEATS,
-          {
-            width: 800,
-            height: 800,
-            crop: 'fill',
-            quality: 'auto:good'
-          }
-        );
-        updateData.artworkUrl = uploadResults.artwork.secure_url;
-      }
 
     } catch (uploadError) {
       console.error('Erreur lors de l\'upload vers Cloudinary:', uploadError);

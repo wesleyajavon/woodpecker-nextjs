@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Grid3X3, List, Play, Pause, ShoppingCart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 import { useBeats } from '@/hooks/useBeats';
 import CheckoutButton from '@/components/CheckoutButton';
 import AddToCartButton from '@/components/AddToCartButton';
@@ -10,7 +11,9 @@ import AddToCartButton from '@/components/AddToCartButton';
 export default function BeatsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
+  const [loadingBeat, setLoadingBeat] = useState<string | null>(null);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Utilisation du hook personnalisé
   const {
@@ -31,13 +34,73 @@ export default function BeatsPage() {
   const genres = ['Tous', 'Trap', 'Hip-Hop', 'Drill', 'Jazz', 'Electronic', 'Boom Bap', 'Synthwave', 'R&B', 'Pop', 'Rock'];
 
   // Gestion de la lecture/arrêt
-  const togglePlay = (beatId: string) => {
+  const togglePlay = async (beatId: string, previewUrl?: string) => {
     if (playingBeat === beatId) {
+      // Pause current audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       setPlayingBeat(null);
+      setLoadingBeat(null);
     } else {
-      setPlayingBeat(beatId);
+      // Stop any currently playing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      
+      // Start new audio if preview URL exists
+      if (previewUrl) {
+        setLoadingBeat(beatId);
+        try {
+          const audio = new Audio(previewUrl);
+          audioRef.current = audio;
+          
+          // Handle audio events
+          audio.addEventListener('canplaythrough', () => {
+            setLoadingBeat(null);
+            setPlayingBeat(beatId);
+          });
+          
+          audio.addEventListener('error', () => {
+            console.error('Error playing audio');
+            setLoadingBeat(null);
+            setPlayingBeat(null);
+          });
+          
+          audio.addEventListener('ended', () => {
+            setPlayingBeat(null);
+            audioRef.current = null;
+          });
+          
+          await audio.play();
+        } catch (error) {
+          console.error('Error playing audio:', error);
+          setLoadingBeat(null);
+          setPlayingBeat(null);
+        }
+      }
     }
   };
+
+  // Cleanup audio when component unmounts or playingBeat changes
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Stop audio when playingBeat changes to null
+  useEffect(() => {
+    if (!playingBeat && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [playingBeat]);
 
   // Pagination helpers
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
@@ -287,10 +350,13 @@ export default function BeatsPage() {
                         
                         {/* Bouton play/pause */}
                         <button
-                          onClick={() => togglePlay(beat.id)}
+                          onClick={() => togglePlay(beat.id, beat.previewUrl || undefined)}
                           className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-xl"
+                          disabled={loadingBeat === beat.id}
                         >
-                          {playingBeat === beat.id ? (
+                          {loadingBeat === beat.id ? (
+                            <div className="w-12 h-12 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : playingBeat === beat.id ? (
                             <Pause className="w-12 h-12 text-white" />
                           ) : (
                             <Play className="w-12 h-12 text-white" />
@@ -366,10 +432,13 @@ export default function BeatsPage() {
                             </div>
                             
                             <button
-                              onClick={() => togglePlay(beat.id)}
+                              onClick={() => togglePlay(beat.id, beat.previewUrl || undefined)}
                               className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-xl"
+                              disabled={loadingBeat === beat.id}
                             >
-                              {playingBeat === beat.id ? (
+                              {loadingBeat === beat.id ? (
+                                <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : playingBeat === beat.id ? (
                                 <Pause className="w-8 h-8 text-white" />
                               ) : (
                                 <Play className="w-8 h-8 text-white" />
@@ -525,15 +594,12 @@ export default function BeatsPage() {
             Je peux créer un beat sur mesure selon vos besoins spécifiques. Contactez-moi pour discuter de votre projet.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105">
-              Commander un beat personnalisé
-            </button>
-            <a
-              href="/upload-test"
-              className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 border border-white/20 hover:border-white/30"
+            <Link 
+              href="/contact"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 text-center"
             >
-              Tester l&apos;Upload
-            </a>
+              Commander un beat personnalisé
+            </Link>
           </div>
         </motion.div>
       </div>

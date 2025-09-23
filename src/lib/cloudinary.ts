@@ -121,36 +121,46 @@ export class CloudinaryService {
       format?: string;
       quality?: string;
       duration?: number;
+      crop_duration?: number; // Nouvelle option pour couper la durée
     } = {}
   ): Promise<CloudinaryResource> {
     try {
       configureCloudinary();
       let result: UploadApiResponse;
       
+      // Configuration de base pour l'upload
+      const uploadOptions = {
+        resource_type: options.resource_type || 'video',
+        folder,
+        overwrite: false,
+        unique_filename: true,
+        use_filename: true,
+        // Appliquer les transformations si crop_duration est spécifié
+        ...(options.crop_duration && {
+          eager: [
+            `so_0,du_${options.crop_duration},f_${options.format || 'mp3'},q_${options.quality || 'auto:low'}`
+          ],
+          eager_async: false
+        })
+      };
+
+      // Debug logging for transformation
+      if (options.crop_duration) {
+        console.log('Cloudinary upload options with cropping:', {
+          crop_duration: options.crop_duration,
+          transformation_string: `so_0,du_${options.crop_duration},f_${options.format || 'mp3'},q_${options.quality || 'auto:low'}`,
+          upload_options: uploadOptions
+        });
+      }
+
       if (typeof file === 'string') {
         // Upload depuis une URL
-        result = await cloudinary.uploader.upload(file, {
-          resource_type: options.resource_type || 'video',
-          folder,
-          overwrite: false,
-          unique_filename: true,
-          use_filename: true,
-          // Pour les gros fichiers, on laisse Cloudinary gérer le format automatiquement
-          // Les transformations seront appliquées à la demande via des URLs de transformation
-        });
+        result = await cloudinary.uploader.upload(file, uploadOptions);
       } else {
         // Upload depuis un Buffer
         result = await new Promise<UploadApiResponse>((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              resource_type: options.resource_type || 'video',
-              folder,
-              overwrite: false,
-              unique_filename: true,
-              use_filename: true,
-              // Pour les gros fichiers, on laisse Cloudinary gérer le format automatiquement
-              // Les transformations seront appliquées à la demande via des URLs de transformation
-            },
+            uploadOptions,
             (error, result) => {
               if (error) reject(error);
               else resolve(result!);
@@ -160,9 +170,25 @@ export class CloudinaryService {
         });
       }
 
+      // Si des transformations ont été appliquées, utiliser l'URL transformée
+      const finalUrl = options.crop_duration && result.eager && result.eager.length > 0 
+        ? result.eager[0].secure_url 
+        : result.secure_url;
+
+      // Debug logging
+      if (options.crop_duration) {
+        console.log('Cloudinary upload with cropping:', {
+          crop_duration: options.crop_duration,
+          original_url: result.secure_url,
+          eager_transformations: result.eager,
+          final_url: finalUrl,
+          duration: result.duration
+        });
+      }
+
       return {
         public_id: result.public_id,
-        secure_url: result.secure_url,
+        secure_url: finalUrl,
         format: result.format,
         resource_type: result.resource_type,
         bytes: result.bytes,

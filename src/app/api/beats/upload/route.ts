@@ -85,13 +85,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload des fichiers vers Cloudinary
-    const uploadResults: Record<string, { public_id: string; secure_url: string; resource_type: string }> = {};
+    const uploadResults: Record<string, { public_id: string; secure_url: string; resource_type: string; duration?: number }> = {};
 
     try {
       // Upload de la preview
       if (files.preview && files.preview[0]) {
         const previewFile = files.preview[0];
-        console.log(`Starting preview upload: ${previewFile.originalname} (${previewFile.size} bytes)`);
+        console.log(`Starting preview upload: ${previewFile.originalname} (${previewFile.size} bytes) - will be cropped to 30 seconds`);
+        console.log('Upload options:', {
+          resource_type: 'video',
+          format: 'mp3',
+          quality: 'auto:low',
+          crop_duration: 30
+        });
+        
         uploadResults.preview = await CloudinaryService.uploadAudio(
           previewFile.buffer,
           CLOUDINARY_FOLDERS.BEATS.PREVIEWS,
@@ -99,10 +106,15 @@ export async function POST(request: NextRequest) {
             resource_type: 'video',
             format: 'mp3',
             quality: 'auto:low',
-            duration: 30 // 30 secondes pour la preview
+            crop_duration: 30 // Couper à 30 secondes pour la preview
           }
         );
-        console.log('Preview upload completed successfully');
+        
+        console.log('Preview upload result:', {
+          public_id: uploadResults.preview.public_id,
+          secure_url: uploadResults.preview.secure_url,
+          duration: uploadResults.preview.duration
+        });
       }
 
       // Upload du master (optionnel)

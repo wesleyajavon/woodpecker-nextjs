@@ -12,36 +12,39 @@ const Hero = () => {
     offset: ["start start", "end start"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.99], [1, 0.3]);
+  
+  // Separate animation for stats - keep them visible longer
+  const statsOpacity = useTransform(scrollYProgress, [0, 0.98], [1, 0.95]);
 
   const floatingIcons = [
-    { icon: Drum, delay: 0, position: "top-20 left-20" },
-    { icon: Radio, delay: 2, position: "top-40 right-20" },
-    { icon: Mic, delay: 4, position: "bottom-20 left-40" },
-    { icon: Music, delay: 1, position: "top-60 left-60" },
-    { icon: Headphones, delay: 3, position: "bottom-40 right-40" },
+    { icon: Drum, delay: 0, position: "top-20 left-4 lg:left-20" },
+    { icon: Radio, delay: 2, position: "top-40 right-4 lg:right-20" },
+    { icon: Mic, delay: 4, position: "bottom-20 left-8 lg:left-40" },
+    { icon: Music, delay: 1, position: "top-60 left-12 lg:left-60" },
+    { icon: Headphones, delay: 3, position: "bottom-40 right-8 lg:right-40" },
   ];
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center overflow-hidden">
+    <section ref={containerRef} className="relative min-h-[140vh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(156,146,172,0.1)_1px,transparent_0)] bg-[length:20px_20px] opacity-30" />
         
         {/* Floating geometric shapes */}
         <motion.div
-          className="absolute top-20 left-20 w-32 h-32 border border-purple-500/20 rounded-full"
+          className="absolute top-20 left-4 lg:left-20 w-16 lg:w-32 h-16 lg:h-32 border border-purple-500/20 rounded-full"
           animate={{ rotate: 360, scale: [1, 1.2, 1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-2xl"
+          className="absolute top-40 right-4 lg:right-20 w-12 lg:w-24 h-12 lg:h-24 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-2xl"
           animate={{ rotate: -360, y: [0, -20, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-20 left-40 w-20 h-20 border border-pink-500/20 rounded-lg"
+          className="absolute bottom-20 left-8 lg:left-40 w-10 lg:w-20 h-10 lg:h-20 border border-pink-500/20 rounded-lg"
           animate={{ rotate: 180, scale: [1, 0.8, 1] }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -63,7 +66,7 @@ const Hero = () => {
               ease: "easeInOut" 
             }}
           >
-            <item.icon className="h-8 w-8" />
+            <item.icon className="h-6 w-6 lg:h-8 lg:w-8" />
           </motion.div>
         ))}
       </div>
@@ -71,14 +74,14 @@ const Hero = () => {
       {/* Main content */}
       <motion.div 
         style={{ y, opacity }}
-        className="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto"
+        className="relative z-20 text-center text-white px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full"
       >
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="inline-flex items-center mt-20 gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
+          className="inline-flex items-center mt-16 lg:mt-20 gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 lg:px-6 py-2 lg:py-3 mb-6 lg:mb-8"
         >
           <Sparkles className="h-5 w-5 text-yellow-400" />
           <span className="text-sm font-medium">Nouveau : Pack Trap 2024</span>
@@ -89,7 +92,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="text-5xl sm:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+          className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 lg:mb-6 leading-tight"
         >
           <span className="block">Woodpecker</span>
           <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
@@ -102,7 +105,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="text-xl sm:text-2xl lg:text-3xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
+          className="text-lg sm:text-xl lg:text-2xl xl:text-3xl text-gray-300 mb-8 lg:mb-12 max-w-4xl mx-auto leading-relaxed px-4"
         >
           Découvrez ma collection exclusive de beats originaux. Des instrumentaux uniques pour rappeurs, chanteurs et producteurs. 
           Chaque beat raconte une histoire.
@@ -113,7 +116,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+          className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center items-center mb-12 lg:mb-16 px-4"
         >
           <motion.div
             whileHover={{ scale: 1.05, y: -5 }}
@@ -121,7 +124,7 @@ const Hero = () => {
           >
             <Link
               href="/beats"
-              className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-10 py-5 rounded-2xl font-semibold text-xl transition-all duration-300 shadow-2xl shadow-purple-500/25"
+              className="group relative inline-flex items-center gap-2 lg:gap-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 lg:px-10 py-3 lg:py-5 rounded-2xl font-semibold text-lg lg:text-xl transition-all duration-300 shadow-2xl shadow-purple-500/25"
             >
               <span>Écouter mes beats</span>
               <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
@@ -133,11 +136,11 @@ const Hero = () => {
             </Link>
           </motion.div>
           
-          <motion.div
+          {/* <motion.div
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
           >
-            <button className="group relative inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-2xl font-semibold text-xl transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-2xl">
+            <button className="group relative inline-flex items-center gap-2 lg:gap-3 bg-white/10 hover:bg-white/20 text-white px-6 lg:px-10 py-3 lg:py-5 rounded-2xl font-semibold text-lg lg:text-xl transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-2xl">
               <Play className="h-6 w-6 group-hover:scale-110 transition-transform" />
               <span>Démo live</span>
               <motion.div
@@ -146,7 +149,7 @@ const Hero = () => {
                 transition={{ duration: 3, repeat: Infinity }}
               />
             </button>
-          </motion.div>
+          </motion.div> */}
         </motion.div>
 
         {/* Stats with enhanced design */}
@@ -154,13 +157,14 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto"
+          style={{ opacity: statsOpacity }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8 max-w-5xl mx-auto px-4 relative z-30 bg-black/40 backdrop-blur-md rounded-3xl py-8 border border-white/10"
         >
           {[
-            { number: '200+', label: 'Beats', icon: Drum },
-            { number: '15+', label: 'Genres', icon: Music },
+            { number: '20+', label: 'Beats', icon: Drum },
+            { number: '10+', label: 'Genres', icon: Music },
             { number: '50+', label: 'Clients', icon: Headphones },
-            { number: '5+', label: 'Années', icon: Sparkles },
+            { number: '3+', label: 'Années d\'expérience', icon: Sparkles },
           ].map((stat, index) => (
             <motion.div
               key={index}
@@ -170,9 +174,9 @@ const Hero = () => {
               whileHover={{ scale: 1.05, y: -5 }}
               className="text-center group"
             >
-              <div className="relative mb-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <stat.icon className="h-8 w-8 text-purple-400" />
+              <div className="relative mb-2 lg:mb-4">
+                <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon className="h-6 w-6 lg:h-8 lg:w-8 text-purple-400" />
                 </div>
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity"
@@ -180,10 +184,10 @@ const Hero = () => {
                   transition={{ duration: 2, repeat: Infinity }}
                 />
               </div>
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
+              <div className="text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-1 lg:mb-2 group-hover:text-purple-300 transition-colors">
                 {stat.number}
               </div>
-              <div className="text-gray-400 group-hover:text-gray-300 transition-colors">
+              <div className="text-sm lg:text-base text-gray-400 group-hover:text-gray-300 transition-colors">
                 {stat.label}
               </div>
             </motion.div>
