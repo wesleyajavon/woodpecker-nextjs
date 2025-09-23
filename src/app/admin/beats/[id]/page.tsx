@@ -463,7 +463,7 @@ export default function BeatManagementPage() {
                     </div>
                   )}
                   
-                  {beat.stemsUrl && (
+                  {/* {beat.stemsUrl && (
                     <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                       <div className="flex items-center gap-3">
                         <Music className="w-5 h-5 text-blue-400" />
@@ -480,7 +480,7 @@ export default function BeatManagementPage() {
                         <Download className="w-4 h-4" />
                       </button>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </motion.div>
