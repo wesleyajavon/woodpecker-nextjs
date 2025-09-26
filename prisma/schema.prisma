@@ -33,6 +33,9 @@ model Beat {
   previewUrl  String?  // URL for preview (30 seconds)
   fullUrl     String?  // URL for full beat (after purchase)
   
+  // Artwork
+  artworkUrl  String?  // URL for beat artwork/cover image
+  
   // Metadata
   isExclusive Boolean  @default(false)
   isActive    Boolean  @default(true)

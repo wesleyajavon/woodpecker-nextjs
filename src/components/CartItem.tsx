@@ -53,6 +53,17 @@ export default function CartItem({ item }: CartItemProps) {
       }`}
     >
       <div className="flex items-start space-x-4">
+        {/* Beat Artwork */}
+        {item.beat.artworkUrl && (
+          <div className="flex-shrink-0">
+            <img
+              src={item.beat.artworkUrl}
+              alt={`${item.beat.title} artwork`}
+              className="w-16 h-16 rounded-lg object-cover"
+            />
+          </div>
+        )}
+        
         {/* Beat Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">

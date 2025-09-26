@@ -28,7 +28,8 @@ export const CLOUDINARY_FOLDERS = {
   BEATS: {
     PREVIEWS: 'woodpecker-beats/beats/previews',
     MASTERS: 'woodpecker-beats/beats/masters',
-    WAVEFORMS: 'woodpecker-beats/beats/waveforms'
+    WAVEFORMS: 'woodpecker-beats/beats/waveforms',
+    ARTWORKS: 'woodpecker-beats/beats/artworks'
   },
   TEMP: 'woodpecker-beats/temp'
 } as const;
@@ -224,6 +225,90 @@ export class CloudinaryService {
     }
   }
 
+  // Upload d'une image
+  static async uploadImage(
+    file: Buffer | string,
+    folder: string,
+    options: {
+      format?: string;
+      quality?: string;
+      width?: number;
+      height?: number;
+      crop?: string;
+    } = {}
+  ): Promise<CloudinaryResource> {
+    try {
+      configureCloudinary();
+      let result: UploadApiResponse;
+      
+      // Configuration de base pour l'upload d'image
+      const uploadOptions = {
+        resource_type: 'image' as const,
+        folder,
+        overwrite: false,
+        unique_filename: true,
+        use_filename: true,
+        format: options.format,
+        quality: options.quality || 'auto:best',
+        ...(options.width && options.height && {
+          width: options.width,
+          height: options.height,
+          crop: options.crop || 'limit'
+        })
+      };
+
+      if (typeof file === 'string') {
+        // Upload depuis une URL
+        result = await cloudinary.uploader.upload(file, uploadOptions);
+      } else {
+        // Upload depuis un Buffer
+        result = await new Promise<UploadApiResponse>((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            uploadOptions,
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result!);
+            }
+          );
+          uploadStream.end(file);
+        });
+      }
+
+      return {
+        public_id: result.public_id,
+        secure_url: result.secure_url,
+        format: result.format,
+        resource_type: result.resource_type,
+        bytes: result.bytes,
+        width: result.width,
+        height: result.height
+      };
+    } catch (error) {
+      console.error('Erreur lors de l\'upload image:', error);
+      
+      // Gestion spécifique des erreurs Cloudinary
+      if (error && typeof error === 'object' && 'http_code' in error) {
+        const cloudinaryError = error as { http_code: number; message: string };
+        
+        switch (cloudinaryError.http_code) {
+          case 400:
+            throw new Error(`Erreur de validation: ${cloudinaryError.message}`);
+          case 401:
+            throw new Error('Clés API Cloudinary invalides');
+          case 403:
+            throw new Error('Accès refusé à Cloudinary');
+          case 413:
+            throw new Error('Image trop volumineuse pour Cloudinary');
+          case 429:
+            throw new Error('Limite de quota Cloudinary atteinte');
+          default:
+            throw new Error(`Erreur Cloudinary (${cloudinaryError.http_code}): ${cloudinaryError.message}`);
+        }
+      }
+      
+      throw new Error('Échec de l\'upload image');
+    }
+  }
 
   // Suppression d'une ressource
   static async deleteResource(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<void> {

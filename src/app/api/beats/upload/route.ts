@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
           size: value.size
         };
         
-        if (key === 'preview' || key === 'master') {
+        if (key === 'preview' || key === 'master' || key === 'artwork') {
           if (!files[key]) {
             files[key] = [];
           }
@@ -133,6 +133,24 @@ export async function POST(request: NextRequest) {
         console.log('Master upload completed successfully');
       }
 
+      // Upload de l'artwork (optionnel)
+      if (files.artwork && files.artwork[0]) {
+        const artworkFile = files.artwork[0];
+        console.log(`Starting artwork upload: ${artworkFile.originalname} (${artworkFile.size} bytes)`);
+        uploadResults.artwork = await CloudinaryService.uploadImage(
+          artworkFile.buffer,
+          CLOUDINARY_FOLDERS.BEATS.ARTWORKS,
+          {
+            format: 'auto',
+            quality: 'auto:best',
+            width: 1000,
+            height: 1000,
+            crop: 'limit'
+          }
+        );
+        console.log('Artwork upload completed successfully');
+      }
+
 
     } catch (uploadError) {
       console.error('Erreur lors de l\'upload vers Cloudinary:', uploadError);
@@ -174,6 +192,7 @@ export async function POST(request: NextRequest) {
         tags: fields.tags ? JSON.parse(fields.tags) : [],
         previewUrl: uploadResults.preview?.secure_url,
         fullUrl: uploadResults.master?.secure_url,
+        artworkUrl: uploadResults.artwork?.secure_url,
         isExclusive: fields.isExclusive === 'true',
         featured: fields.featured === 'true'
       };

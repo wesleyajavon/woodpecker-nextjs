@@ -341,12 +341,20 @@ export default function BeatsPage() {
                     // Vue grille
                     <>
                       <div className="relative mb-4">
-                        <div className="w-full h-32 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
-                          <div className="text-center text-white">
-                            <div className="text-2xl font-bold mb-2">{beat.genre}</div>
-                            <div className="text-sm opacity-80">{beat.bpm} BPM</div>
+                        {beat.artworkUrl ? (
+                          <img
+                            src={beat.artworkUrl}
+                            alt={`${beat.title} artwork`}
+                            className="w-full h-32 object-cover rounded-xl"
+                          />
+                        ) : (
+                          <div className="w-full h-32 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
+                            <div className="text-center text-white">
+                              <div className="text-2xl font-bold mb-2">{beat.genre}</div>
+                              <div className="text-sm opacity-80">{beat.bpm} BPM</div>
+                            </div>
                           </div>
-                        </div>
+                        )}
                         
                         {/* Bouton play/pause */}
                         <button
@@ -425,11 +433,21 @@ export default function BeatsPage() {
                     <>
                       <div className="flex-1">
                         <div className="flex items-center gap-4">
-                          <div className="relative w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <div className="text-center text-white">
-                              <div className="text-sm font-bold">{beat.genre}</div>
-                              <div className="text-xs opacity-80">{beat.bpm} BPM</div>
-                            </div>
+                          <div className="relative w-20 h-20 rounded-xl flex-shrink-0 overflow-hidden">
+                            {beat.artworkUrl ? (
+                              <img
+                                src={beat.artworkUrl}
+                                alt={`${beat.title} artwork`}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                                <div className="text-center text-white">
+                                  <div className="text-sm font-bold">{beat.genre}</div>
+                                  <div className="text-xs opacity-80">{beat.bpm} BPM</div>
+                                </div>
+                              </div>
+                            )}
                             
                             <button
                               onClick={() => togglePlay(beat.id, beat.previewUrl || undefined)}

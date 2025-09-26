@@ -24,6 +24,7 @@ interface MulterFile {
 interface UploadedFiles {
   preview?: MulterFile[];
   master?: MulterFile[];
+  artwork?: MulterFile[];
   [key: string]: MulterFile[] | undefined;
 }
 
@@ -84,7 +85,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           size: value.size
         };
         
-        if (key === 'preview' || key === 'master') {
+        if (key === 'preview' || key === 'master' || key === 'artwork') {
           if (!files[key]) {
             files[key] = [];
           }
@@ -129,6 +130,22 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           }
         );
         updateData.fullUrl = uploadResults.master.secure_url;
+      }
+
+      // Upload de l'artwork (optionnel)
+      if (files.artwork && files.artwork[0]) {
+        const artworkFile = files.artwork[0];
+        uploadResults.artwork = await CloudinaryService.uploadImage(
+          artworkFile.buffer,
+          CLOUDINARY_FOLDERS.BEATS.ARTWORKS,
+          {
+            width: 800,
+            height: 800,
+            crop: 'fill',
+            quality: 'auto:best'
+          }
+        );
+        updateData.artworkUrl = uploadResults.artwork.secure_url;
       }
 
 

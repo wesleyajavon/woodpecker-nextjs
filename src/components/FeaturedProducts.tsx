@@ -142,12 +142,20 @@ export default function FeaturedProducts() {
             >
               {/* Image/Preview */}
               <div className="relative h-48 overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="text-3xl font-bold mb-2">{beat.genre}</div>
-                    <div className="text-sm opacity-80">{beat.bpm} BPM</div>
+                {beat.artworkUrl ? (
+                  <img
+                    src={beat.artworkUrl}
+                    alt={`${beat.title} artwork`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <div className="text-3xl font-bold mb-2">{beat.genre}</div>
+                      <div className="text-sm opacity-80">{beat.bpm} BPM</div>
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* Bouton play/pause */}
                 <button

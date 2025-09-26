@@ -105,6 +105,77 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
+// PATCH - Mise à jour partielle d'un beat
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  try {
+    // Vérification de l'authentification
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'ID du beat requis' },
+        { status: 400 }
+      );
+    }
+
+    // Vérification que le beat existe
+    const existingBeat = await BeatService.getBeatById(id);
+    if (!existingBeat) {
+      return NextResponse.json(
+        { error: 'Beat non trouvé' },
+        { status: 404 }
+      );
+    }
+
+    // Vérification des autorisations
+    const userId = await getUserIdFromEmail(session.user.email);
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Utilisateur non trouvé' },
+        { status: 404 }
+      );
+    }
+
+    // Si on supprime l'artwork, supprimer aussi le fichier Cloudinary
+    if (body.artworkUrl === null && existingBeat.artworkUrl) {
+      try {
+        const artworkPublicId = extractPublicId(existingBeat.artworkUrl);
+        if (artworkPublicId) {
+          await CloudinaryService.deleteResource(artworkPublicId, 'image');
+        }
+      } catch (cloudinaryError) {
+        console.error('Erreur lors de la suppression de l\'artwork Cloudinary:', cloudinaryError);
+        // On continue même si la suppression Cloudinary échoue
+      }
+    }
+
+    // Mise à jour du beat
+    const updatedBeat = await BeatService.updateBeat(id, body);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Beat mis à jour avec succès',
+      data: updatedBeat
+    });
+
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du beat:', error);
+    return NextResponse.json(
+      { error: 'Erreur interne du serveur' },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE - Supprimer un beat
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
@@ -157,6 +228,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         const masterPublicId = extractPublicId(existingBeat.fullUrl);
         if (masterPublicId) {
           await CloudinaryService.deleteResource(masterPublicId, 'video');
+        }
+      }
+
+      if (existingBeat.artworkUrl) {
+        const artworkPublicId = extractPublicId(existingBeat.artworkUrl);
+        if (artworkPublicId) {
+          await CloudinaryService.deleteResource(artworkPublicId, 'image');
         }
       }
 
