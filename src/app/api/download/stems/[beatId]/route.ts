@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { getUserIdFromEmail } from '@/lib/userUtils';
 import { CloudinaryService } from '@/lib/cloudinary';
+import { prisma } from '@/lib/prisma';
 
 interface RouteParams {
   params: Promise<{
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Vérifier que l'utilisateur a acheté ce beat
-    const hasPurchased = await OrderService.hasEmailPurchasedBeat(session.user.email, beatId);
+    const hasPurchased = await OrderService.hasCustomerPurchasedBeat(session.user.email, beatId);
     if (!hasPurchased) {
       return NextResponse.json(
         { error: 'Vous devez avoir acheté ce beat pour télécharger les stems' },
