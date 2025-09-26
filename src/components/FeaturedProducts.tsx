@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Pause, ShoppingCart, Star, Clock, Music } from 'lucide-react';
+import { Play, Pause, ShoppingCart, Star, Clock, Music, Archive } from 'lucide-react';
 import { useFeaturedBeats } from '@/hooks/useFeaturedBeats';
 import CheckoutButton from '@/components/CheckoutButton';
 
@@ -221,6 +221,12 @@ export default function FeaturedProducts() {
                       {tag}
                     </span>
                   ))}
+                  {beat.stemsUrl && (
+                    <span className="px-2 py-1 bg-orange-500/20 text-orange-300 text-xs rounded-full flex items-center gap-1">
+                      <Archive className="w-3 h-3" />
+                      Stems
+                    </span>
+                  )}
                 </div>
 
                 {/* Prix et CTA */}

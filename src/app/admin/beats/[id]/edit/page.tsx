@@ -11,7 +11,8 @@ import {
     X,
     AlertCircle,
     Save,
-    Image
+    Image,
+    Archive
 } from 'lucide-react';
 import Link from 'next/link';
 import AdminRoute from '@/components/AdminRoute';
@@ -30,15 +31,18 @@ export default function BeatEditPage() {
         preview: number;
         master: number;
         artwork: number;
+        stems: number;
     }>({
         preview: 0,
         master: 0,
-        artwork: 0
+        artwork: 0,
+        stems: 0
     });
     const [uploadedFiles, setUploadedFiles] = useState<{
         preview?: File;
         master?: File;
         artwork?: File;
+        stems?: File;
     }>({});
 
     // Chargement des données du beat
@@ -106,13 +110,48 @@ export default function BeatEditPage() {
         }
     };
 
+    // Suppression des stems
+    const handleRemoveStems = async () => {
+        if (!beat) return;
+
+        try {
+            setIsUploading(true);
+            
+            const response = await fetch(`/api/beats/${beatId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    stemsUrl: null
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erreur lors de la suppression');
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                setBeat(result.data);
+            }
+
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError(errorMessage);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     // Upload des fichiers
     const handleUpload = async () => {
         if (!beat) return;
 
         try {
             setIsUploading(true);
-            setUploadProgress({ preview: 0, master: 0, artwork: 0 });
+            setUploadProgress({ preview: 0, master: 0, artwork: 0, stems: 0 });
 
             const formData = new FormData();
 
@@ -120,13 +159,15 @@ export default function BeatEditPage() {
             if (uploadedFiles.preview) formData.append('preview', uploadedFiles.preview);
             if (uploadedFiles.master) formData.append('master', uploadedFiles.master);
             if (uploadedFiles.artwork) formData.append('artwork', uploadedFiles.artwork);
+            if (uploadedFiles.stems) formData.append('stems', uploadedFiles.stems);
 
             // Simulation du progrès d'upload
             const progressInterval = setInterval(() => {
                 setUploadProgress(prev => ({
                     preview: Math.min(prev.preview + 10, 100),
                     master: Math.min(prev.master + 8, 100),
-                    artwork: Math.min(prev.artwork + 12, 100)
+                    artwork: Math.min(prev.artwork + 12, 100),
+                    stems: Math.min(prev.stems + 15, 100)
                 }));
             }, 200);
 
@@ -147,7 +188,7 @@ export default function BeatEditPage() {
             if (result.success) {
                 setBeat(result.data);
                 setUploadedFiles({});
-                setUploadProgress({ preview: 0, master: 0, artwork: 0 });
+                setUploadProgress({ preview: 0, master: 0, artwork: 0, stems: 0 });
                 router.push(`/admin/beats/${beatId}`);
             }
 
@@ -428,6 +469,69 @@ export default function BeatEditPage() {
                                 </div>
                             </div>
 
+                            {/* Stems */}
+                            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                                <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                    <Archive className="w-5 h-5" />
+                                    Stems (ZIP)
+                                </h4>
+
+                                {beat.stemsUrl ? (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                                            <p className="text-white text-sm">Fichier stems disponible</p>
+                                            <button
+                                                onClick={() => handleRemoveStems()}
+                                                className="text-red-400 hover:text-red-300 transition-colors"
+                                                title="Supprimer les stems"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        <div className="p-3 bg-white/5 rounded-lg">
+                                            <p className="text-white text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-400 mb-4">Aucun fichier stems</p>
+                                )}
+
+                                <div>
+                                    <input
+                                        type="file"
+                                        accept=".zip"
+                                        onChange={(e) => e.target.files?.[0] && handleFileSelect('stems', e.target.files[0])}
+                                        className="hidden"
+                                        id="stems-upload"
+                                    />
+                                    <label
+                                        htmlFor="stems-upload"
+                                        className="block w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
+                                    >
+                                        {uploadedFiles.stems ? (
+                                            <div className="flex items-center gap-2 text-purple-300">
+                                                <Archive className="w-5 h-5" />
+                                                <span>{uploadedFiles.stems.name}</span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setUploadedFiles(prev => ({ ...prev, stems: undefined }));
+                                                    }}
+                                                    className="ml-auto text-red-400 hover:text-red-300"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 text-gray-400">
+                                                <Upload className="w-5 h-5" />
+                                                <span>Remplacer le fichier stems</span>
+                                            </div>
+                                        )}
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
 
                         {/* Section des progrès et actions */}
@@ -476,6 +580,21 @@ export default function BeatEditPage() {
                                                 <div
                                                     className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                                     style={{ width: `${uploadProgress.artwork}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {uploadedFiles.stems && (
+                                        <div>
+                                            <div className="flex justify-between text-sm text-gray-300 mb-1">
+                                                <span>Stems</span>
+                                                <span>{uploadProgress.stems}%</span>
+                                            </div>
+                                            <div className="w-full bg-gray-700 rounded-full h-2">
+                                                <div
+                                                    className="bg-orange-500 h-2 rounded-full transition-all duration-300"
+                                                    style={{ width: `${uploadProgress.stems}%` }}
                                                 />
                                             </div>
                                         </div>

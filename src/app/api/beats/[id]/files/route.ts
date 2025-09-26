@@ -25,6 +25,7 @@ interface UploadedFiles {
   preview?: MulterFile[];
   master?: MulterFile[];
   artwork?: MulterFile[];
+  stems?: MulterFile[];
   [key: string]: MulterFile[] | undefined;
 }
 
@@ -85,7 +86,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           size: value.size
         };
         
-        if (key === 'preview' || key === 'master' || key === 'artwork') {
+        if (key === 'preview' || key === 'master' || key === 'artwork' || key === 'stems') {
           if (!files[key]) {
             files[key] = [];
           }
@@ -146,6 +147,16 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           }
         );
         updateData.artworkUrl = uploadResults.artwork.secure_url;
+      }
+
+      // Upload des stems (optionnel)
+      if (files.stems && files.stems[0]) {
+        const stemsFile = files.stems[0];
+        uploadResults.stems = await CloudinaryService.uploadZip(
+          stemsFile.buffer,
+          CLOUDINARY_FOLDERS.BEATS.STEMS
+        );
+        updateData.stemsUrl = uploadResults.stems.secure_url;
       }
 
 

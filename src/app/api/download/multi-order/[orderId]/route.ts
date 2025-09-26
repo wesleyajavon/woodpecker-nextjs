@@ -12,6 +12,7 @@ interface BeatDownloadUrls {
   beatId: string
   beatTitle: string
   downloadUrls: DownloadUrls
+  hasStems?: boolean
 }
 
 export async function POST(
@@ -73,7 +74,8 @@ export async function POST(
         downloadUrls: {
           master: masterUrl,
           expiresAt: expiresAt.toISOString(),
-        }
+        },
+        hasStems: !!beat.stemsUrl
       })
     }
 

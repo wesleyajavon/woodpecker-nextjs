@@ -158,6 +158,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // Si on supprime les stems, supprimer aussi le fichier Cloudinary
+    if (body.stemsUrl === null && existingBeat.stemsUrl) {
+      try {
+        const stemsPublicId = extractPublicId(existingBeat.stemsUrl);
+        if (stemsPublicId) {
+          await CloudinaryService.deleteResource(stemsPublicId, 'raw');
+        }
+      } catch (cloudinaryError) {
+        console.error('Erreur lors de la suppression des stems Cloudinary:', cloudinaryError);
+        // On continue même si la suppression Cloudinary échoue
+      }
+    }
+
     // Mise à jour du beat
     const updatedBeat = await BeatService.updateBeat(id, body);
 
@@ -235,6 +248,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         const artworkPublicId = extractPublicId(existingBeat.artworkUrl);
         if (artworkPublicId) {
           await CloudinaryService.deleteResource(artworkPublicId, 'image');
+        }
+      }
+
+      if (existingBeat.stemsUrl) {
+        const stemsPublicId = extractPublicId(existingBeat.stemsUrl);
+        if (stemsPublicId) {
+          await CloudinaryService.deleteResource(stemsPublicId, 'raw');
         }
       }
 

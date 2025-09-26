@@ -20,6 +20,8 @@ interface MulterFile {
 interface UploadedFiles {
   preview?: MulterFile[];
   master?: MulterFile[];
+  artwork?: MulterFile[];
+  stems?: MulterFile[];
   [key: string]: MulterFile[] | undefined;
 }
 
@@ -151,6 +153,17 @@ export async function POST(request: NextRequest) {
         console.log('Artwork upload completed successfully');
       }
 
+      // Upload des stems (optionnel)
+      if (files.stems && files.stems[0]) {
+        const stemsFile = files.stems[0];
+        console.log(`Starting stems upload: ${stemsFile.originalname} (${stemsFile.size} bytes)`);
+        uploadResults.stems = await CloudinaryService.uploadZip(
+          stemsFile.buffer,
+          CLOUDINARY_FOLDERS.BEATS.STEMS
+        );
+        console.log('Stems upload completed successfully');
+      }
+
 
     } catch (uploadError) {
       console.error('Erreur lors de l\'upload vers Cloudinary:', uploadError);
@@ -193,6 +206,7 @@ export async function POST(request: NextRequest) {
         previewUrl: uploadResults.preview?.secure_url,
         fullUrl: uploadResults.master?.secure_url,
         artworkUrl: uploadResults.artwork?.secure_url,
+        stemsUrl: uploadResults.stems?.secure_url,
         isExclusive: fields.isExclusive === 'true',
         featured: fields.featured === 'true'
       };

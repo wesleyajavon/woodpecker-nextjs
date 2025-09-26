@@ -8,6 +8,7 @@ import { Download, Music, Clock, Tag, Star } from 'lucide-react'
 import { Order, MultiItemOrder } from '@/types/order'
 import { Beat } from '@/types/beat'
 import { useSession } from 'next-auth/react'
+import DownloadStemsButton from '@/components/DownloadStemsButton'
 
 interface DownloadUrls {
   master: string
@@ -18,6 +19,7 @@ interface BeatDownloadUrls {
   beatId: string
   beatTitle: string
   downloadUrls: DownloadUrls
+  hasStems?: boolean
 }
 
 interface MultiOrderDownloadData {
@@ -405,6 +407,14 @@ function SuccessContent() {
                               <Download className="w-4 h-4 inline mr-2" />
                               Télécharger le master (WAV)
                             </a>
+                            
+                            {beatDownload.hasStems && (
+                              <DownloadStemsButton
+                                beatId={beatDownload.beatId}
+                                beatTitle={beatDownload.beatTitle}
+                                className="mt-2"
+                              />
+                            )}
                             
                           </div>
                         </motion.div>

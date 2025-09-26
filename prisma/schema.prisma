@@ -32,6 +32,7 @@ model Beat {
   // Audio files
   previewUrl  String?  // URL for preview (30 seconds)
   fullUrl     String?  // URL for full beat (after purchase)
+  stemsUrl    String?  // URL for stems ZIP file (after purchase)
   
   // Artwork
   artworkUrl  String?  // URL for beat artwork/cover image

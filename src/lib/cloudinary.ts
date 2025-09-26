@@ -28,6 +28,7 @@ export const CLOUDINARY_FOLDERS = {
   BEATS: {
     PREVIEWS: 'woodpecker-beats/beats/previews',
     MASTERS: 'woodpecker-beats/beats/masters',
+    STEMS: 'woodpecker-beats/beats/stems',
     WAVEFORMS: 'woodpecker-beats/beats/waveforms',
     ARTWORKS: 'woodpecker-beats/beats/artworks'
   },
@@ -222,6 +223,78 @@ export class CloudinaryService {
       }
       
       throw new Error('Échec de l\'upload audio');
+    }
+  }
+
+  // Upload d'un fichier ZIP (stems)
+  static async uploadZip(
+    file: Buffer | string,
+    folder: string,
+    options: {
+      resource_type?: 'raw';
+    } = {}
+  ): Promise<CloudinaryResource> {
+    try {
+      configureCloudinary();
+      let result: UploadApiResponse;
+      
+      // Configuration de base pour l'upload de fichier ZIP
+      const uploadOptions = {
+        resource_type: 'raw' as const,
+        folder,
+        overwrite: false,
+        unique_filename: true,
+        use_filename: true
+      };
+
+      if (typeof file === 'string') {
+        // Upload depuis une URL
+        result = await cloudinary.uploader.upload(file, uploadOptions);
+      } else {
+        // Upload depuis un Buffer
+        result = await new Promise<UploadApiResponse>((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            uploadOptions,
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result!);
+            }
+          );
+          uploadStream.end(file);
+        });
+      }
+
+      return {
+        public_id: result.public_id,
+        secure_url: result.secure_url,
+        format: result.format,
+        resource_type: result.resource_type,
+        bytes: result.bytes
+      };
+    } catch (error) {
+      console.error('Erreur lors de l\'upload ZIP:', error);
+      
+      // Gestion spécifique des erreurs Cloudinary
+      if (error && typeof error === 'object' && 'http_code' in error) {
+        const cloudinaryError = error as { http_code: number; message: string };
+        
+        switch (cloudinaryError.http_code) {
+          case 400:
+            throw new Error(`Erreur de validation: ${cloudinaryError.message}`);
+          case 401:
+            throw new Error('Clés API Cloudinary invalides');
+          case 403:
+            throw new Error('Accès refusé à Cloudinary');
+          case 413:
+            throw new Error('Fichier ZIP trop volumineux pour Cloudinary');
+          case 429:
+            throw new Error('Limite de quota Cloudinary atteinte');
+          default:
+            throw new Error(`Erreur Cloudinary (${cloudinaryError.http_code}): ${cloudinaryError.message}`);
+        }
+      }
+      
+      throw new Error('Échec de l\'upload ZIP');
     }
   }
 

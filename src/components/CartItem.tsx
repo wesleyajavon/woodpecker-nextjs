@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Trash2, Plus, Minus, Music, Clock, Tag } from 'lucide-react'
+import { Trash2, Plus, Minus, Music, Clock, Tag, Archive } from 'lucide-react'
 import { CartItem as CartItemType } from '@/types/cart'
 import { useCartActions } from '@/hooks/useCart'
 import { Button } from './ui/Button'
@@ -89,6 +89,12 @@ export default function CartItem({ item }: CartItemProps) {
                   <div className="flex items-center space-x-1 text-purple-400">
                     <Tag className="h-4 w-4" />
                     <span className="font-medium">Exclusive</span>
+                  </div>
+                )}
+                {item.beat.stemsUrl && (
+                  <div className="flex items-center space-x-1 text-orange-400">
+                    <Archive className="h-4 w-4" />
+                    <span className="font-medium">Stems</span>
                   </div>
                 )}
               </div>
