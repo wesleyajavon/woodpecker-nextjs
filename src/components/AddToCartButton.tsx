@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ShoppingCart, Check, Plus } from 'lucide-react'
 import { Beat } from '@/types/beat'
+import { LicenseType } from '@/types/cart'
 import { useAddToCart } from '@/hooks/useCart'
 import { Button } from './ui/Button'
 
 interface AddToCartButtonProps {
   beat: Beat
+  licenseType: LicenseType
   className?: string
   size?: 'sm' | 'md' | 'lg'
   variant?: 'primary' | 'outline' | 'ghost' | 'secondary' | undefined
@@ -18,6 +20,7 @@ interface AddToCartButtonProps {
 
 export default function AddToCartButton({ 
   beat, 
+  licenseType,
   className = '', 
   size = 'md',
   variant = 'primary',
@@ -31,7 +34,7 @@ export default function AddToCartButton({
   const handleAddToCart = async () => {
     try {
       setIsLoading(true)
-      addToCart(beat, 1)
+      addToCart(beat, licenseType, 1)
       setIsAdded(true)
       
       // Reset the "added" state after 2 seconds

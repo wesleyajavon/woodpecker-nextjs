@@ -1,7 +1,7 @@
 import { Beat } from './beat'
 
 export type OrderStatus = 'PENDING' | 'PAID' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED'
-export type LicenseType = 'NON_EXCLUSIVE' | 'EXCLUSIVE' | 'CUSTOM'
+export type LicenseType = 'WAV_LEASE' | 'TRACKOUT_LEASE' | 'UNLIMITED_LEASE' | 'EXCLUSIVE' | 'CUSTOM'
 
 export interface Order {
   id: string

@@ -21,13 +21,21 @@ model Beat {
   bpm         Int
   key         String
   duration    String // Format: "3:24"
-  price       Decimal  @db.Decimal(10, 2)
+  // Prix par type de licence
+  wavLeasePrice      Decimal  @db.Decimal(10, 2) @default(19.99)
+  trackoutLeasePrice Decimal  @db.Decimal(10, 2) @default(39.99)
+  unlimitedLeasePrice Decimal @db.Decimal(10, 2) @default(79.99)
   rating      Float    @default(0)
   reviewCount Int      @default(0)
   tags        String[] // Array of tags like ["Dark", "Hard", "Underground"]
   
   // Stripe integration
-  stripePriceId String? // Stripe price ID for checkout
+  stripePriceId String? // Stripe price ID for checkout (deprecated)
+  
+  // Stripe Price IDs for each license type
+  stripeWavPriceId      String?
+  stripeTrackoutPriceId String?
+  stripeUnlimitedPriceId String?
   
   // Audio files
   previewUrl  String?  // URL for preview (30 seconds)
@@ -56,7 +64,6 @@ model Beat {
   @@index([genre])
   @@index([bpm])
   @@index([key])
-  @@index([price])
   @@index([rating])
   @@index([isActive])
   @@index([featured])
@@ -82,7 +89,7 @@ model Order {
   paidAt        DateTime?
   
   // License information
-  licenseType   LicenseType @default(NON_EXCLUSIVE)
+  licenseType   LicenseType @default(WAV_LEASE)
   usageRights  String[]    // Array of usage rights
   
   // Timestamps
@@ -123,7 +130,7 @@ model MultiItemOrder {
   sessionId     String?  // Stripe session ID for multi-item orders
   
   // License information
-  licenseType   LicenseType @default(NON_EXCLUSIVE)
+  licenseType   LicenseType @default(WAV_LEASE)
   usageRights  String[]    // Array of usage rights
   
   // Timestamps
@@ -175,7 +182,9 @@ enum OrderStatus {
 }
 
 enum LicenseType {
-  NON_EXCLUSIVE
+  WAV_LEASE
+  TRACKOUT_LEASE
+  UNLIMITED_LEASE
   EXCLUSIVE
   CUSTOM
 }

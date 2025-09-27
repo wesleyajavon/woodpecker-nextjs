@@ -261,7 +261,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
                   <span>•</span>
                   <span>{beat.duration}</span>
                   <span>•</span>
-                  <span className="text-purple-300 font-medium">{formatPrice(beat.price)}</span>
+                  <span className="text-purple-300 font-medium">{formatPrice(beat.wavLeasePrice)}</span>
                 </div>
 
                 {beat.tags.length > 0 && (

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the complete multi-item cart and order system implemented for the Woodpecker beats platform. The system allows users to add multiple beats to their cart, checkout in a single transaction, and receive individual download links for each purchased beat.
+This document describes the complete multi-item cart and order system implemented for the Woodpecker beats platform. The system allows users to add multiple beats to their cart with different license types, checkout in a single transaction, and receive individual download links for each purchased beat based on their selected license.
 
 ## 🏗️ Architecture
 
@@ -30,7 +30,7 @@ model MultiItemOrder {
   sessionId     String?  // Stripe session ID for multi-item orders
   
   // License information
-  licenseType   LicenseType @default(NON_EXCLUSIVE)
+  licenseType   LicenseType @default(WAV_LEASE)
   usageRights  String[]    // Array of usage rights
   
   // Timestamps
@@ -95,6 +95,7 @@ interface CartState {
 
 interface CartItem {
   beat: Beat
+  licenseType: LicenseType
   quantity: number
   addedAt: Date
 }
@@ -105,6 +106,8 @@ interface CartItem {
 - Real-time cart updates
 - Automatic total calculations
 - Optimistic updates
+- License-based pricing
+- Dynamic price calculations
 
 ### 2. Custom Hooks
 
@@ -120,6 +123,16 @@ const { cart, addToCart, removeFromCart, updateQuantity, clearCart } = useCart()
 const cartCount = useCartCount()
 const cartTotal = useCartTotal()
 const cartItems = useCartItems()
+
+// License utilities
+const getPriceByLicense = (beat: Beat, licenseType: LicenseType) => {
+  switch (licenseType) {
+    case 'WAV_LEASE': return beat.wavLeasePrice
+    case 'TRACKOUT_LEASE': return beat.trackoutLeasePrice
+    case 'UNLIMITED_LEASE': return beat.unlimitedLeasePrice
+    default: return beat.wavLeasePrice
+  }
+}
 ```
 
 ### 3. UI Components
@@ -129,20 +142,22 @@ const cartItems = useCartItems()
 
 Displays individual cart items with:
 - Beat details (title, genre, BPM, key, duration)
+- License type display and selection
 - Quantity controls (+/- buttons)
 - Remove functionality
-- Price calculations
+- Dynamic price calculations based on license
 - Smooth animations
 
 #### CartSummary Component
 **File**: `src/components/CartSummary.tsx`
 
 Shows order summary with:
-- Itemized breakdown
-- Total calculations
+- Itemized breakdown with license types
+- Dynamic total calculations based on licenses
 - Checkout button
 - Clear cart option
 - Empty state handling
+- License type indicators
 
 #### AddToCartButton Component
 **File**: `src/components/AddToCartButton.tsx`
@@ -153,6 +168,8 @@ Reusable button for adding beats to cart:
 - Loading states
 - Success feedback
 - Smooth animations
+- License type selection
+- Dynamic pricing display
 
 ## 🔄 Order Flow
 
@@ -160,24 +177,26 @@ Reusable button for adding beats to cart:
 
 ```mermaid
 graph TD
-    A[User adds beat to cart] --> B[Cart state updated]
-    B --> C[localStorage persisted]
-    C --> D[UI updates in real-time]
-    D --> E[Cart count badge updated]
+    A[User selects license type] --> B[User adds beat to cart]
+    B --> C[Cart state updated with license]
+    C --> D[localStorage persisted]
+    D --> E[UI updates in real-time]
+    E --> F[Cart count badge updated]
+    F --> G[Price recalculated based on license]
 ```
 
 ### 2. Checkout Process
 
 ```mermaid
 graph TD
-    A[User clicks checkout] --> B[Validate cart items]
-    B --> C[Create Stripe session]
+    A[User clicks checkout] --> B[Validate cart items and licenses]
+    B --> C[Create Stripe session with priceIds]
     C --> D[Redirect to Stripe]
     D --> E[Payment completed]
     E --> F[Webhook processes order]
-    F --> G[MultiItemOrder created]
+    F --> G[MultiItemOrder created with license info]
     G --> H[Success page displays]
-    H --> I[Download links generated]
+    H --> I[Download links generated based on license]
 ```
 
 ### 3. Download Flow
@@ -185,10 +204,14 @@ graph TD
 ```mermaid
 graph TD
     A[User clicks download] --> B[Validate order ownership]
-    B --> C[Check beat permissions]
-    C --> D[Generate Cloudinary URL]
-    D --> E[Redirect to download]
-    E --> F[File downloaded]
+    B --> C[Check license type]
+    C --> D[Check beat permissions]
+    D --> E[Generate Cloudinary URL]
+    E --> F[Redirect to download]
+    F --> G[File downloaded]
+    G --> H{License allows stems?}
+    H -->|Yes| I[Show stems download button]
+    H -->|No| J[Hide stems download button]
 ```
 
 ## 🛠️ API Endpoints
@@ -205,6 +228,7 @@ graph TD
     priceId: string
     quantity: number
     beatTitle: string
+    licenseType: LicenseType
   }>
   successUrl: string
   cancelUrl: string
@@ -258,6 +282,7 @@ graph TD
         master: string
         expiresAt: string
       }
+      hasStems: boolean
     }>
     expiresAt: string
   }
@@ -383,16 +408,18 @@ Complete testing interface with:
 
 ### Manual Testing Checklist
 
-- [ ] Add single beat to cart
-- [ ] Add multiple beats to cart
+- [ ] Add single beat to cart with different licenses
+- [ ] Add multiple beats to cart with mixed licenses
 - [ ] Update quantities
 - [ ] Remove items from cart
 - [ ] Clear entire cart
+- [ ] Test license selection modal
 - [ ] Proceed to checkout
 - [ ] Complete payment
 - [ ] View success page
 - [ ] Generate download links
 - [ ] Download individual beats
+- [ ] Test stems download (Trackout/Unlimited only)
 - [ ] Test mobile responsiveness
 
 ## 🚀 Deployment Considerations
@@ -499,5 +526,5 @@ For technical support or questions about the cart system:
 ---
 
 **Last Updated**: January 2025
-**Version**: 1.0.0
+**Version**: 2.0.0
 **Maintainer**: Development Team

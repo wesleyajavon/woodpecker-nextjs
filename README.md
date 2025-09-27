@@ -44,6 +44,14 @@ Woodpecker est un beatmaker talentueux qui crée des instrumentaux uniques pour 
 - **Téléchargements sécurisés** - Liens individuels pour chaque beat acheté
 - **Interface moderne** - Design responsive avec animations fluides
 
+### **Système de licences** 🎵
+- **Trois types de licences** - WAV Lease, Trackout Lease, Unlimited Lease
+- **Pricing dynamique** - Prix différents selon le type de licence
+- **Sélection de licence** - Interface intuitive avec modal élégante
+- **Accès contrôlé** - Téléchargement des stems selon la licence
+- **Intégration Stripe** - Produits et prix automatiquement créés
+- **Sécurité renforcée** - Vérification côté serveur des permissions
+
 ### **Technologies**
 - **Next.js 14** avec App Router
 - **TypeScript** pour la sécurité des types
@@ -169,6 +177,11 @@ src/
 - `CART_SYSTEM_DOCUMENTATION.md` - Documentation complète du système de panier
 - `CART_QUICK_REFERENCE.md` - Guide de référence rapide pour les développeurs
 - `CART_ARCHITECTURE.md` - Architecture technique détaillée
+- `LICENSING_SYSTEM.md` - Documentation du système de licences
+- `MIGRATION_GUIDE.md` - Guide de migration vers le nouveau système
+- `CLOUDINARY.md` - Configuration du stockage cloud
+- `DATABASE.md` - Documentation de la base de données
+- `STRIPE_SETUP.md` - Configuration des paiements
 
 ### **Pages de test**
 - `/cart-test` - Interface de test complète pour le système de panier

@@ -115,7 +115,7 @@ export default function UploadTestPage() {
                         </div>
                         <div>
                           <span className="text-gray-400">Prix:</span>
-                          <div className="text-white font-medium">{entry.beat.price}€</div>
+                          <div className="text-white font-medium">{entry.beat.wavLeasePrice}€</div>
                         </div>
                       </div>
                     </div>
@@ -151,7 +151,7 @@ export default function UploadTestPage() {
                     <div><span className="text-gray-400">BPM:</span> {beat.bpm}</div>
                     <div><span className="text-gray-400">Tonalité:</span> {beat.key}</div>
                     <div><span className="text-gray-400">Durée:</span> {beat.duration}</div>
-                    <div><span className="text-gray-400">Prix:</span> {beat.price}€</div>
+                    <div><span className="text-gray-400">Prix:</span> {beat.wavLeasePrice}€</div>
                   </div>
                   {beat.tags.length > 0 && (
                     <div className="mt-4">

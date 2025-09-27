@@ -13,7 +13,9 @@ interface OrderItemWithPartialBeat {
     bpm: number
     key: string
     duration: string
-    price: unknown // Prisma Decimal type
+    wavLeasePrice: unknown // Prisma Decimal type
+    trackoutLeasePrice: unknown // Prisma Decimal type
+    unlimitedLeasePrice: unknown // Prisma Decimal type
     isExclusive: boolean
     featured: boolean
     fullUrl: string | null
@@ -57,7 +59,9 @@ export async function GET(
                 bpm: true,
                 key: true,
                 duration: true,
-                price: true,
+                wavLeasePrice: true,
+                trackoutLeasePrice: true,
+                unlimitedLeasePrice: true,
                 isExclusive: true,
                 featured: true,
                 fullUrl: true,

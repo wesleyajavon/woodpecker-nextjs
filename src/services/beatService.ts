@@ -2,11 +2,13 @@ import { prisma } from '@/lib/prisma'
 import { Beat, CreateBeatInput, UpdateBeatInput, BeatFilters, BeatSortOptions } from '@/types/beat'
 // Import Decimal from Prisma
 import { Decimal } from '@prisma/client/runtime/library'
-import { createStripeProductForBeat } from '@/lib/stripe'
+import { createBeatStripeProducts } from '@/lib/stripe'
 
-// Type for Prisma Beat result with Decimal price
-type PrismaBeatResult = Omit<Beat, 'price'> & {
-  price: Decimal
+// Type for Prisma Beat result with Decimal prices
+type PrismaBeatResult = Omit<Beat, 'wavLeasePrice' | 'trackoutLeasePrice' | 'unlimitedLeasePrice'> & {
+  wavLeasePrice: Decimal
+  trackoutLeasePrice: Decimal
+  unlimitedLeasePrice: Decimal
 }
 
 // Type for the where clause in Prisma queries
@@ -37,7 +39,9 @@ export class BeatService {
   private static convertPrismaBeat(beat: PrismaBeatResult): Beat {
     return {
       ...beat,
-      price: Number(beat.price)
+      wavLeasePrice: Number(beat.wavLeasePrice),
+      trackoutLeasePrice: Number(beat.trackoutLeasePrice),
+      unlimitedLeasePrice: Number(beat.unlimitedLeasePrice)
     }
   }
 
@@ -46,7 +50,9 @@ export class BeatService {
     const beat = await prisma.beat.create({
       data: {
         ...data,
-        price: new Decimal(data.price),
+        wavLeasePrice: new Decimal(data.wavLeasePrice),
+        trackoutLeasePrice: new Decimal(data.trackoutLeasePrice),
+        unlimitedLeasePrice: new Decimal(data.unlimitedLeasePrice),
         userId
       }
     })
@@ -56,19 +62,30 @@ export class BeatService {
     // Automatically create Stripe product for the new beat
     try {
       console.log(`🔄 Creating Stripe product for new beat: ${beat.title}`)
-      const stripeResult = await createStripeProductForBeat(convertedBeat)
+      const stripeResult = await createBeatStripeProducts({
+        id: convertedBeat.id,
+        title: convertedBeat.title,
+        description: convertedBeat.description || null,
+        wavLeasePrice: convertedBeat.wavLeasePrice,
+        trackoutLeasePrice: convertedBeat.trackoutLeasePrice,
+        unlimitedLeasePrice: convertedBeat.unlimitedLeasePrice
+      })
       
-      if (stripeResult.success) {
-        // Update the beat with the Stripe price ID
+      if (stripeResult) {
+        // Update the beat with the Stripe price IDs
         const updatedBeat = await prisma.beat.update({
           where: { id: beat.id },
-          data: { stripePriceId: stripeResult.priceId }
+          data: { 
+            stripeWavPriceId: stripeResult.prices.wav,
+            stripeTrackoutPriceId: stripeResult.prices.trackout,
+            stripeUnlimitedPriceId: stripeResult.prices.unlimited
+          }
         })
         
-        console.log(`✅ Stripe product created and linked to beat: ${beat.title}`)
+        console.log(`✅ Stripe products created and linked to beat: ${beat.title}`)
         return this.convertPrismaBeat(updatedBeat as PrismaBeatResult)
       } else {
-        console.warn(`⚠️  Failed to create Stripe product for beat: ${beat.title}`, stripeResult.error || stripeResult.reason)
+        console.warn(`⚠️  Failed to create Stripe product for beat: ${beat.title}`)
         // Return the beat without Stripe integration - it can be created later
         return convertedBeat
       }
@@ -223,7 +240,7 @@ export class BeatService {
 
   // Update a beat
   static async updateBeat(id: string, data: UpdateBeatInput, userId?: string): Promise<Beat> {
-    const { price, ...otherData } = data
+    const { wavLeasePrice, trackoutLeasePrice, unlimitedLeasePrice, ...otherData } = data
     
     // Check if beat belongs to user if userId is provided
     if (userId) {
@@ -245,7 +262,9 @@ export class BeatService {
       bpm?: number
       key?: string
       duration?: string
-      price?: Decimal
+      wavLeasePrice?: Decimal
+      trackoutLeasePrice?: Decimal
+      unlimitedLeasePrice?: Decimal
       tags?: string[]
       previewUrl?: string
       fullUrl?: string
@@ -254,8 +273,14 @@ export class BeatService {
       featured?: boolean
     } = { ...otherData }
     
-    if (price !== undefined) {
-      updateData.price = new Decimal(price)
+    if (wavLeasePrice !== undefined) {
+      updateData.wavLeasePrice = new Decimal(wavLeasePrice)
+    }
+    if (trackoutLeasePrice !== undefined) {
+      updateData.trackoutLeasePrice = new Decimal(trackoutLeasePrice)
+    }
+    if (unlimitedLeasePrice !== undefined) {
+      updateData.unlimitedLeasePrice = new Decimal(unlimitedLeasePrice)
     }
 
     const updatedBeat = await prisma.beat.update({
@@ -324,18 +349,18 @@ export class BeatService {
     })
     const averagePrice = await prisma.beat.aggregate({
       where: { isActive: true },
-      _avg: { price: true }
+      _avg: { wavLeasePrice: true }
     })
     const totalRevenue = await prisma.beat.aggregate({
       where: { isActive: true },
-      _sum: { price: true }
+      _sum: { wavLeasePrice: true }
     })
 
     return {
       totalBeats,
       totalGenres: totalGenres.length,
-      averagePrice: averagePrice._avg.price ? Number(averagePrice._avg.price) : 0,
-      totalRevenue: totalRevenue._sum.price ? Number(totalRevenue._sum.price) : 0
+      averagePrice: averagePrice._avg.wavLeasePrice ? Number(averagePrice._avg.wavLeasePrice) : 0,
+      totalRevenue: totalRevenue._sum.wavLeasePrice ? Number(totalRevenue._sum.wavLeasePrice) : 0
     }
   }
 }

@@ -2,7 +2,7 @@
 
 ## System Overview
 
-The multi-item cart and order system is built with a modern, scalable architecture that supports both single and multi-item purchases while maintaining data consistency and security.
+The multi-item cart and order system is built with a modern, scalable architecture that supports both single and multi-item purchases while maintaining data consistency and security. The system now includes a comprehensive licensing system with three different contract types and corresponding pricing.
 
 ## 🎯 Core Architecture Principles
 
@@ -12,6 +12,7 @@ The multi-item cart and order system is built with a modern, scalable architectu
 4. **Data Persistence**: localStorage for cart persistence, PostgreSQL for orders
 5. **Security**: Server-side validation and secure download URLs
 6. **Performance**: Optimized queries and efficient re-renders
+7. **Licensing System**: Three-tier licensing with dynamic pricing and access control
 
 ## 📁 File Structure
 
@@ -25,9 +26,12 @@ src/
 │   ├── CartItem.tsx            # Individual cart item display
 │   ├── CartSummary.tsx         # Order summary and checkout
 │   ├── AddToCartButton.tsx     # Reusable add to cart button
+│   ├── BeatCard.tsx            # Beat display with license selection
+│   ├── LicenseSelector.tsx     # License selection component
 │   └── Navigation.tsx          # Updated with cart functionality
 ├── types/
 │   ├── cart.ts                 # Cart-related type definitions
+│   ├── beat.ts                 # Beat type definitions with licensing
 │   └── order.ts                # Order type definitions
 ├── app/
 │   ├── cart/
@@ -52,6 +56,9 @@ src/
 │           ├── beat/
 │           │   └── [beatId]/
 │           │       └── route.ts # Individual beat download
+│           ├── stems/
+│           │   └── [beatId]/
+│           │       └── route.ts # Stems download (license-restricted)
 │           └── multi-order/
 │               └── [orderId]/
 │                   └── route.ts # Multi-order download generation
@@ -72,15 +79,15 @@ Component Re-render → Cart Count Update → Navigation Badge
 ### 2. Checkout Flow
 
 ```
-Cart Items → Validation → Stripe Session → Payment → Webhook → Database
+Cart Items → License Selection → Validation → Stripe Session → Payment → Webhook → Database
      ↓
-Success Page → Order Display → Download Generation → File Access
+Success Page → Order Display → Download Generation → File Access (License-based)
 ```
 
 ### 3. Download Flow
 
 ```
-Download Request → Order Validation → Beat Verification → Cloudinary URL → File Download
+Download Request → Order Validation → License Verification → Beat Verification → Cloudinary URL → File Download
 ```
 
 ## 🗄️ Database Architecture
@@ -116,14 +123,15 @@ App
 │   │   ├── Cart Button
 │   │   └── Cart Count Badge
 │   ├── Beats Page
-│   │   └── Beat Cards
+│   │   └── BeatCard
+│   │       ├── License Selection Modal
 │   │       └── AddToCartButton
 │   ├── Cart Page
 │   │   ├── CartItem (for each item)
 │   │   └── CartSummary
 │   └── Success Page
 │       ├── Order Details
-│       └── Download Sections
+│       └── Download Sections (License-based)
 ```
 
 ### State Management Architecture
@@ -158,6 +166,7 @@ CartContext (Provider)
 | GET | `/api/orders/multi-payment/[sessionId]` | Get multi-item order | sessionId | `{success, data}` |
 | POST | `/api/download/multi-order/[orderId]` | Generate downloads | `{customerEmail}` | `{success, data}` |
 | GET | `/api/download/beat/[beatId]` | Download file | `{orderId, customerEmail, type}` | File stream |
+| GET | `/api/download/stems/[beatId]` | Download stems | `{orderId, customerEmail}` | File stream (License-restricted) |
 
 ### API Response Patterns
 
@@ -185,6 +194,7 @@ CartContext (Provider)
 2. **Beat Access**: Verify beat is part of the order
 3. **Download Security**: Time-limited signed URLs
 4. **Input Validation**: All inputs sanitized and validated
+5. **License Verification**: Stems access restricted to Trackout/Unlimited licenses
 
 ### Data Protection
 
@@ -192,6 +202,7 @@ CartContext (Provider)
 2. **Server-Side**: Order data in encrypted database
 3. **Transmission**: HTTPS for all API calls
 4. **Storage**: Secure file storage with Cloudinary
+5. **License Enforcement**: Server-side validation of license types
 
 ## ⚡ Performance Architecture
 
@@ -274,6 +285,11 @@ CartContext (Provider)
    - Download completion rate
    - File access patterns
 
+4. **License Metrics**
+   - License type distribution
+   - Stems download rate
+   - License upgrade rate
+
 ### Logging Strategy
 
 1. **Client-Side**: Console logging for debugging
@@ -330,6 +346,6 @@ CartContext (Provider)
 
 ---
 
-**Architecture Version**: 1.0.0
+**Architecture Version**: 2.0.0
 **Last Updated**: January 2025
 **Maintainer**: Development Team

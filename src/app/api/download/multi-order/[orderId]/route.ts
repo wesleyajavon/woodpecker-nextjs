@@ -75,7 +75,7 @@ export async function POST(
           master: masterUrl,
           expiresAt: expiresAt.toISOString(),
         },
-        hasStems: !!beat.stemsUrl
+        hasStems: !!beat.stemsUrl && (order.licenseType === 'TRACKOUT_LEASE' || order.licenseType === 'UNLIMITED_LEASE')
       })
     }
 

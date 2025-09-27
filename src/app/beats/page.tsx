@@ -2,16 +2,14 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Grid3X3, List, Play, Pause, ShoppingCart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Grid3X3, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useBeats } from '@/hooks/useBeats';
-import CheckoutButton from '@/components/CheckoutButton';
-import AddToCartButton from '@/components/AddToCartButton';
+import BeatCard from '@/components/BeatCard';
 
 export default function BeatsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
-  const [loadingBeat, setLoadingBeat] = useState<string | null>(null);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -42,7 +40,6 @@ export default function BeatsPage() {
         audioRef.current.currentTime = 0;
       }
       setPlayingBeat(null);
-      setLoadingBeat(null);
     } else {
       // Stop any currently playing audio
       if (audioRef.current) {
@@ -52,20 +49,17 @@ export default function BeatsPage() {
       
       // Start new audio if preview URL exists
       if (previewUrl) {
-        setLoadingBeat(beatId);
         try {
           const audio = new Audio(previewUrl);
           audioRef.current = audio;
           
           // Handle audio events
           audio.addEventListener('canplaythrough', () => {
-            setLoadingBeat(null);
             setPlayingBeat(beatId);
           });
           
           audio.addEventListener('error', () => {
             console.error('Error playing audio');
-            setLoadingBeat(null);
             setPlayingBeat(null);
           });
           
@@ -77,7 +71,6 @@ export default function BeatsPage() {
           await audio.play();
         } catch (error) {
           console.error('Error playing audio:', error);
-          setLoadingBeat(null);
           setPlayingBeat(null);
         }
       }
@@ -125,42 +118,6 @@ export default function BeatsPage() {
   const handleItemsPerPageChange = (newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
     updateLimit(newItemsPerPage);
-  };
-
-  // Formatage du prix
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(price);
-  };
-
-  // Affichage des étoiles
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <Star key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-      );
-    }
-
-    const emptyStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />
-      );
-    }
-
-    return stars;
   };
 
   if (loading && beats.length === 0) {
@@ -333,181 +290,14 @@ export default function BeatsPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
-                  className={`bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden hover:bg-white/20 transition-all duration-300 transform hover:scale-105 ${
-                    viewMode === 'list' ? 'flex items-center p-4' : 'p-4'
-                  }`}
                 >
-                  {viewMode === 'grid' ? (
-                    // Vue grille
-                    <>
-                      <div className="relative mb-4">
-                        {beat.artworkUrl ? (
-                          <img
-                            src={beat.artworkUrl}
-                            alt={`${beat.title} artwork`}
-                            className="w-full h-32 object-cover rounded-xl"
-                          />
-                        ) : (
-                          <div className="w-full h-32 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
-                            <div className="text-center text-white">
-                              <div className="text-2xl font-bold mb-2">{beat.genre}</div>
-                              <div className="text-sm opacity-80">{beat.bpm} BPM</div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Bouton play/pause */}
-                        <button
-                          onClick={() => togglePlay(beat.id, beat.previewUrl || undefined)}
-                          className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-xl"
-                          disabled={loadingBeat === beat.id}
-                        >
-                          {loadingBeat === beat.id ? (
-                            <div className="w-12 h-12 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          ) : playingBeat === beat.id ? (
-                            <Pause className="w-12 h-12 text-white" />
-                          ) : (
-                            <Play className="w-12 h-12 text-white" />
-                          )}
-                        </button>
-
-                        {/* Badge exclusif */}
-                        {beat.isExclusive && (
-                          <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-bold">
-                            EXCLUSIF
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="space-y-3">
-                        <h3 className="text-xl font-bold text-white truncate">{beat.title}</h3>
-                        <p className="text-gray-300 text-sm line-clamp-2">{beat.description}</p>
-                        
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <span>{beat.bpm} BPM</span>
-                          <span>•</span>
-                          <span>{beat.key}</span>
-                          <span>•</span>
-                          <span>{beat.duration}</span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1">
-                            {renderStars(beat.rating)}
-                          </div>
-                          <span className="text-gray-400 text-sm">({beat.reviewCount})</span>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1">
-                          {beat.tags.slice(0, 3).map((tag, tagIndex) => (
-                            <span
-                              key={tagIndex}
-                              className="bg-purple-500/20 text-purple-300 text-xs px-2 py-1 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          {/* <span className="text-2xl font-bold text-white">€{beat.price.toFixed(2)}</span> */}
-                          <div className="flex items-center gap-2">
-                            <AddToCartButton
-                              beat={beat}
-                              size="sm"
-                              variant="outline"
-                              className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30"
-                            />
-                            <CheckoutButton
-                              priceId={beat.stripePriceId || beat.id}
-                              beatTitle={beat.title}
-                              price={beat.price}
-                              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    // Vue liste
-                    <>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-4">
-                          <div className="relative w-20 h-20 rounded-xl flex-shrink-0 overflow-hidden">
-                            {beat.artworkUrl ? (
-                              <img
-                                src={beat.artworkUrl}
-                                alt={`${beat.title} artwork`}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                                <div className="text-center text-white">
-                                  <div className="text-sm font-bold">{beat.genre}</div>
-                                  <div className="text-xs opacity-80">{beat.bpm} BPM</div>
-                                </div>
-                              </div>
-                            )}
-                            
-                            <button
-                              onClick={() => togglePlay(beat.id, beat.previewUrl || undefined)}
-                              className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-xl"
-                              disabled={loadingBeat === beat.id}
-                            >
-                              {loadingBeat === beat.id ? (
-                                <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                              ) : playingBeat === beat.id ? (
-                                <Pause className="w-8 h-8 text-white" />
-                              ) : (
-                                <Play className="w-8 h-8 text-white" />
-                              )}
-                            </button>
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-xl font-bold text-white truncate">{beat.title}</h3>
-                            <p className="text-gray-300 text-sm line-clamp-2">{beat.description}</p>
-                            
-                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
-                              <span>{beat.bpm} BPM</span>
-                              <span>{beat.key}</span>
-                              <span>{beat.duration}</span>
-                            </div>
-
-                            <div className="flex items-center gap-2 mt-2">
-                              <div className="flex items-center gap-1">
-                                {renderStars(beat.rating)}
-                              </div>
-                              <span className="text-gray-400 text-sm">({beat.reviewCount})</span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4 flex-shrink-0">
-                            <div className="text-right">
-                              {/* <span className="text-2xl font-bold text-white">€{beat.price.toFixed(2)}</span> */}
-                              {beat.isExclusive && (
-                                <div className="text-yellow-500 text-xs font-bold mt-1">EXCLUSIF</div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <AddToCartButton
-                                beat={beat}
-                                size="md"
-                                variant="outline"
-                                className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30"
-                              />
-                              <CheckoutButton
-                                priceId={beat.stripePriceId || beat.id}
-                                beatTitle={beat.title}
-                                price={beat.price}
-                                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  <BeatCard
+                    beat={beat}
+                    isPlaying={playingBeat === beat.id}
+                    onPlay={togglePlay}
+                    onPause={togglePlay}
+                    className={viewMode === 'list' ? 'flex items-center' : ''}
+                  />
                 </motion.div>
               ))}
             </motion.div>

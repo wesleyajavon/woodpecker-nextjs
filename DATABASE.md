@@ -54,15 +54,32 @@ model Beat {
   bpm         Int
   key         String
   duration    String
+  // Pricing for different license types
+  wavLeasePrice      Decimal  @db.Decimal(10, 2) @default(19.99)
+  trackoutLeasePrice Decimal  @db.Decimal(10, 2) @default(39.99)
+  unlimitedLeasePrice Decimal @db.Decimal(10, 2) @default(79.99)
+  
+  // Legacy pricing (deprecated)
   price       Decimal  @db.Decimal(10, 2)
+  
   rating      Float    @default(0)
   reviewCount Int      @default(0)
   tags        String[]
   previewUrl  String?
   fullUrl     String?
+  stemsUrl    String?  // ZIP file containing stems
+  artworkUrl  String?  // Beat artwork image
   isExclusive Boolean  @default(false)
   isActive    Boolean  @default(true)
   featured    Boolean  @default(false)
+  
+  // Stripe integration
+  stripePriceId String? // Deprecated
+  
+  // Stripe Price IDs for each license type
+  stripeWavPriceId      String?
+  stripeTrackoutPriceId String?
+  stripeUnlimitedPriceId String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   orders      Order[]
@@ -82,7 +99,7 @@ model Order {
   paymentMethod String?
   paymentId     String?
   paidAt        DateTime?
-  licenseType   LicenseType @default(NON_EXCLUSIVE)
+  licenseType   LicenseType @default(WAV_LEASE)
   usageRights   String[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -142,7 +159,9 @@ Le script de seed crée automatiquement :
 - `genre` - Recherche par genre
 - `bpm` - Filtrage par BPM
 - `key` - Filtrage par tonalité
-- `price` - Tri et filtrage par prix
+- `wavLeasePrice` - Tri et filtrage par prix WAV
+- `trackoutLeasePrice` - Tri et filtrage par prix Trackout
+- `unlimitedLeasePrice` - Tri et filtrage par prix Unlimited
 - `rating` - Tri par note
 - `isActive` - Filtrage des beats actifs
 - `featured` - Filtrage des beats en vedette

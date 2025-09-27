@@ -1,7 +1,10 @@
 import { Beat } from './beat'
 
+export type LicenseType = 'WAV_LEASE' | 'TRACKOUT_LEASE' | 'UNLIMITED_LEASE';
+
 export interface CartItem {
   beat: Beat
+  licenseType: LicenseType
   quantity: number
   addedAt: Date
 }
@@ -15,9 +18,9 @@ export interface CartState {
 
 export interface CartContextType {
   cart: CartState
-  addToCart: (beat: Beat, quantity?: number) => void
-  removeFromCart: (beatId: string) => void
-  updateQuantity: (beatId: string, quantity: number) => void
+  addToCart: (beat: Beat, licenseType: LicenseType, quantity?: number) => void
+  removeFromCart: (beatId: string, licenseType: LicenseType) => void
+  updateQuantity: (beatId: string, licenseType: LicenseType, quantity: number) => void
   clearCart: () => void
   toggleCart: () => void
   openCart: () => void

@@ -2,6 +2,7 @@
 
 import { useCart as useCartContext } from '@/contexts/CartContext'
 import { Beat } from '@/types/beat'
+import { LicenseType } from '@/types/cart'
 
 export function useCart() {
   return useCartContext()

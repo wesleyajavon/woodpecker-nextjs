@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Trash2, Plus, Minus, Music, Clock, Tag, Archive } from 'lucide-react'
 import { CartItem as CartItemType } from '@/types/cart'
+import { Beat } from '@/types/beat'
 import { useCartActions } from '@/hooks/useCart'
 import { Button } from './ui/Button'
 
@@ -15,18 +16,27 @@ export default function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeFromCart } = useCartActions()
   const [isRemoving, setIsRemoving] = useState(false)
 
+  const getPrice = (beat: Beat, licenseType: string): number => {
+    switch (licenseType) {
+      case 'WAV_LEASE': return beat.wavLeasePrice
+      case 'TRACKOUT_LEASE': return beat.trackoutLeasePrice
+      case 'UNLIMITED_LEASE': return beat.unlimitedLeasePrice
+      default: return beat.wavLeasePrice
+    }
+  }
+
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity <= 0) {
       handleRemove()
     } else {
-      updateQuantity(item.beat.id, newQuantity)
+      updateQuantity(item.beat.id, item.licenseType, newQuantity)
     }
   }
 
   const handleRemove = () => {
     setIsRemoving(true)
     setTimeout(() => {
-      removeFromCart(item.beat.id)
+      removeFromCart(item.beat.id, item.licenseType)
     }, 300)
   }
 
@@ -75,6 +85,17 @@ export default function CartItem({ item }: CartItemProps) {
                 {item.beat.genre} • {item.beat.bpm} BPM • {item.beat.key}
               </p>
               
+              {/* License Type */}
+              <div className="mt-2">
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  item.licenseType === 'WAV_LEASE' ? 'bg-blue-500/20 text-blue-300' :
+                  item.licenseType === 'TRACKOUT_LEASE' ? 'bg-purple-500/20 text-purple-300' :
+                  'bg-orange-500/20 text-orange-300'
+                }`}>
+                  {item.licenseType.replace('_', ' ')}
+                </span>
+              </div>
+              
               {/* Beat Details */}
               <div className="flex items-center space-x-4 mt-2 text-sm text-gray-400">
                 <div className="flex items-center space-x-1">
@@ -103,10 +124,10 @@ export default function CartItem({ item }: CartItemProps) {
             {/* Price */}
             <div className="text-right">
               <div className="text-xl font-bold text-white">
-                €{(item.beat.price * item.quantity).toFixed(2)}
+                €{(getPrice(item.beat, item.licenseType) * item.quantity).toFixed(2)}
               </div>
               <div className="text-sm text-gray-400">
-                €{item.beat.price.toFixed(2)} each
+                €{getPrice(item.beat, item.licenseType).toFixed(2)} each
               </div>
             </div>
           </div>

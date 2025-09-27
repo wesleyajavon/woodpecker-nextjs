@@ -48,7 +48,9 @@ export async function GET(request: NextRequest) {
                 bpm: true,
                 key: true,
                 duration: true,
-                price: true,
+                wavLeasePrice: true,
+                trackoutLeasePrice: true,
+                unlimitedLeasePrice: true,
                 isExclusive: true,
                 featured: true,
                 fullUrl: true

@@ -74,8 +74,8 @@ export default function BeatManagementPage() {
 
   // Gestion des modifications
   const handleEditChange = (field: keyof Beat, value: string | number | boolean) => {
-    // Exclure le prix des modifications inline
-    if (field === 'price') {
+    // Exclure les prix des modifications inline
+    if (field === 'wavLeasePrice' || field === 'trackoutLeasePrice' || field === 'unlimitedLeasePrice') {
       return;
     }
     
@@ -482,8 +482,14 @@ export default function BeatManagementPage() {
                 </h3>
                 
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-2">
-                    {beat.price}€
+                  <div className="text-lg font-bold text-white mb-2">
+                    WAV: {beat.wavLeasePrice}€
+                  </div>
+                  <div className="text-lg font-bold text-white mb-2">
+                    Trackout: {beat.trackoutLeasePrice}€
+                  </div>
+                  <div className="text-lg font-bold text-white mb-2">
+                    Unlimited: {beat.unlimitedLeasePrice}€
                   </div>
                   <div className="text-sm text-gray-400 mb-4">
                     {beat.isExclusive ? 'Exclusif' : 'Non-exclusif'}

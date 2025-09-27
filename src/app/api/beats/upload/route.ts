@@ -6,6 +6,7 @@ import { CreateBeatInput } from '@/types/beat';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { getUserIdFromEmail } from '@/lib/userUtils';
+import { createBeatStripeProducts } from '@/lib/stripe';
 
 // Types pour les fichiers uploadés via Multer
 interface MulterFile {
@@ -201,7 +202,9 @@ export async function POST(request: NextRequest) {
         bpm: parseInt(fields.bpm),
         key: fields.key,
         duration: fields.duration,
-        price: parseFloat(fields.price),
+        wavLeasePrice: parseFloat(fields.wavLeasePrice),
+        trackoutLeasePrice: parseFloat(fields.trackoutLeasePrice),
+        unlimitedLeasePrice: parseFloat(fields.unlimitedLeasePrice),
         tags: fields.tags ? JSON.parse(fields.tags) : [],
         previewUrl: uploadResults.preview?.secure_url,
         fullUrl: uploadResults.master?.secure_url,
@@ -213,14 +216,51 @@ export async function POST(request: NextRequest) {
 
       const newBeat = await BeatService.createBeat(beatData, userId);
 
-      return NextResponse.json({
-        success: true,
-        message: 'Beat uploadé avec succès',
-        data: {
-          beat: newBeat,
-          uploads: uploadResults
-        }
-      }, { status: 201 });
+      // Créer les produits Stripe pour ce beat
+      try {
+        console.log('🎵 Creating Stripe products for new beat...');
+        const stripeProducts = await createBeatStripeProducts({
+          id: newBeat.id,
+          title: newBeat.title,
+          description: newBeat.description || null,
+          wavLeasePrice: newBeat.wavLeasePrice,
+          trackoutLeasePrice: newBeat.trackoutLeasePrice,
+          unlimitedLeasePrice: newBeat.unlimitedLeasePrice
+        });
+
+        // Mettre à jour le beat avec les priceId Stripe
+        const updatedBeat = await BeatService.updateBeat(newBeat.id, {
+          stripeWavPriceId: stripeProducts.prices.wav,
+          stripeTrackoutPriceId: stripeProducts.prices.trackout,
+          stripeUnlimitedPriceId: stripeProducts.prices.unlimited
+        });
+
+        console.log('✅ Stripe products created successfully');
+
+        return NextResponse.json({
+          success: true,
+          message: 'Beat uploadé avec succès et produits Stripe créés',
+          data: {
+            beat: updatedBeat,
+            uploads: uploadResults,
+            stripeProducts
+          }
+        }, { status: 201 });
+
+      } catch (stripeError) {
+        console.error('❌ Error creating Stripe products:', stripeError);
+        
+        // Retourner le beat même si Stripe a échoué
+        return NextResponse.json({
+          success: true,
+          message: 'Beat uploadé avec succès (erreur Stripe - produits à créer manuellement)',
+          data: {
+            beat: newBeat,
+            uploads: uploadResults,
+            stripeError: 'Failed to create Stripe products'
+          }
+        }, { status: 201 });
+      }
 
     } catch (dbError) {
       console.error('Erreur lors de la création du beat:', dbError);

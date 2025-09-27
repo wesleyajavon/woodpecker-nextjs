@@ -8,11 +8,27 @@ import CartItem from '@/components/CartItem'
 import CartSummary from '@/components/CartSummary'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
+import { LicenseType } from '@/types/cart'
+import { Beat } from '@/types/beat'
 
 export default function CartPage() {
   const { cart } = useCart()
   const { clearCart } = useCartActions()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
+
+  // Helper function to get the correct priceId based on license type
+  const getPriceIdByLicense = (beat: Beat, licenseType: LicenseType): string | null => {
+    switch (licenseType) {
+      case 'WAV_LEASE':
+        return beat.stripeWavPriceId || null
+      case 'TRACKOUT_LEASE':
+        return beat.stripeTrackoutPriceId || null
+      case 'UNLIMITED_LEASE':
+        return beat.stripeUnlimitedPriceId || null
+      default:
+        return beat.stripeWavPriceId || null
+    }
+  }
 
   // Handle checkout
   const handleCheckout = async () => {
@@ -23,9 +39,10 @@ export default function CartPage() {
       
       // Prepare items for multi-item checkout
       const items = cart.items.map(item => ({
-        priceId: item.beat.stripePriceId || item.beat.id,
+        priceId: getPriceIdByLicense(item.beat, item.licenseType) || item.beat.id,
         quantity: item.quantity,
         beatTitle: item.beat.title,
+        licenseType: item.licenseType,
       }))
 
       // Filter out items without valid price IDs

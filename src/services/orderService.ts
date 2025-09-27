@@ -3,11 +3,13 @@ import { Order, CreateOrderInput, UpdateOrderInput, OrderFilters, OrderSortOptio
 // Import Decimal from Prisma
 import { Decimal } from '@prisma/client/runtime/library'
 
-// Type for Prisma Order result with Decimal totalAmount and beat with Decimal price
+// Type for Prisma Order result with Decimal totalAmount and beat with Decimal prices
 type PrismaOrderResult = Omit<Order, 'totalAmount' | 'beat'> & {
   totalAmount: Decimal
-  beat: Omit<Order['beat'], 'price'> & {
-    price: Decimal
+  beat: Omit<Order['beat'], 'wavLeasePrice' | 'trackoutLeasePrice' | 'unlimitedLeasePrice'> & {
+    wavLeasePrice: Decimal
+    trackoutLeasePrice: Decimal
+    unlimitedLeasePrice: Decimal
   }
 }
 
@@ -31,7 +33,9 @@ export class OrderService {
       totalAmount: Number(order.totalAmount),
       beat: {
         ...order.beat,
-        price: Number(order.beat.price)
+        wavLeasePrice: Number(order.beat.wavLeasePrice),
+        trackoutLeasePrice: Number(order.beat.trackoutLeasePrice),
+        unlimitedLeasePrice: Number(order.beat.unlimitedLeasePrice)
       }
     }
   }
@@ -43,7 +47,7 @@ export class OrderService {
         ...data,
         totalAmount: new Decimal(data.totalAmount),
         currency: data.currency || 'EUR',
-        licenseType: data.licenseType || 'NON_EXCLUSIVE',
+        licenseType: data.licenseType || 'WAV_LEASE',
         usageRights: data.usageRights || []
       },
       include: {

@@ -4,8 +4,25 @@ import { headers } from 'next/headers'
 import { OrderService } from '@/services/orderService'
 import { BeatService } from '@/services/beatService'
 import { PrismaClient } from '@prisma/client'
+import { LicenseType } from '@/types/cart'
 
 const prisma = new PrismaClient()
+
+// Helper function to get usage rights based on license type
+function getUsageRights(licenseType: string): string[] {
+  switch (licenseType) {
+    case 'WAV_LEASE':
+      return ['WAV/MP3 files', 'Commercial use', 'Streaming', 'Limited distribution']
+    case 'TRACKOUT_LEASE':
+      return ['WAV/MP3 files', 'Stems', 'Commercial use', 'Streaming', 'Extended distribution']
+    case 'UNLIMITED_LEASE':
+      return ['WAV/MP3 files', 'Stems', 'Commercial use', 'Streaming', 'Unlimited distribution']
+    case 'EXCLUSIVE':
+      return ['Exclusive rights', 'WAV/MP3 files', 'Stems', 'Commercial use', 'Streaming', 'Unlimited distribution']
+    default:
+      return ['WAV/MP3 files', 'Commercial use', 'Streaming']
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -124,7 +141,7 @@ export async function POST(request: NextRequest) {
                 paymentId: session.id,
                 sessionId: session.id,
                 paidAt: new Date(),
-                licenseType: 'NON_EXCLUSIVE',
+                licenseType: 'WAV_LEASE',
                 usageRights: ['Non-exclusive rights', 'Commercial use', 'Streaming'],
                 items: {
                   create: orderItems.map(item => ({
@@ -168,6 +185,9 @@ export async function POST(request: NextRequest) {
               break
             }
 
+            // Get license type from session metadata
+            const licenseType = fullSession.metadata?.license_type || 'WAV_LEASE'
+            
             // Create the order in the database
             const orderData = {
               customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
@@ -177,10 +197,8 @@ export async function POST(request: NextRequest) {
               currency: fullSession.currency?.toUpperCase() || 'EUR',
               paymentMethod: 'card',
               paymentId: session.id,
-              licenseType: beat.isExclusive ? 'EXCLUSIVE' as const : 'NON_EXCLUSIVE' as const,
-              usageRights: beat.isExclusive 
-                ? ['Exclusive rights', 'Commercial use', 'Streaming', 'Distribution']
-                : ['Non-exclusive rights', 'Commercial use', 'Streaming'],
+              licenseType: licenseType as LicenseType,
+              usageRights: getUsageRights(licenseType),
               beatId: beatId
             }
 

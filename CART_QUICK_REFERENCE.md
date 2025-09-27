@@ -33,6 +33,7 @@ function MyComponent() {
 ```typescript
 <AddToCartButton
   beat={beat}
+  licenseType="WAV_LEASE"
   size="md"
   variant="outline"
   className="custom-class"
@@ -54,7 +55,7 @@ function MyComponent() {
 ### Add to Cart
 ```typescript
 const addToCart = useAddToCart()
-addToCart(beat, quantity) // quantity defaults to 1
+addToCart(beat, licenseType, quantity) // quantity defaults to 1
 ```
 
 ### Remove from Cart
@@ -92,6 +93,7 @@ cart.isOpen         // Cart open state
 ```typescript
 interface CartItem {
   beat: Beat
+  licenseType: LicenseType
   quantity: number
   addedAt: Date
 }
@@ -107,9 +109,10 @@ const response = await fetch('/api/stripe/create-multi-checkout', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     items: cartItems.map(item => ({
-      priceId: item.beat.stripePriceId,
+      priceId: getPriceIdByLicense(item.beat, item.licenseType),
       quantity: item.quantity,
-      beatTitle: item.beat.title
+      beatTitle: item.beat.title,
+      licenseType: item.licenseType
     })),
     successUrl: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancelUrl: `${origin}/cart`
@@ -206,16 +209,18 @@ Cart data is automatically saved to localStorage and restored on page load.
 
 ### Test Cart Functionality
 1. Visit `/cart-test`
-2. Add multiple beats to cart
+2. Add multiple beats to cart with different licenses
 3. Test quantity updates
 4. Test remove functionality
-5. Test checkout flow
+5. Test license selection
+6. Test checkout flow
 
 ### Test Download Flow
-1. Complete a test purchase
+1. Complete a test purchase with different licenses
 2. Verify success page loads
 3. Test download link generation
 4. Verify file downloads work
+5. Test stems download (Trackout/Unlimited only)
 
 ## 📈 Performance Tips
 
@@ -236,7 +241,10 @@ const handleAddToCart = useCallback((beat) => {
 ```typescript
 // Memoize expensive calculations
 const cartTotal = useMemo(() => {
-  return cart.items.reduce((total, item) => total + (item.beat.price * item.quantity), 0)
+  return cart.items.reduce((total, item) => {
+    const price = getPriceByLicense(item.beat, item.licenseType)
+    return total + (price * item.quantity)
+  }, 0)
 }, [cart.items])
 ```
 
@@ -246,6 +254,7 @@ const cartTotal = useMemo(() => {
 - Order validation happens server-side
 - Download URLs expire after 30 minutes
 - All API calls validate user permissions
+- Stems access restricted to Trackout/Unlimited licenses
 
 ## 📞 Support
 
@@ -258,5 +267,5 @@ For issues or questions:
 
 ---
 
-**Quick Reference Version**: 1.0.0
+**Quick Reference Version**: 2.0.0
 **Last Updated**: January 2025

@@ -6,15 +6,23 @@ export interface Beat {
   bpm: number
   key: string
   duration: string
-  price: number
+  // Prix par type de licence
+  wavLeasePrice: number
+  trackoutLeasePrice: number
+  unlimitedLeasePrice: number
   rating: number
   reviewCount: number
   tags: string[]
-  stripePriceId?: string | null
+  stripePriceId?: string | null // Deprecated
   previewUrl?: string | null
   fullUrl?: string | null
   stemsUrl?: string | null
   artworkUrl?: string | null
+  
+  // Stripe Price IDs for each license type
+  stripeWavPriceId?: string | null
+  stripeTrackoutPriceId?: string | null
+  stripeUnlimitedPriceId?: string | null
   isExclusive: boolean
   isActive: boolean
   featured: boolean
@@ -29,7 +37,9 @@ export interface CreateBeatInput {
   bpm: number
   key: string
   duration: string
-  price: number
+  wavLeasePrice: number
+  trackoutLeasePrice: number
+  unlimitedLeasePrice: number
   tags: string[]
   previewUrl?: string
   fullUrl?: string
@@ -46,7 +56,9 @@ export interface UpdateBeatInput {
   bpm?: number
   key?: string
   duration?: string
-  price?: number
+  wavLeasePrice?: number
+  trackoutLeasePrice?: number
+  unlimitedLeasePrice?: number
   tags?: string[]
   previewUrl?: string
   fullUrl?: string
@@ -55,6 +67,11 @@ export interface UpdateBeatInput {
   isExclusive?: boolean
   isActive?: boolean
   featured?: boolean
+  
+  // Stripe Price IDs
+  stripeWavPriceId?: string | null
+  stripeTrackoutPriceId?: string | null
+  stripeUnlimitedPriceId?: string | null
 }
 
 export interface BeatFilters {

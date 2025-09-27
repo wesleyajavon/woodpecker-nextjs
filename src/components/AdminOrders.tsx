@@ -362,7 +362,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                               <p className="text-sm text-gray-300">{order.beat.genre} • {order.beat.bpm} BPM</p>
                             </div>
                             <div className="text-right">
-                              <div className="text-white font-semibold">{formatAmount(order.beat.price)}</div>
+                              <div className="text-white font-semibold">{formatAmount(order.beat.wavLeasePrice)}</div>
                               <div className="text-sm text-gray-300">Quantité: 1</div>
                             </div>
                           </div>

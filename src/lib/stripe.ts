@@ -11,6 +11,86 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
 })
 
+// Interface pour les données d'un beat
+interface BeatStripeData {
+  id: string
+  title: string
+  description: string | null
+  wavLeasePrice: number
+  trackoutLeasePrice: number
+  unlimitedLeasePrice: number
+}
+
+// Fonction pour créer les 3 produits Stripe pour un beat
+export async function createBeatStripeProducts(beat: BeatStripeData) {
+  try {
+    console.log(`🎵 Creating Stripe products for beat: ${beat.title}`)
+    
+    // Créer le produit principal
+    const product = await stripe.products.create({
+      name: beat.title,
+      description: beat.description || `Beat: ${beat.title}`,
+      metadata: {
+        beat_id: beat.id,
+        type: 'beat'
+      }
+    })
+    
+    console.log(`✅ Created product: ${product.id}`)
+    
+    // Créer les 3 prix pour chaque type de licence
+    const [wavPrice, trackoutPrice, unlimitedPrice] = await Promise.all([
+      // WAV Lease
+      stripe.prices.create({
+        product: product.id,
+        unit_amount: Math.round(beat.wavLeasePrice * 100), // Convertir en centimes
+        currency: 'eur',
+        metadata: {
+          beat_id: beat.id,
+          license_type: 'WAV_LEASE'
+        }
+      }),
+      
+      // Trackout Lease
+      stripe.prices.create({
+        product: product.id,
+        unit_amount: Math.round(beat.trackoutLeasePrice * 100),
+        currency: 'eur',
+        metadata: {
+          beat_id: beat.id,
+          license_type: 'TRACKOUT_LEASE'
+        }
+      }),
+      
+      // Unlimited Lease
+      stripe.prices.create({
+        product: product.id,
+        unit_amount: Math.round(beat.unlimitedLeasePrice * 100),
+        currency: 'eur',
+        metadata: {
+          beat_id: beat.id,
+          license_type: 'UNLIMITED_LEASE'
+        }
+      })
+    ])
+    
+    console.log(`✅ Created prices: WAV=${wavPrice.id}, Trackout=${trackoutPrice.id}, Unlimited=${unlimitedPrice.id}`)
+    
+    return {
+      productId: product.id,
+      prices: {
+        wav: wavPrice.id,
+        trackout: trackoutPrice.id,
+        unlimited: unlimitedPrice.id
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Error creating Stripe products:', error)
+    throw error
+  }
+}
+
 // Helper function to create a test product
 export async function createTestProduct() {
   try {
@@ -50,149 +130,7 @@ export async function createTestProduct() {
   }
 }
 
-// Helper function to create Stripe products for all beats from Prisma
-export async function createStripeProductsForAllBeats() {
-  try {
-    // Dynamic import to avoid build-time issues
-    const { PrismaClient } = await import('@prisma/client')
-    const prisma = new PrismaClient()
 
-    console.log('🔄 Fetching beats from database...')
-    
-    // Fetch all active beats from the database
-    const beats = await prisma.beat.findMany({
-      where: { isActive: true },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        genre: true,
-        bpm: true,
-        key: true,
-        duration: true,
-        price: true,
-        tags: true,
-        isExclusive: true,
-        featured: true,
-      }
-    })
-
-    console.log(`📊 Found ${beats.length} beats to process`)
-
-    const results = []
-
-    for (const beat of beats) {
-      try {
-        console.log(`\n🎵 Processing beat: ${beat.title}`)
-
-        // Check if product already exists in Stripe
-        const existingProducts = await stripe.products.search({
-          query: `name:'${beat.title.replace(/'/g, "\\'")}'`,
-        })
-
-        if (existingProducts.data.length > 0) {
-          console.log(`⚠️  Product already exists: ${beat.title}`)
-          results.push({
-            beat: beat.title,
-            status: 'skipped',
-            reason: 'Product already exists in Stripe',
-            existingProductId: existingProducts.data[0].id,
-          })
-          continue
-        }
-
-        // Create Stripe product
-        const product = await stripe.products.create({
-          name: beat.title,
-          description: beat.description || `Beat ${beat.genre} - ${beat.bpm} BPM`,
-          metadata: {
-            beat_id: beat.id,
-            genre: beat.genre,
-            bpm: beat.bpm.toString(),
-            key: beat.key,
-            duration: beat.duration,
-            is_exclusive: beat.isExclusive.toString(),
-            featured: beat.featured.toString(),
-            tags: beat.tags.join(','),
-          },
-        })
-
-        // Set different prices based on beat characteristics
-        let priceAmount: number
-        
-        if (beat.isExclusive) {
-          // Exclusive beats are more expensive
-          priceAmount = 9999 // €99.99
-        } else if (beat.featured) {
-          // Featured beats get premium pricing
-          priceAmount = 4999 // €49.99
-        } else {
-          // Regular beats use the database price or default
-          priceAmount = Math.round((Number(beat.price) || 29.99) * 100)
-        }
-
-        // Create price for the product
-        const price = await stripe.prices.create({
-          product: product.id,
-          unit_amount: priceAmount,
-          currency: 'eur',
-          metadata: {
-            beat_id: beat.id,
-            product_id: product.id,
-            price_type: beat.isExclusive ? 'exclusive' : beat.featured ? 'featured' : 'regular',
-          },
-        })
-
-        // Update the beat in the database with the Stripe price ID
-        await prisma.beat.update({
-          where: { id: beat.id },
-          data: { stripePriceId: price.id }
-        })
-
-        console.log(`✅ Created product: ${beat.title}`)
-        console.log(`   Price: €${(priceAmount / 100).toFixed(2)}`)
-        console.log(`   Product ID: ${product.id}`)
-        console.log(`   Price ID: ${price.id}`)
-        console.log(`   Updated database with Stripe price ID`)
-
-        results.push({
-          beat: beat.title,
-          status: 'created',
-          productId: product.id,
-          priceId: price.id,
-          price: `€${(priceAmount / 100).toFixed(2)}`,
-          priceType: beat.isExclusive ? 'exclusive' : beat.featured ? 'featured' : 'regular',
-        })
-
-      } catch (error) {
-        console.error(`❌ Error processing beat ${beat.title}:`, error)
-        results.push({
-          beat: beat.title,
-          status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error',
-        })
-      }
-    }
-
-    await prisma.$disconnect()
-
-    // Summary
-    console.log('\n📋 Summary:')
-    const created = results.filter(r => r.status === 'created').length
-    const skipped = results.filter(r => r.status === 'skipped').length
-    const errors = results.filter(r => r.status === 'error').length
-
-    console.log(`✅ Created: ${created}`)
-    console.log(`⚠️  Skipped: ${skipped}`)
-    console.log(`❌ Errors: ${errors}`)
-
-    return results
-
-  } catch (error) {
-    console.error('❌ Error creating Stripe products for beats:', error)
-    throw error
-  }
-}
 
 // Helper function to list all products
 export async function listProducts() {
@@ -228,7 +166,9 @@ export async function createStripeProductForBeat(beat: {
   bpm: number
   key: string
   duration: string
-  price: number
+  wavLeasePrice: number
+  trackoutLeasePrice: number
+  unlimitedLeasePrice: number
   tags: string[]
   isExclusive: boolean
   featured: boolean
@@ -277,7 +217,7 @@ export async function createStripeProductForBeat(beat: {
     //   priceAmount = 4999 // €49.99
     // } else {
     //   // Regular beats use the database price or default
-     const priceAmount = Math.round((Number(beat.price) || 29.99) * 100)
+     const priceAmount = Math.round((Number(beat.wavLeasePrice) || 29.99) * 100)
     // }
 
     // Create price for the product
@@ -336,6 +276,93 @@ export async function createCheckoutSession(priceId: string, successUrl: string,
     return session
   } catch (error) {
     console.error('❌ Error creating checkout session:', error)
+    throw error
+  }
+}
+
+// Helper function to create a checkout session with license information
+// Fonction pour créer une session de checkout avec priceId
+export async function createCheckoutSessionWithPriceId(params: {
+  priceId: string;
+  beatId: string;
+  licenseType: string;
+  beatTitle: string;
+  successUrl: string;
+  cancelUrl: string;
+}) {
+  try {
+    const { priceId, beatId, licenseType, beatTitle, successUrl, cancelUrl } = params;
+    
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId, // Utiliser le priceId existant
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        beat_id: beatId,
+        license_type: licenseType,
+        beat_title: beatTitle,
+      },
+    })
+
+    return session
+  } catch (error) {
+    console.error('❌ Error creating checkout session with priceId:', error)
+    throw error
+  }
+}
+
+// Fonction pour créer une session de checkout avec licence (fallback avec price_data)
+export async function createCheckoutSessionWithLicense(params: {
+  beatId: string;
+  licenseType: string;
+  beatTitle: string;
+  price: number;
+  successUrl: string;
+  cancelUrl: string;
+}) {
+  try {
+    const { beatId, licenseType, beatTitle, price, successUrl, cancelUrl } = params;
+    
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `${beatTitle} - ${licenseType.replace('_', ' ')}`,
+              description: `Beat license: ${licenseType.replace('_', ' ')}`,
+              metadata: {
+                beat_id: beatId,
+                license_type: licenseType,
+              },
+            },
+            unit_amount: Math.round(price * 100), // Convert to cents
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        beat_id: beatId,
+        license_type: licenseType,
+        beat_title: beatTitle,
+        price: price.toString(),
+      },
+    })
+
+    return session
+  } catch (error) {
+    console.error('❌ Error creating checkout session with license:', error)
     throw error
   }
 }

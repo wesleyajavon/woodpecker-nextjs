@@ -8,6 +8,7 @@ import AddToCartButton from '@/components/AddToCartButton'
 import CartItem from '@/components/CartItem'
 import CartSummary from '@/components/CartSummary'
 import { Button } from '@/components/ui/Button'
+import { LicenseType } from '@/types/cart'
 
 // Mock beat data for testing
 const mockBeats: Beat[] = [
@@ -19,11 +20,15 @@ const mockBeats: Beat[] = [
     bpm: 140,
     key: 'A minor',
     duration: '3:45',
-    price: 29.99,
+    wavLeasePrice: 19.99,
+    trackoutLeasePrice: 39.99,
+    unlimitedLeasePrice: 79.99,
     rating: 4.8,
     reviewCount: 24,
     tags: ['dark', 'trap', 'heavy'],
-    stripePriceId: 'price_1Q1234567890abcdef',
+    stripeWavPriceId: 'price_1Q1234567890abcdef',
+    stripeTrackoutPriceId: 'price_1Q1234567890abcdef_trackout',
+    stripeUnlimitedPriceId: 'price_1Q1234567890abcdef_unlimited',
     previewUrl: null,
     fullUrl: null,
     isExclusive: true,
@@ -40,11 +45,15 @@ const mockBeats: Beat[] = [
     bpm: 85,
     key: 'C major',
     duration: '2:30',
-    price: 19.99,
+    wavLeasePrice: 19.99,
+    trackoutLeasePrice: 39.99,
+    unlimitedLeasePrice: 79.99,
     rating: 4.6,
     reviewCount: 18,
     tags: ['chill', 'lo-fi', 'relaxing'],
-    stripePriceId: 'price_1Q2345678901bcdefg',
+    stripeWavPriceId: 'price_1Q2345678901bcdefg',
+    stripeTrackoutPriceId: 'price_1Q2345678901bcdefg_trackout',
+    stripeUnlimitedPriceId: 'price_1Q2345678901bcdefg_unlimited',
     previewUrl: null,
     fullUrl: null,
     isExclusive: false,
@@ -61,11 +70,15 @@ const mockBeats: Beat[] = [
     bpm: 120,
     key: 'G major',
     duration: '3:15',
-    price: 24.99,
+    wavLeasePrice: 24.99,
+    trackoutLeasePrice: 49.99,
+    unlimitedLeasePrice: 99.99,
     rating: 4.9,
     reviewCount: 31,
     tags: ['pop', 'upbeat', 'catchy'],
-    stripePriceId: 'price_1Q3456789012cdefgh',
+    stripeWavPriceId: 'price_1Q3456789012cdefgh',
+    stripeTrackoutPriceId: 'price_1Q3456789012cdefgh_trackout',
+    stripeUnlimitedPriceId: 'price_1Q3456789012cdefgh_unlimited',
     previewUrl: null,
     fullUrl: null,
     isExclusive: false,
@@ -81,6 +94,20 @@ export default function CartTestPage() {
   const { clearCart } = useCartActions()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
 
+  // Helper function to get the correct priceId based on license type
+  const getPriceIdByLicense = (beat: Beat, licenseType: LicenseType): string | null => {
+    switch (licenseType) {
+      case 'WAV_LEASE':
+        return beat.stripeWavPriceId || null
+      case 'TRACKOUT_LEASE':
+        return beat.stripeTrackoutPriceId || null
+      case 'UNLIMITED_LEASE':
+        return beat.stripeUnlimitedPriceId || null
+      default:
+        return beat.stripeWavPriceId || null
+    }
+  }
+
   const handleCheckout = async () => {
     if (cart.items.length === 0) return
 
@@ -89,9 +116,10 @@ export default function CartTestPage() {
       
       // Prepare items for multi-item checkout
       const items = cart.items.map(item => ({
-        priceId: item.beat.stripePriceId || item.beat.id,
+        priceId: getPriceIdByLicense(item.beat, item.licenseType) || item.beat.id,
         quantity: item.quantity,
         beatTitle: item.beat.title,
+        licenseType: item.licenseType,
       }))
 
       // Filter out items without valid price IDs
@@ -200,7 +228,7 @@ export default function CartTestPage() {
                         </div>
                         <div className="flex items-center space-x-2">
                           <span className="text-2xl font-bold text-gray-900">
-                            €{beat.price.toFixed(2)}
+                            €{beat.wavLeasePrice.toFixed(2)}
                           </span>
                           {beat.isExclusive && (
                             <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
@@ -212,6 +240,7 @@ export default function CartTestPage() {
                       <div className="ml-4">
                         <AddToCartButton
                           beat={beat}
+                          licenseType="WAV_LEASE"
                           size="md"
                           className="w-full"
                         />

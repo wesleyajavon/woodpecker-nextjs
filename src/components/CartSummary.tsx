@@ -5,6 +5,8 @@ import { motion } from 'framer-motion'
 import { ShoppingCart, CreditCard, Trash2, ArrowRight } from 'lucide-react'
 import { useCart, useCartActions } from '@/hooks/useCart'
 import { Button } from './ui/Button'
+import { Beat } from '@/types/beat'
+import { LicenseType } from '@/types/cart'
 
 interface CartSummaryProps {
   onCheckout: () => void
@@ -14,6 +16,34 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
   const { cart } = useCart()
   const { clearCart } = useCartActions()
   const [isClearing, setIsClearing] = useState(false)
+
+  // Helper function to get price based on license type
+  const getPriceByLicense = (beat: Beat, licenseType: LicenseType): number => {
+    switch (licenseType) {
+      case 'WAV_LEASE':
+        return beat.wavLeasePrice
+      case 'TRACKOUT_LEASE':
+        return beat.trackoutLeasePrice
+      case 'UNLIMITED_LEASE':
+        return beat.unlimitedLeasePrice
+      default:
+        return beat.wavLeasePrice
+    }
+  }
+
+  // Helper function to get license display name
+  const getLicenseDisplayName = (licenseType: LicenseType): string => {
+    switch (licenseType) {
+      case 'WAV_LEASE':
+        return 'WAV Lease'
+      case 'TRACKOUT_LEASE':
+        return 'Trackout Lease'
+      case 'UNLIMITED_LEASE':
+        return 'Unlimited Lease'
+      default:
+        return 'WAV Lease'
+    }
+  }
 
   const handleClearCart = () => {
     setIsClearing(true)
@@ -68,13 +98,18 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
       {/* Cart Items Summary */}
       <div className="space-y-3 mb-6">
         {cart.items.map((item) => (
-          <div key={item.beat.id} className="flex items-center justify-between text-sm">
+          <div key={`${item.beat.id}-${item.licenseType}`} className="flex items-center justify-between text-sm">
             <div className="flex-1">
-              <span className="font-medium text-white">{item.beat.title}</span>
-              <span className="text-gray-400 ml-2">× {item.quantity}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-white">{item.beat.title}</span>
+                <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
+                  {getLicenseDisplayName(item.licenseType)}
+                </span>
+              </div>
+              <span className="text-gray-400 text-xs">× {item.quantity}</span>
             </div>
             <span className="font-medium text-white">
-              €{(item.beat.price * item.quantity).toFixed(2)}
+              €{(getPriceByLicense(item.beat, item.licenseType) * item.quantity).toFixed(2)}
             </span>
           </div>
         ))}

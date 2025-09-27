@@ -96,7 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           currency: fullSession.currency?.toUpperCase() || 'EUR',
           paymentMethod: 'card',
           paymentId: session.id,
-          licenseType: beat.isExclusive ? 'EXCLUSIVE' as const : 'NON_EXCLUSIVE' as const,
+          licenseType: beat.isExclusive ? 'EXCLUSIVE' as const : 'WAV_LEASE' as const,
           usageRights: beat.isExclusive 
             ? ['Exclusive rights', 'Commercial use', 'Streaming', 'Distribution']
             : ['Non-exclusive rights', 'Commercial use', 'Streaming'],

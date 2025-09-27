@@ -1,6 +1,6 @@
 # Stripe Integration Setup
 
-This guide will help you set up Stripe integration for your Woodpecker Beats application.
+This guide will help you set up Stripe integration for your Woodpecker Beats application with the new licensing system and dynamic pricing.
 
 ## Prerequisites
 
@@ -38,33 +38,39 @@ pnpm run stripe:create-product
 
 This will:
 - Create a test beat product called "Test Beat - Midnight Trap"
-- Set the price to €29.99
-- Add metadata (genre, BPM, key, duration)
+- Create three prices for different license types:
+  - WAV Lease: €19.99
+  - Trackout Lease: €39.99
+  - Unlimited Lease: €79.99
+- Add metadata (genre, BPM, key, duration, license type)
 - List all existing products
 
 ### 4. What Gets Created
 
 The test script creates:
 - **Product**: A beat with metadata
-- **Price**: €29.99 in EUR
-- **Checkout Session**: Ready for payment processing
+- **Three Prices**: One for each license type (WAV, Trackout, Unlimited)
+- **Checkout Session**: Ready for payment processing with license selection
 
 ### 5. Available Functions
 
 The Stripe integration provides these helper functions:
 
-- `createTestProduct()` - Creates a test product and price
+- `createBeatStripeProducts()` - Creates a beat product with three license prices
+- `createCheckoutSessionWithPriceId()` - Creates checkout session with existing priceId
+- `createCheckoutSessionWithLicense()` - Creates checkout session with dynamic pricing
 - `listProducts()` - Lists all Stripe products
 - `getProduct(productId)` - Retrieves a specific product
-- `createCheckoutSession()` - Creates a payment checkout session
 
 ### 6. Next Steps
 
 After testing:
-1. Create real products for your beats
-2. Integrate checkout into your frontend
+1. Create real products for your beats with three license prices
+2. Integrate license selection into your frontend
 3. Handle webhook events for successful payments
 4. Connect payments to your order system
+5. Implement license-based download restrictions
+6. Test the complete flow with different license types
 
 ## Testing
 

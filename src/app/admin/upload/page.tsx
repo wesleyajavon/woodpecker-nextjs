@@ -118,7 +118,9 @@ export default function AdminUploadPage() {
                           <div className="text-sm text-gray-300 space-y-1">
                             <div>{beat.genre} • {beat.bpm} BPM</div>
                             <div>{beat.key} • {beat.duration}</div>
-                            <div className="text-purple-300 font-medium">{beat.price}€</div>
+                            <div className="text-purple-300 font-medium">
+                              WAV: {beat.wavLeasePrice}€ | Trackout: {beat.trackoutLeasePrice}€ | Unlimited: {beat.unlimitedLeasePrice}€
+                            </div>
                           </div>
                         </motion.div>
                       ))}

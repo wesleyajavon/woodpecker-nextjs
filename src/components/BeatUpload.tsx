@@ -40,7 +40,9 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     bpm: 140,
     key: 'C',
     duration: '3:00',
-    price: 29.99,
+    wavLeasePrice: 19.99,
+    trackoutLeasePrice: 39.99,
+    unlimitedLeasePrice: 79.99,
     tags: [] as string[],
     isExclusive: false,
     featured: false
@@ -98,7 +100,9 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       newErrors.push(`La description ne peut pas dépasser ${BEAT_CONFIG.maxDescriptionLength} caractères`);
     }
     if (!uploadedFiles.preview) newErrors.push('La preview audio est requise');
-    if (formData.price <= 0) newErrors.push('Le prix doit être supérieur à 0');
+    if (formData.wavLeasePrice <= 0) newErrors.push('Le prix WAV Lease doit être supérieur à 0');
+    if (formData.trackoutLeasePrice <= 0) newErrors.push('Le prix Trackout Lease doit être supérieur à 0');
+    if (formData.unlimitedLeasePrice <= 0) newErrors.push('Le prix Unlimited Lease doit être supérieur à 0');
     if (formData.bpm < 60 || formData.bpm > 200) newErrors.push('Le BPM doit être entre 60 et 200');
 
     setErrors(newErrors);
@@ -164,7 +168,9 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           bpm: 140,
           key: 'C',
           duration: '3:00',
-          price: 29.99,
+          wavLeasePrice: 19.99,
+          trackoutLeasePrice: 39.99,
+          unlimitedLeasePrice: 79.99,
           tags: [],
           isExclusive: false,
           featured: false
@@ -500,19 +506,56 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             </div>
           </div>
 
-          {/* Prix */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Prix (EUR) <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="number"
-              value={formData.price}
-              onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
-              className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              min="0"
-              step="0.01"
-            />
+          {/* Prix par licence */}
+          <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-white">Prix par type de licence</h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* WAV Lease */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                  WAV Lease (EUR) <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.wavLeasePrice}
+                  onChange={(e) => handleInputChange('wavLeasePrice', parseFloat(e.target.value))}
+                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              {/* Trackout Lease */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                  Trackout Lease (EUR) <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.trackoutLeasePrice}
+                  onChange={(e) => handleInputChange('trackoutLeasePrice', parseFloat(e.target.value))}
+                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              {/* Unlimited Lease */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                  Unlimited Lease (EUR) <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.unlimitedLeasePrice}
+                  onChange={(e) => handleInputChange('unlimitedLeasePrice', parseFloat(e.target.value))}
+                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Tags */}

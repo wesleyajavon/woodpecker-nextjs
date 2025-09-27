@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import { Beat } from '@/types/beat'
-import { CartItem, CartState, CartContextType } from '@/types/cart'
+import { CartItem, CartState, CartContextType, LicenseType } from '@/types/cart'
 
 const CART_STORAGE_KEY = 'woodpecker-cart'
 
@@ -14,9 +14,9 @@ const initialState: CartState = {
 }
 
 type CartAction =
-  | { type: 'ADD_TO_CART'; payload: { beat: Beat; quantity: number } }
-  | { type: 'REMOVE_FROM_CART'; payload: { beatId: string } }
-  | { type: 'UPDATE_QUANTITY'; payload: { beatId: string; quantity: number } }
+  | { type: 'ADD_TO_CART'; payload: { beat: Beat; licenseType: LicenseType; quantity: number } }
+  | { type: 'REMOVE_FROM_CART'; payload: { beatId: string; licenseType: LicenseType } }
+  | { type: 'UPDATE_QUANTITY'; payload: { beatId: string; licenseType: LicenseType; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'OPEN_CART' }
@@ -26,53 +26,88 @@ type CartAction =
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_TO_CART': {
-      const { beat, quantity } = action.payload
-      const existingItem = state.items.find(item => item.beat.id === beat.id)
+      const { beat, licenseType, quantity } = action.payload
+      const existingItem = state.items.find(item => 
+        item.beat.id === beat.id && item.licenseType === licenseType
+      )
       
       let newItems: CartItem[]
       if (existingItem) {
         newItems = state.items.map(item =>
-          item.beat.id === beat.id
+          item.beat.id === beat.id && item.licenseType === licenseType
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
       } else {
-        newItems = [...state.items, { beat, quantity, addedAt: new Date() }]
+        newItems = [...state.items, { beat, licenseType, quantity, addedAt: new Date() }]
+      }
+      
+      const getPrice = (beat: Beat, licenseType: LicenseType): number => {
+        switch (licenseType) {
+          case 'WAV_LEASE': return beat.wavLeasePrice
+          case 'TRACKOUT_LEASE': return beat.trackoutLeasePrice
+          case 'UNLIMITED_LEASE': return beat.unlimitedLeasePrice
+          default: return beat.wavLeasePrice
+        }
       }
       
       return {
         ...state,
         items: newItems,
         totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0),
-        totalPrice: newItems.reduce((sum, item) => sum + (item.beat.price * item.quantity), 0),
+        totalPrice: newItems.reduce((sum, item) => sum + (getPrice(item.beat, item.licenseType) * item.quantity), 0),
       }
     }
     
     case 'REMOVE_FROM_CART': {
-      const newItems = state.items.filter(item => item.beat.id !== action.payload.beatId)
+      const { beatId, licenseType } = action.payload
+      const newItems = state.items.filter(item => 
+        !(item.beat.id === beatId && item.licenseType === licenseType)
+      )
+      
+      const getPrice = (beat: Beat, licenseType: LicenseType): number => {
+        switch (licenseType) {
+          case 'WAV_LEASE': return beat.wavLeasePrice
+          case 'TRACKOUT_LEASE': return beat.trackoutLeasePrice
+          case 'UNLIMITED_LEASE': return beat.unlimitedLeasePrice
+          default: return beat.wavLeasePrice
+        }
+      }
+      
       return {
         ...state,
         items: newItems,
         totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0),
-        totalPrice: newItems.reduce((sum, item) => sum + (item.beat.price * item.quantity), 0),
+        totalPrice: newItems.reduce((sum, item) => sum + (getPrice(item.beat, item.licenseType) * item.quantity), 0),
       }
     }
     
     case 'UPDATE_QUANTITY': {
-      const { beatId, quantity } = action.payload
+      const { beatId, licenseType, quantity } = action.payload
       if (quantity <= 0) {
-        return cartReducer(state, { type: 'REMOVE_FROM_CART', payload: { beatId } })
+        return cartReducer(state, { type: 'REMOVE_FROM_CART', payload: { beatId, licenseType } })
       }
       
       const newItems = state.items.map(item =>
-        item.beat.id === beatId ? { ...item, quantity } : item
+        item.beat.id === beatId && item.licenseType === licenseType
+          ? { ...item, quantity }
+          : item
       )
+      
+      const getPrice = (beat: Beat, licenseType: LicenseType): number => {
+        switch (licenseType) {
+          case 'WAV_LEASE': return beat.wavLeasePrice
+          case 'TRACKOUT_LEASE': return beat.trackoutLeasePrice
+          case 'UNLIMITED_LEASE': return beat.unlimitedLeasePrice
+          default: return beat.wavLeasePrice
+        }
+      }
       
       return {
         ...state,
         items: newItems,
         totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0),
-        totalPrice: newItems.reduce((sum, item) => sum + (item.beat.price * item.quantity), 0),
+        totalPrice: newItems.reduce((sum, item) => sum + (getPrice(item.beat, item.licenseType) * item.quantity), 0),
       }
     }
     
@@ -104,11 +139,19 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     
     case 'LOAD_CART':
       const items = action.payload.items
+      const getPrice = (beat: Beat, licenseType: LicenseType): number => {
+        switch (licenseType) {
+          case 'WAV_LEASE': return beat.wavLeasePrice
+          case 'TRACKOUT_LEASE': return beat.trackoutLeasePrice
+          case 'UNLIMITED_LEASE': return beat.unlimitedLeasePrice
+          default: return beat.wavLeasePrice
+        }
+      }
       return {
         ...state,
         items,
         totalItems: items.reduce((sum, item) => sum + item.quantity, 0),
-        totalPrice: items.reduce((sum, item) => sum + (item.beat.price * item.quantity), 0),
+        totalPrice: items.reduce((sum, item) => sum + (getPrice(item.beat, item.licenseType) * item.quantity), 0),
       }
     
     default:
@@ -152,16 +195,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart])
 
-  const addToCart = (beat: Beat, quantity: number = 1) => {
-    dispatch({ type: 'ADD_TO_CART', payload: { beat, quantity } })
+  const addToCart = (beat: Beat, licenseType: LicenseType, quantity: number = 1) => {
+    dispatch({ type: 'ADD_TO_CART', payload: { beat, licenseType, quantity } })
   }
 
-  const removeFromCart = (beatId: string) => {
-    dispatch({ type: 'REMOVE_FROM_CART', payload: { beatId } })
+  const removeFromCart = (beatId: string, licenseType: LicenseType) => {
+    dispatch({ type: 'REMOVE_FROM_CART', payload: { beatId, licenseType } })
   }
 
-  const updateQuantity = (beatId: string, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { beatId, quantity } })
+  const updateQuantity = (beatId: string, licenseType: LicenseType, quantity: number) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { beatId, licenseType, quantity } })
   }
 
   const clearCart = () => {

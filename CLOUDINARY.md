@@ -41,13 +41,18 @@ woodpecker-beats/
 ├── beats/
 │   ├── previews/     # Previews audio (30s, MP3, qualité optimisée)
 │   ├── masters/      # Fichiers masters (WAV, qualité maximale)
+│   ├── stems/        # Fichiers stems (ZIP, accès restreint par licence)
 │   └── waveforms/    # Waveforms générés automatiquement
+├── artwork/
+│   └── beats/        # Images d'artwork des beats
 └── temp/             # Fichiers temporaires (nettoyage automatique)
 ```
 
 ### **Conventions de nommage**
 
 - **Beats** : `{genre}_{bpm}_{key}_{timestamp}`
+- **Stems** : `{genre}_{bpm}_{key}_{timestamp}_stems`
+- **Artwork** : `{genre}_{bpm}_{key}_{timestamp}_artwork`
 
 ## **🎵 Gestion des fichiers audio**
 
@@ -59,6 +64,7 @@ woodpecker-beats/
 | WAV    | Master | Auto:best | 100MB |
 | AIFF   | Master | Auto:best | 100MB |
 | FLAC   | Master | Auto:best | 100MB |
+| ZIP    | Stems | Raw | 500MB |
 
 ### **Transformations audio**
 
@@ -78,6 +84,15 @@ woodpecker-beats/
   resource_type: 'video',
   format: 'wav',
   quality: 'auto:best'
+}
+```
+
+#### **Stems (fichiers bruts)**
+```typescript
+{
+  resource_type: 'raw',
+  format: 'zip',
+  // Pas de transformation pour les stems
 }
 ```
 
@@ -148,10 +163,13 @@ POST /api/beats/upload
 **Fichiers acceptés :**
 - `preview` (requis) : Fichier audio preview
 - `master` (optionnel) : Fichier audio master
+- `stems` (optionnel) : Archive ZIP contenant les stems
+- `artwork` (optionnel) : Image d'artwork du beat
 
 **Données du formulaire :**
 - `title`, `description`, `genre`, `bpm`, `key`, `duration`
-- `price`, `tags`, `isExclusive`, `featured`
+- `wavLeasePrice`, `trackoutLeasePrice`, `unlimitedLeasePrice`
+- `tags`, `isExclusive`, `featured`
 
 
 ## **📊 Gestion des ressources**
@@ -184,6 +202,16 @@ const imageResult = await CloudinaryService.uploadImage(
     quality: 'auto:good'
   }
 );
+
+// Upload stems
+const stemsResult = await CloudinaryService.uploadRaw(
+  fileBuffer,
+  CLOUDINARY_FOLDERS.BEATS.STEMS,
+  {
+    resource_type: 'raw',
+    format: 'zip'
+  }
+);
 ```
 
 ### **Suppression de ressources**
@@ -193,6 +221,12 @@ const imageResult = await CloudinaryService.uploadImage(
 await CloudinaryService.deleteResource(
   publicId,
   resourceType // 'image', 'video', ou 'raw'
+);
+
+// Suppression des stems
+await CloudinaryService.deleteResource(
+  stemsPublicId,
+  'raw'
 );
 ```
 
@@ -294,6 +328,7 @@ const maxImageSize = 10 * 1024 * 1024;   // 10MB
 - **Upload** : 1000 fichiers par heure (compte gratuit)
 - **Transformations** : 25 000 transformations par mois
 - **Stockage** : 25GB (compte gratuit)
+- **Stems** : Fichiers ZIP jusqu'à 500MB
 
 ## **📈 Monitoring et analytics**
 
@@ -317,6 +352,8 @@ console.log(`Format: ${result.format}`);
 - **Taux de succès** : Pourcentage d'uploads réussis
 - **Temps d'upload** : Durée moyenne des uploads
 - **Utilisation du stockage** : Espace utilisé par type de fichier
+- **Téléchargements de stems** : Fréquence d'accès aux fichiers stems
+- **Répartition des licences** : Usage par type de licence
 
 ## **🚨 Dépannage**
 
@@ -333,6 +370,11 @@ console.log(`Format: ${result.format}`);
 #### **3. "Invalid file format"**
 - Vérifiez le type MIME du fichier
 - Assurez-vous que le format est supporté
+
+#### **4. "Stems not accessible"**
+- Vérifiez que l'utilisateur a la bonne licence
+- Confirmez que le fichier stems existe
+- Vérifiez les permissions de téléchargement
 
 ### **Solutions**
 
@@ -363,6 +405,8 @@ if (fileInfo.size > maxSize) {
 - **Watermarking automatique** : Ajout de logos sur les previews
 - **Analyse audio** : Détection automatique du BPM et de la tonalité
 - **Compression intelligente** : Optimisation automatique selon l'usage
+- **Gestion des licences** : Contrôle d'accès basé sur les types de licence
+- **Téléchargements sécurisés** : URLs signées avec expiration
 
 ### **2. Intégrations**
 
@@ -395,4 +439,23 @@ if (fileInfo.size > maxSize) {
 
 ---
 
-**Note** : Cette configuration est optimisée pour une utilisation en production. Testez toujours vos uploads en environnement de développement avant de déployer.
+**Note** : Cette configuration est optimisée pour une utilisation en production avec le système de licences. Testez toujours vos uploads en environnement de développement avant de déployer.
+
+## **🔐 Sécurité des téléchargements**
+
+### **Contrôle d'accès par licence**
+
+- **WAV Lease** : Accès uniquement aux fichiers masters
+- **Trackout Lease** : Accès aux masters + stems
+- **Unlimited Lease** : Accès aux masters + stems + distribution illimitée
+
+### **URLs signées**
+
+```typescript
+// Génération d'URL signée pour téléchargement sécurisé
+const signedUrl = cloudinary.utils.api_sign_request({
+  public_id: publicId,
+  timestamp: Math.round(new Date().getTime() / 1000),
+  expiration: Math.round((new Date().getTime() + 30 * 60 * 1000) / 1000) // 30 minutes
+}, process.env.CLOUDINARY_API_SECRET)
+```

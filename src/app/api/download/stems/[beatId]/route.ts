@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth';
 import { getUserIdFromEmail } from '@/lib/userUtils';
 import { CloudinaryService } from '@/lib/cloudinary';
 import { prisma } from '@/lib/prisma';
+import { LicenseType } from '@prisma/client';
 
 interface RouteParams {
   params: Promise<{
@@ -60,11 +61,33 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Vérifier que l'utilisateur a acheté ce beat
-    const hasPurchased = await OrderService.hasCustomerPurchasedBeat(session.user.email, beatId);
-    if (!hasPurchased) {
+    // Vérifier que l'utilisateur a acheté ce beat avec une licence appropriée (Trackout ou Unlimited)
+    const hasPurchasedWithStemsLicense = await prisma.order.findFirst({
+      where: {
+        customerEmail: session.user.email,
+        beatId: beatId,
+        status: { in: ['PAID', 'COMPLETED'] },
+        licenseType: { in: ['TRACKOUT_LEASE', 'UNLIMITED_LEASE'] }
+      }
+    });
+
+    // Vérifier aussi dans les commandes multi-items
+    const hasPurchasedInMultiOrder = await prisma.multiItemOrder.findFirst({
+      where: {
+        customerEmail: session.user.email,
+        status: { in: ['PAID', 'COMPLETED'] },
+        licenseType: { in: ['TRACKOUT_LEASE', 'UNLIMITED_LEASE'] },
+        items: {
+          some: {
+            beatId: beatId
+          }
+        }
+      }
+    });
+
+    if (!hasPurchasedWithStemsLicense && !hasPurchasedInMultiOrder) {
       return NextResponse.json(
-        { error: 'Vous devez avoir acheté ce beat pour télécharger les stems' },
+        { error: 'Vous devez avoir acheté ce beat avec une licence Trackout ou Unlimited pour télécharger les stems' },
         { status: 403 }
       );
     }
