@@ -1,220 +1,60 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Play, ArrowRight, Sparkles, Music, Headphones, Mic, Drum, Radio } from 'lucide-react';
+import { ArrowRight, Music } from 'lucide-react';
+import { TextRewind } from './ui/text-rewind';
+import { HoverBorderGradient } from './ui/hover-border-gradient';
 
 const Hero = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.99], [1, 0.3]);
-  
-  // Separate animation for stats - keep them visible longer
-  const statsOpacity = useTransform(scrollYProgress, [0, 0.98], [1, 0.95]);
-
-  const floatingIcons = [
-    { icon: Drum, delay: 0, position: "top-20 left-4 lg:left-20" },
-    { icon: Radio, delay: 2, position: "top-40 right-4 lg:right-20" },
-    { icon: Mic, delay: 4, position: "bottom-20 left-8 lg:left-40" },
-    { icon: Music, delay: 1, position: "top-60 left-12 lg:left-60" },
-    { icon: Headphones, delay: 3, position: "bottom-40 right-8 lg:right-40" },
-  ];
-
   return (
-    <section ref={containerRef} className="relative min-h-[140vh] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(156,146,172,0.1)_1px,transparent_0)] bg-[length:20px_20px] opacity-30" />
-        
-        {/* Floating geometric shapes */}
-        <motion.div
-          className="absolute top-20 left-4 lg:left-20 w-16 lg:w-32 h-16 lg:h-32 border border-purple-500/20 rounded-full"
-          animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute top-40 right-4 lg:right-20 w-12 lg:w-24 h-12 lg:h-24 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-2xl"
-          animate={{ rotate: -360, y: [0, -20, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-20 left-8 lg:left-40 w-10 lg:w-20 h-10 lg:h-20 border border-pink-500/20 rounded-lg"
-          animate={{ rotate: 180, scale: [1, 0.8, 1] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        {/* Floating music icons */}
-        {floatingIcons.map((item, index) => (
-          <motion.div
-            key={index}
-            className={`absolute ${item.position} text-purple-400/30`}
-            animate={{ 
-              y: [0, -30, 0],
-              rotate: [0, 360],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              duration: 8, 
-              delay: item.delay, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
-            }}
-          >
-            <item.icon className="h-6 w-6 lg:h-8 lg:w-8" />
-          </motion.div>
-        ))}
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center overflow-hidden">
       {/* Main content */}
-      <motion.div 
-        style={{ y, opacity }}
-        className="relative z-20 text-center text-white px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full"
-      >
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="inline-flex items-center mt-16 lg:mt-20 gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 lg:px-6 py-2 lg:py-3 mb-6 lg:mb-8"
-        >
-          <Sparkles className="h-5 w-5 text-yellow-400" />
-          <span className="text-sm font-medium">Nouveau : Pack Trap 2024</span>
-        </motion.div>
-
+      <div className="relative z-10 text-center text-foreground px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         {/* Main heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 lg:mb-6 leading-tight"
-        >
-          <span className="block">Woodpecker</span>
-          <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
-            Beatmaker
-          </span>
-        </motion.h1>
+        <div className="mb-16">
+          <TextRewind text="l.outsider beats" />
+          {/* <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="text-4xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent"
+          >
+            Beats
+          </motion.div> */}
+        </div>
 
         {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4 }}
-          className="text-lg sm:text-xl lg:text-2xl xl:text-3xl text-gray-300 mb-8 lg:mb-12 max-w-4xl mx-auto leading-relaxed px-4"
+          transition={{ duration: 1, delay: 0.2 }}
+          className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
         >
-          Découvrez ma collection exclusive de beats originaux. Des instrumentaux uniques pour rappeurs, chanteurs et producteurs. 
-          Chaque beat raconte une histoire.
+          Beatmaker professionnel - Des instrumentaux uniques pour rappeurs, chanteurs et producteurs
         </motion.p>
 
-        {/* CTA Buttons */}
+        {/* CTA Button */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center items-center mb-12 lg:mb-16 px-4"
+          transition={{ duration: 1, delay: 0.4 }}
+          className="flex justify-center"
         >
-          <motion.div
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Link
-              href="/beats"
-              className="group relative inline-flex items-center gap-2 lg:gap-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 lg:px-10 py-3 lg:py-5 rounded-2xl font-semibold text-lg lg:text-xl transition-all duration-300 shadow-2xl shadow-purple-500/25"
+          <Link href="/beats">
+            <HoverBorderGradient
+              containerClassName="rounded-2xl"
+              className="group inline-flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300"
+              duration={1.5}
+              clockwise={true}
             >
               <span>Écouter mes beats</span>
-              <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </Link>
-          </motion.div>
-          
-          {/* <motion.div
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <button className="group relative inline-flex items-center gap-2 lg:gap-3 bg-white/10 hover:bg-white/20 text-white px-6 lg:px-10 py-3 lg:py-5 rounded-2xl font-semibold text-lg lg:text-xl transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-2xl">
-              <Play className="h-6 w-6 group-hover:scale-110 transition-transform" />
-              <span>Démo live</span>
-              <motion.div
-                className="absolute inset-0 bg-white/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              />
-            </button>
-          </motion.div> */}
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </HoverBorderGradient>
+          </Link>
         </motion.div>
-
-        {/* Stats with enhanced design */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          style={{ opacity: statsOpacity }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8 max-w-5xl mx-auto px-4 relative z-30 bg-black/40 backdrop-blur-md rounded-3xl py-8 border border-white/10"
-        >
-          {[
-            { number: '20+', label: 'Beats', icon: Drum },
-            { number: '10+', label: 'Genres', icon: Music },
-            { number: '50+', label: 'Clients', icon: Headphones },
-            { number: '3+', label: 'Années d\'expérience', icon: Sparkles },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 1 + index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="text-center group"
-            >
-              <div className="relative mb-2 lg:mb-4">
-                <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <stat.icon className="h-6 w-6 lg:h-8 lg:w-8 text-purple-400" />
-                </div>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </div>
-              <div className="text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-1 lg:mb-2 group-hover:text-purple-300 transition-colors">
-                {stat.number}
-              </div>
-              <div className="text-sm lg:text-base text-gray-400 group-hover:text-gray-300 transition-colors">
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
-        >
-          <motion.div
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-1 h-3 bg-white/60 rounded-full mt-2"
-          />
-        </motion.div>
-      </motion.div>
-    </section>
+      </div>
+    </div>
   );
 };
 

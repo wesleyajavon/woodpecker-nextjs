@@ -1,15 +1,11 @@
 
-import Hero from '@/components/Hero';
-import FeaturedProducts from '@/components/FeaturedProducts';
-import Footer from '@/components/Footer';
+import LandingSection from '@/components/LandingSection';
+import { Footer } from '@/components/blocks/footer-section';
 
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-hidden">
-      <div>
-        <Hero />
-        <FeaturedProducts />
-      </div>
+      <LandingSection />
       <Footer />
     </main>
   );
