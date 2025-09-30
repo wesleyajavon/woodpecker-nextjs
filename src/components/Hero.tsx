@@ -13,7 +13,7 @@ const Hero = () => {
       <div className="relative z-10 text-center text-foreground px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         {/* Main heading */}
         <div className="mb-16">
-          <TextRewind text="l.outsider beats" />
+          <TextRewind text="l.outsider" />
           {/* <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
