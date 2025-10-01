@@ -133,17 +133,10 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 
 		let count = 0;
 		let animationId: number = 0;
-		let lastTime = 0;
 
-		// Animation function with throttling
-		const animate = (currentTime: number) => {
+		// Animation function
+		const animate = () => {
 			animationId = requestAnimationFrame(animate);
-
-			// Throttle animation to 30fps for better performance
-			if (currentTime - lastTime < 33) {
-				return;
-			}
-			lastTime = currentTime;
 
 			const positionAttribute = geometry.attributes.position;
 			const positions = positionAttribute.array as Float32Array;
@@ -153,10 +146,10 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 				for (let iy = 0; iy < AMOUNTY; iy++) {
 					const index = i * 3;
 
-					// Animate Y position with sine waves (reduced intensity)
+					// Animate Y position with sine waves
 					positions[index + 1] =
-						Math.sin((ix + count) * 0.2) * 30 +
-						Math.sin((iy + count) * 0.3) * 30;
+						Math.sin((ix + count) * 0.3) * 50 +
+						Math.sin((iy + count) * 0.5) * 50;
 
 					i++;
 				}
@@ -164,7 +157,7 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 
 			positionAttribute.needsUpdate = true;
 			renderer.render(scene, camera);
-			count += 0.05; // Slower animation
+			count += 0.1;
 		};
 
 		// Handle window resize
@@ -177,7 +170,7 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 		window.addEventListener('resize', handleResize);
 
 		// Start animation
-		animate(0);
+		animate();
 
 		// Store references
 		sceneRef.current = {
