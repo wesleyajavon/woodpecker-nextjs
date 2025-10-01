@@ -72,7 +72,7 @@ export default function ResendEmailButton({
         ) : (
           <>
             <Mail className="w-4 h-4 mr-2" />
-            Renvoyer l'email de confirmation
+            Renvoyer l&apos;email de confirmation
           </>
         )}
       </Button>

@@ -8,6 +8,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
+// Type for child element when asChild is true
+type ChildElement = React.ReactElement<React.HTMLAttributes<HTMLElement>>
+
 export function Button({ 
   variant = 'primary', 
   size = 'md', 
@@ -36,7 +39,7 @@ export function Button({
   const classes = cn(baseClasses, variantClasses[variant], sizeClasses[size], className)
   
   if (asChild) {
-    const child = children as React.ReactElement<any>
+    const child = children as ChildElement
     return React.cloneElement(child, {
       className: cn(classes, child.props?.className),
       ...props
