@@ -7,6 +7,8 @@ import { useCart, useCartActions } from '@/hooks/useCart'
 import CartItem from '@/components/CartItem'
 import CartSummary from '@/components/CartSummary'
 import { Button } from '@/components/ui/Button'
+import { DottedSurface } from '@/components/ui/dotted-surface'
+import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { LicenseType } from '@/types/cart'
 import { Beat } from '@/types/beat'
@@ -86,14 +88,28 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-800 pt-20 pb-12">
+    <div className="min-h-screen bg-background pt-20 pb-12">
+      <DottedSurface className="size-full z-0" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
+        <div
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+            'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+            'blur-[30px]',
+          )}
+        />
+      </div>
+
       {/* Header */}
-      <div className="bg-gray-700 border-b border-gray-600">
+      <div className="bg-card/10 backdrop-blur-lg border-b border-border/20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <Link href="/beats">
-                <Button variant="outline" size="sm" className="flex items-center space-x-2 bg-gray-600 border-gray-500 text-white hover:bg-gray-500 hover:text-white">
+                <Button variant="outline" size="sm" className="flex items-center space-x-2 bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30">
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back to Beats</span>
                 </Button>
@@ -101,7 +117,7 @@ export default function CartPage() {
               
               <div className="flex items-center space-x-3">
                 <ShoppingCart className="h-6 w-6 text-purple-400" />
-                <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
+                <h1 className="text-2xl font-bold text-foreground">Shopping Cart</h1>
                 {cart.totalItems > 0 && (
                   <span className="bg-purple-600 text-purple-100 text-sm font-medium px-2.5 py-0.5 rounded-full">
                     {cart.totalItems} {cart.totalItems === 1 ? 'item' : 'items'}
@@ -114,7 +130,7 @@ export default function CartPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {cart.items.length === 0 ? (
           // Empty Cart State
           <motion.div
@@ -123,12 +139,12 @@ export default function CartPage() {
             className="text-center py-16"
           >
             <div className="max-w-md mx-auto">
-              <div className="bg-gray-700 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <ShoppingCart className="h-12 w-12 text-gray-400" />
+              <div className="bg-card/20 backdrop-blur-lg rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg border border-border/20">
+                <ShoppingCart className="h-12 w-12 text-muted-foreground" />
               </div>
               
-              <h2 className="text-3xl font-bold text-white mb-4">Your cart is empty</h2>
-              <p className="text-lg text-gray-300 mb-8">
+              <h2 className="text-3xl font-bold text-foreground mb-4">Your cart is empty</h2>
+              <p className="text-lg text-muted-foreground mb-8">
                 Looks like you haven&apos;t added any beats to your cart yet. 
                 Start building your music collection!
               </p>
@@ -141,7 +157,7 @@ export default function CartPage() {
                   </Button>
                 </Link>
                 
-                <div className="text-sm text-gray-400 mt-2">
+                <div className="text-sm text-muted-foreground mt-2">
                   Discover our collection of premium beats from talented producers
                 </div>
               </div>
@@ -157,9 +173,9 @@ export default function CartPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                <div className="bg-gray-700 rounded-xl p-6">
+                <div className="bg-card/10 backdrop-blur-lg rounded-xl p-6 border border-border/20">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-white">
+                    <h2 className="text-xl font-semibold text-foreground">
                       Cart Items ({cart.totalItems})
                     </h2>
                   </div>
@@ -190,10 +206,10 @@ export default function CartPage() {
           animate={{ opacity: 1 }}
           className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
         >
-          <div className="bg-gray-700 rounded-xl p-8 text-center border border-gray-600">
+          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-8 text-center border border-border/20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-white mb-2">Processing Checkout</h3>
-            <p className="text-gray-300">Please wait while we prepare your order...</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Processing Checkout</h3>
+            <p className="text-muted-foreground">Please wait while we prepare your order...</p>
           </div>
         </motion.div>
       )}

@@ -44,7 +44,7 @@ const Hero = () => {
           <Link href="/beats">
             <HoverBorderGradient
               containerClassName="rounded-2xl"
-              className="group inline-flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300"
+              className="group inline-flex items-center gap-3 backdrop-blur-lg px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 border border-border/20"
               duration={1.5}
               clockwise={true}
             >

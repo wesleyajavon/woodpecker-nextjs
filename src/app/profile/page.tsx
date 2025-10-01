@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import Avatar from '@/components/Avatar'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { DottedSurface } from '@/components/ui/dotted-surface'
+import { cn } from '@/lib/utils'
 
 interface UserProfile {
   id: string
@@ -85,33 +87,37 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-800 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gray-700 shadow-xl rounded-2xl overflow-hidden">
-            <div className="px-6 py-8 sm:px-8 sm:py-10">
-              <div className="flex items-center justify-center py-20">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-400 mx-auto mb-4"></div>
-                  <p className="text-gray-300">Chargement du profil...</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-800 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gray-700 shadow-xl rounded-2xl overflow-hidden">
+      <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        <DottedSurface className="size-full z-0" />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+              'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+              'blur-[30px]',
+            )}
+          />
+        </div>
+
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="bg-card/10 backdrop-blur-lg shadow-xl rounded-2xl overflow-hidden border border-border/20">
             <div className="px-6 py-8 sm:px-8 sm:py-10">
-              {/* Header Section */}
-              <div className="text-center mb-8">
+              {loading ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-400 mx-auto mb-4"></div>
+                    <p className="text-foreground">Chargement du profil...</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Header Section */}
+                  <div className="text-center mb-8">
                 <div className="flex justify-center mb-6">
                   <Avatar
                     src={user?.image}
@@ -121,34 +127,34 @@ export default function ProfilePage() {
                     showName={false}
                   />
                 </div>
-                <h1 className="text-3xl font-bold text-white mb-2">
+                <h1 className="text-3xl font-bold text-foreground mb-2">
                   {user?.name || 'Utilisateur'}
                 </h1>
-                <p className="text-lg text-gray-300 mb-2">{user?.email}</p>
-                <p className="text-sm text-gray-400">
+                <p className="text-lg text-muted-foreground mb-2">{user?.email}</p>
+                <p className="text-sm text-muted-foreground">
                   Membre depuis {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
                 </p>
               </div>
 
               {error && (
-                <div className="mb-6 bg-red-900/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
+                <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="mb-6 bg-green-900/20 border border-green-500/30 text-green-300 px-4 py-3 rounded-lg">
+                <div className="mb-6 bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg">
                   {success}
                 </div>
               )}
 
               {/* Profile Edit Form */}
-              <div className="bg-gray-600 rounded-xl p-6 mb-8">
-                <h2 className="text-xl font-semibold text-white mb-6">Modifier le profil</h2>
+              <div className="bg-card/10 backdrop-blur-lg rounded-xl p-6 mb-8 border border-border/20">
+                <h2 className="text-xl font-semibold text-foreground mb-6">Modifier le profil</h2>
                 <form onSubmit={handleUpdateProfile} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                      <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                         Nom d&apos;affichage
                       </label>
                       <input
@@ -156,13 +162,13 @@ export default function ProfilePage() {
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-500 text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors placeholder-gray-400"
+                        className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground"
                         placeholder="Votre nom d'affichage"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-2">
+                      <label htmlFor="image" className="block text-sm font-medium text-foreground mb-2">
                         URL de l&apos;avatar
                       </label>
                       <input
@@ -170,10 +176,10 @@ export default function ProfilePage() {
                         id="image"
                         value={formData.image}
                         onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-700 border border-gray-500 text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors placeholder-gray-400"
+                        className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground"
                         placeholder="https://example.com/avatar.jpg"
                       />
-                      <p className="mt-2 text-sm text-gray-400">
+                      <p className="mt-2 text-sm text-muted-foreground">
                         Laissez vide pour utiliser l&apos;avatar par défaut
                       </p>
                     </div>
@@ -200,18 +206,18 @@ export default function ProfilePage() {
               </div>
 
               {/* Account Information */}
-              <div className="bg-gray-600 border border-gray-500 rounded-xl p-6">
-                <h3 className="text-xl font-semibold text-white mb-6">
+              <div className="bg-card/10 backdrop-blur-lg border border-border/20 rounded-xl p-6">
+                <h3 className="text-xl font-semibold text-foreground mb-6">
                   Informations du compte
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <div className="bg-gray-700 rounded-lg p-4">
-                      <dt className="text-sm font-medium text-gray-300 mb-1">Email</dt>
-                      <dd className="text-sm text-white break-all">{user?.email}</dd>
+                    <div className="bg-card/20 rounded-lg p-4 border border-border/10">
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">Email</dt>
+                      <dd className="text-sm text-foreground break-all">{user?.email}</dd>
                     </div>
-                    <div className="bg-gray-700 rounded-lg p-4">
-                      <dt className="text-sm font-medium text-gray-300 mb-1">Email vérifié</dt>
+                    <div className="bg-card/20 rounded-lg p-4 border border-border/10">
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">Email vérifié</dt>
                       <dd className="text-sm">
                         {user?.emailVerified ? (
                           <span className="inline-flex items-center text-green-600">
@@ -232,19 +238,21 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <div className="bg-gray-700 rounded-lg p-4">
-                      <dt className="text-sm font-medium text-gray-300 mb-1">ID utilisateur</dt>
-                      <dd className="text-sm text-white font-mono break-all">{user?.id}</dd>
+                    <div className="bg-card/20 rounded-lg p-4 border border-border/10">
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">ID utilisateur</dt>
+                      <dd className="text-sm text-foreground font-mono break-all">{user?.id}</dd>
                     </div>
-                    <div className="bg-gray-700 rounded-lg p-4">
-                      <dt className="text-sm font-medium text-gray-300 mb-1">Dernière mise à jour</dt>
-                      <dd className="text-sm text-white">
+                    <div className="bg-card/20 rounded-lg p-4 border border-border/10">
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">Dernière mise à jour</dt>
+                      <dd className="text-sm text-foreground">
                         {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString('fr-FR') : 'N/A'}
                       </dd>
                     </div>
                   </div>
                 </div>
               </div>
+                </>
+              )}
             </div>
           </div>
         </div>

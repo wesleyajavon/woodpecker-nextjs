@@ -13,6 +13,11 @@ const Navigation = () => {
 
   const navItems = [
     { 
+      name: 'Home', 
+      link: '/', 
+      icon: <Music className="h-4 w-4 text-foreground" />
+    },
+    { 
       name: 'Beats', 
       link: '/beats', 
       icon: <Music className="h-4 w-4 text-foreground" />
@@ -36,7 +41,7 @@ const Navigation = () => {
       
       {/* Fixed elements for cart, theme toggle, and auth */}
       <div className="fixed top-4 right-4 z-[5001] flex items-center space-x-3">
-        <ThemeToggle />
+        {/* <ThemeToggle /> */}
         
         <Link href="/cart">
           <motion.button

@@ -99,8 +99,46 @@ export const useBeats = (
   const updateLimit = useCallback((newLimit: number) => {
     setLimit(newLimit);
     setCurrentPage(1);
-    fetchBeats(1, searchTerm, selectedGenre);
-  }, [fetchBeats, searchTerm, selectedGenre]);
+    // Appel direct avec le nouveau limit au lieu d'utiliser fetchBeats
+    const fetchWithNewLimit = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const params = new URLSearchParams({
+          page: '1',
+          limit: newLimit.toString()
+        });
+
+        if (searchTerm) params.append('search', searchTerm);
+        if (selectedGenre && selectedGenre !== 'Tous') params.append('genre', selectedGenre);
+
+        const response = await fetch(`/api/beats?${params.toString()}`);
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des beats');
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
+          setBeats(result.data);
+          setTotalPages(result.pagination.totalPages);
+          setTotalBeats(result.pagination.total);
+          setCurrentPage(1);
+        } else {
+          throw new Error(result.error || 'Erreur inconnue');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur inconnue');
+        console.error('Erreur lors du chargement des beats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchWithNewLimit();
+  }, [searchTerm, selectedGenre]);
 
   // Chargement initial
   useEffect(() => {

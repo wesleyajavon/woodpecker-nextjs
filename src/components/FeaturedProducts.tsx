@@ -87,7 +87,7 @@ export default function FeaturedProducts() {
               duration={2500}
             />
           </motion.div>
-          <p className="mt-4 text-center text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-4 text-center text-xl text-foreground max-w-2xl mx-auto">
             Que des bangers dans cette sélection d&apos;instrus qui retournent tout en ce moment.          </p>
         </motion.div>
 
@@ -124,7 +124,7 @@ export default function FeaturedProducts() {
           <Link href="/beats">
             <HoverBorderGradient
               containerClassName="rounded-2xl"
-              className="inline-flex items-center gap-2 text-white px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300"
               duration={1.5}
               clockwise={true}
             >

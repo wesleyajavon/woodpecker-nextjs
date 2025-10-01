@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
+import { DottedSurface } from '@/components/ui/dotted-surface'
+import { cn } from '@/lib/utils'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
@@ -54,9 +56,23 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-800 pt-20 pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
-        <div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
+    <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <DottedSurface className="size-full z-0" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
+        <div
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+            'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+            'blur-[30px]',
+          )}
+        />
+      </div>
+
+      <div className="max-w-md mx-auto relative z-10">
+        <div className="bg-card/10 backdrop-blur-lg shadow-2xl rounded-2xl overflow-hidden border border-border/20">
           <div className="px-8 py-10">
             <div className="text-center mb-8">
               <div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
@@ -64,17 +80,17 @@ export default function SignInPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl font-bold text-foreground mb-2">
                 Bienvenue
               </h2>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Connectez-vous à votre compte Woodpecker
               </p>
             </div>
 
             <div className="space-y-6">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg flex items-center">
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -87,7 +103,7 @@ export default function SignInPage() {
                 <Button
                   onClick={() => handleOAuthSignIn('github')}
                   disabled={isLoading}
-                  className="w-full flex justify-center items-center space-x-3 bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg transition-all duration-300 hover:shadow-lg"
+                  className="w-full flex justify-center items-center space-x-3 bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30 py-3 rounded-lg transition-all duration-300 hover:shadow-lg"
                 >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -102,7 +118,7 @@ export default function SignInPage() {
                 <Button
                   onClick={() => handleOAuthSignIn('google')}
                   disabled={isLoading}
-                  className="w-full flex justify-center items-center space-x-3 bg-white border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 py-3 rounded-lg transition-all duration-300 hover:shadow-lg"
+                  className="w-full flex justify-center items-center space-x-3 bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30 py-3 rounded-lg transition-all duration-300 hover:shadow-lg"
                 >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -122,23 +138,23 @@ export default function SignInPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-                  <span className="font-medium text-black">Continuer avec Google</span>
+                  <span className="font-medium">Continuer avec Google</span>
                 </Button>
               </div>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
+                  <div className="w-full border-t border-border/20" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500 font-medium">Ou</span>
+                  <span className="px-4 bg-card/10 backdrop-blur-lg text-muted-foreground font-medium">Ou</span>
                 </div>
               </div>
 
               {/* Email Sign In */}
               <form className="space-y-6" onSubmit={handleEmailSignIn}>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                     Adresse email
                   </label>
                   <input
@@ -149,7 +165,7 @@ export default function SignInPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors placeholder-gray-400"
+                    className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground"
                     placeholder="Votre adresse email"
                   />
                 </div>

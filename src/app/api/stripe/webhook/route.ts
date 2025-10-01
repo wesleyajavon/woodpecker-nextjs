@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
 import { OrderService } from '@/services/orderService'
 import { BeatService } from '@/services/beatService'
+import { sendOrderConfirmationEmail } from '@/services/orderEmailService'
 import { PrismaClient } from '@prisma/client'
 import { LicenseType } from '@/types/cart'
 
@@ -156,6 +157,18 @@ export async function POST(request: NextRequest) {
 
             console.log('Multi-item order created successfully:', multiOrder.id)
 
+            // Send confirmation email with download links
+            try {
+              await sendOrderConfirmationEmail(
+                multiOrder.id,
+                multiOrder.customerEmail,
+                true // isMultiItem
+              )
+            } catch (emailError) {
+              console.error('Failed to send confirmation email for multi-item order:', emailError)
+              // Don't fail the webhook if email fails
+            }
+
           } else {
             // Handle single-item order (existing logic)
             const lineItem = lineItems[0]
@@ -204,6 +217,18 @@ export async function POST(request: NextRequest) {
 
             const order = await OrderService.createOrder(orderData)
             console.log('Order created successfully:', order.id)
+
+            // Send confirmation email with download links
+            try {
+              await sendOrderConfirmationEmail(
+                order.id,
+                order.customerEmail,
+                false // isMultiItem
+              )
+            } catch (emailError) {
+              console.error('Failed to send confirmation email for single order:', emailError)
+              // Don't fail the webhook if email fails
+            }
           }
 
         } catch (error) {

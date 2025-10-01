@@ -11,7 +11,9 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Force dark theme on mount
+    setTheme('dark');
+  }, [setTheme]);
 
   if (!mounted) {
     return null;
@@ -21,21 +23,20 @@ export function ThemeToggle() {
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="relative p-3 rounded-xl transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-      aria-label="Toggle theme"
+      onClick={() => {
+        // Always set to dark theme, no toggle
+        setTheme('dark');
+      }}
+      className="relative p-3 rounded-xl transition-all duration-300 bg-gray-800 text-gray-300 hover:bg-gray-700 cursor-pointer"
+      aria-label="Dark theme (locked)"
+      title="Dark theme is locked"
     >
       <motion.div
-        key={theme}
-        initial={{ rotate: -180, opacity: 0 }}
+        initial={{ rotate: 0, opacity: 1 }}
         animate={{ rotate: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {theme === 'dark' ? (
-          <Sun className="h-5 w-5" />
-        ) : (
-          <Moon className="h-5 w-5" />
-        )}
+        <Moon className="h-5 w-5" />
       </motion.div>
     </motion.button>
   );

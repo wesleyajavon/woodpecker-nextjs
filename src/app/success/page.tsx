@@ -9,6 +9,10 @@ import { Order, MultiItemOrder } from '@/types/order'
 import { Beat } from '@/types/beat'
 import { useSession } from 'next-auth/react'
 import DownloadStemsButton from '@/components/DownloadStemsButton'
+import ResendEmailButton from '@/components/ResendEmailButton'
+import { DottedSurface } from '@/components/ui/dotted-surface'
+import { Button } from '@/components/ui/Button'
+import { cn } from '@/lib/utils'
 
 interface DownloadUrls {
   master: string
@@ -153,10 +157,24 @@ function SuccessContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-400 mx-auto"></div>
-          <p className="mt-4 text-lg text-white">Processing your order...</p>
+      <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <DottedSurface className="size-full z-0" />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+              'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+              'blur-[30px]',
+            )}
+          />
+        </div>
+
+        <div className="text-center relative z-10">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg text-foreground">Processing your order...</p>
         </div>
       </div>
     )
@@ -164,27 +182,40 @@ function SuccessContent() {
 
   if (!sessionId) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-800">
-        <div className="max-w-md w-full bg-gray-700 rounded-lg shadow-lg p-8 text-center border border-gray-600">
+      <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <DottedSurface className="size-full z-0" />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+              'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+              'blur-[30px]',
+            )}
+          />
+        </div>
+
+        <div className="max-w-md w-full bg-card/10 backdrop-blur-lg rounded-lg shadow-lg p-8 text-center border border-border/20 relative z-10">
           <div className="mb-6">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-900/20">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-500/20">
               <svg className="h-8 w-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
             Invalid Session
           </h1>
-          <p className="text-gray-300 mb-6">
+          <p className="text-muted-foreground mb-6">
             No session ID found. Please complete your purchase to access this page.
           </p>
-          <Link 
-            href="/beats"
-            className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Browse Beats
-          </Link>
+          <Button asChild variant="primary" className="w-full">
+            <Link href="/beats">
+              Browse Beats
+            </Link>
+          </Button>
         </div>
       </div>
     )
@@ -192,34 +223,48 @@ function SuccessContent() {
 
   if (!orderDetails && !multiOrderDetails) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-800">
-        <div className="max-w-md w-full bg-gray-700 rounded-lg shadow-lg p-8 text-center border border-gray-600">
+      <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <DottedSurface className="size-full z-0" />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+              'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+              'blur-[30px]',
+            )}
+          />
+        </div>
+
+        <div className="max-w-md w-full bg-card/10 backdrop-blur-lg rounded-lg shadow-lg p-8 text-center border border-border/20 relative z-10">
           <div className="mb-6">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-900/20">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-500/20">
               <svg className="h-8 w-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
             Order Not Found
           </h1>
-          <p className="text-gray-300 mb-6">
+          <p className="text-muted-foreground mb-6">
             We couldn&apos;t find your order details. This might be because the payment is still processing.
           </p>
           <div className="space-y-3">
-            <Link 
-              href="/beats"
-              className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Browse Beats
-            </Link>
-            <button 
+            <Button asChild variant="primary" className="w-full">
+              <Link href="/beats">
+                Browse Beats
+              </Link>
+            </Button>
+            <Button 
               onClick={() => window.location.reload()}
-              className="block w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
+              variant="card"
+              className="w-full"
             >
               Try Again
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -227,12 +272,26 @@ function SuccessContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-800 pt-20 pb-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <DottedSurface className="size-full z-0" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
+        <div
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+            'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+            'blur-[30px]',
+          )}
+        />
+      </div>
+
+      <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-700 rounded-2xl shadow-xl overflow-hidden border border-gray-600"
+          className="bg-card/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-border/20"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-green-500 to-green-600 px-8 py-12 text-center">
@@ -263,25 +322,25 @@ function SuccessContent() {
           <div className="p-8">
             {isMultiItemOrder && multiOrderDetails ? (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-white mb-6">Détails de la commande</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">Détails de la commande</h2>
                 
-                <div className="bg-gray-600 rounded-xl p-6 mb-6 border border-gray-500">
+                <div className="bg-card/20 backdrop-blur-lg rounded-xl p-6 mb-6 border border-border/20">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium text-gray-300">ID de commande:</span>
-                      <p className="text-white font-mono">{multiOrderDetails.id}</p>
+                      <span className="font-medium text-muted-foreground">ID de commande:</span>
+                      <p className="text-foreground font-mono">{multiOrderDetails.id}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-300">Email:</span>
-                      <p className="text-white">{multiOrderDetails.customerEmail}</p>
+                      <span className="font-medium text-muted-foreground">Email:</span>
+                      <p className="text-foreground">{multiOrderDetails.customerEmail}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-300">Montant total:</span>
-                      <p className="text-white text-lg font-semibold">€{multiOrderDetails.totalAmount}</p>
+                      <span className="font-medium text-muted-foreground">Montant total:</span>
+                      <p className="text-foreground text-lg font-semibold">€{multiOrderDetails.totalAmount}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-300">Statut:</span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/20 text-green-300 border border-green-500/30">
+                      <span className="font-medium text-muted-foreground">Statut:</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                         {multiOrderDetails.status}
                       </span>
                     </div>
@@ -290,19 +349,19 @@ function SuccessContent() {
 
                 {/* Beats List */}
                 <div className="space-y-4 mb-8">
-                  <h3 className="text-xl font-semibold text-white">Beats achetés</h3>
+                  <h3 className="text-xl font-semibold text-foreground">Beats achetés</h3>
                   {multiOrderDetails.items.map((item, index) => (
                     <motion.div
                       key={item.id}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="bg-gray-600 border border-gray-500 rounded-xl p-4 hover:shadow-md hover:shadow-gray-900/20 transition-shadow"
+                      className="bg-card/20 backdrop-blur-lg border border-border/20 rounded-xl p-4 hover:shadow-md hover:shadow-primary/10 transition-shadow"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h4 className="font-semibold text-white">{item.beat.title}</h4>
-                          <div className="flex items-center space-x-4 mt-1 text-sm text-gray-400">
+                          <h4 className="font-semibold text-foreground">{item.beat.title}</h4>
+                          <div className="flex items-center space-x-4 mt-1 text-sm text-muted-foreground">
                             <span className="flex items-center">
                               <Music className="h-4 w-4 mr-1" />
                               {item.beat.genre}
@@ -314,7 +373,7 @@ function SuccessContent() {
                               {(item.beat as Beat).duration}
                             </span>
                             {(item.beat as Beat).isExclusive && (
-                              <span className="flex items-center text-purple-400">
+                              <span className="flex items-center text-primary">
                                 <Tag className="h-4 w-4 mr-1" />
                                 Exclusive
                               </span>
@@ -322,8 +381,8 @@ function SuccessContent() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-white">€{(item.unitPrice * item.quantity).toFixed(2)}</p>
-                          <p className="text-sm text-gray-400">€{item.unitPrice} × {item.quantity}</p>
+                          <p className="font-semibold text-foreground">€{(item.unitPrice * item.quantity).toFixed(2)}</p>
+                          <p className="text-sm text-muted-foreground">€{item.unitPrice} × {item.quantity}</p>
                         </div>
                       </div>
                     </motion.div>
@@ -332,36 +391,36 @@ function SuccessContent() {
               </div>
             ) : orderDetails && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-white mb-6">Détails de la commande</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">Détails de la commande</h2>
                 
-                <div className="bg-gray-600 rounded-xl p-6 border border-gray-500">
+                <div className="bg-card/20 backdrop-blur-lg rounded-xl p-6 border border-border/20">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium text-gray-300">ID de commande:</span>
-                      <p className="text-white font-mono">{orderDetails.id}</p>
+                      <span className="font-medium text-muted-foreground">ID de commande:</span>
+                      <p className="text-foreground font-mono">{orderDetails.id}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-300">Beat:</span>
-                      <p className="text-white">{orderDetails.beat.title}</p>
+                      <span className="font-medium text-muted-foreground">Beat:</span>
+                      <p className="text-foreground">{orderDetails.beat.title}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-300">Montant:</span>
-                      <p className="text-white text-lg font-semibold">€{orderDetails.totalAmount.toFixed(2)}</p>
+                      <span className="font-medium text-muted-foreground">Montant:</span>
+                      <p className="text-foreground text-lg font-semibold">€{orderDetails.totalAmount.toFixed(2)}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-300">Statut:</span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900/20 text-green-300 border border-green-500/30">
+                      <span className="font-medium text-muted-foreground">Statut:</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                         {orderDetails.status}
                       </span>
                     </div>
                   </div>
-            </div>
+                </div>
           </div>
         )}
 
             {/* Download Section */}
-            <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-6 mb-8">
-              <h3 className="text-xl font-semibold text-blue-300 mb-4 flex items-center">
+            <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mb-8">
+              <h3 className="text-xl font-semibold text-primary mb-4 flex items-center">
                 <Download className="w-6 h-6 mr-2" />
                 Télécharger vos beats
             </h3>
@@ -370,20 +429,21 @@ function SuccessContent() {
                 // Multi-item downloads
                 !multiOrderDownloads ? (
                   <div className="text-center">
-                    <p className="text-blue-300 mb-4">
+                    <p className="text-primary mb-4">
                       Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
                     </p>
-                    <button
+                    <Button
                       onClick={generateMultiOrderDownloadUrls}
                       disabled={isGeneratingDownload}
-                      className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                      variant="primary"
+                      className="w-full"
                     >
                       {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    <p className="text-blue-300">
+                    <p className="text-primary">
                       Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
                     </p>
                     
@@ -394,19 +454,20 @@ function SuccessContent() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="bg-gray-600 rounded-lg p-4 border border-blue-500/30"
+                          className="bg-card/20 backdrop-blur-lg rounded-lg p-4 border border-primary/30"
                         >
-                          <h4 className="font-semibold text-white mb-3">{beatDownload.beatTitle}</h4>
+                          <h4 className="font-semibold text-foreground mb-3">{beatDownload.beatTitle}</h4>
                           
                           <div className="space-y-2">
-                            <a
-                              href={beatDownload.downloadUrls.master}
-                              download
-                              className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-center font-medium"
-                            >
-                              <Download className="w-4 h-4 inline mr-2" />
-                              Télécharger le master (WAV)
-                            </a>
+                            <Button asChild variant="primary" className="w-full">
+                              <a
+                                href={beatDownload.downloadUrls.master}
+                                download
+                              >
+                                <Download className="w-4 h-4 mr-2" />
+                                Télécharger le master (WAV)
+                              </a>
+                            </Button>
                             
                             {beatDownload.hasStems && (
                               <DownloadStemsButton
@@ -421,47 +482,67 @@ function SuccessContent() {
                       ))}
                     </div>
                     
-                    <p className="text-xs text-blue-400 text-center">
+                    <p className="text-xs text-primary/70 text-center">
                       ⏰ Expire le {new Date(multiOrderDownloads.expiresAt).toLocaleString('fr-FR')}
                     </p>
+                    
+                    {multiOrderDetails && (
+                      <ResendEmailButton
+                        orderId={multiOrderDetails.id}
+                        customerEmail={multiOrderDetails.customerEmail}
+                        isMultiItem={true}
+                        className="mt-4"
+                      />
+                    )}
                   </div>
                 )
               ) : (
                 // Single item downloads
                 !downloadUrls ? (
               <div className="text-center">
-                    <p className="text-blue-300 mb-4">
+                    <p className="text-primary mb-4">
                   Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
                 </p>
-                <button
+                <Button
                   onClick={generateDownloadUrls}
                   disabled={isGeneratingDownload}
-                      className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                  variant="primary"
+                  className="w-full"
                 >
                   {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
-                </button>
+                </Button>
               </div>
             ) : (
                   <div className="space-y-4">
-                    <p className="text-blue-300">
+                    <p className="text-primary">
                   Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
                 </p>
                 
                 <div className="space-y-2">
-                  <a
-                    href={downloadUrls.master}
-                    download
-                        className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-center font-medium"
-                  >
-                        <Download className="w-4 h-4 inline mr-2" />
-                    Télécharger le master (WAV)
-                  </a>
+                  <Button asChild variant="primary" className="w-full">
+                    <a
+                      href={downloadUrls.master}
+                      download
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Télécharger le master (WAV)
+                    </a>
+                  </Button>
                   
                 </div>
                 
-                    <p className="text-xs text-blue-400 text-center">
-                  ⏰ Expire le {new Date(downloadUrls.expiresAt).toLocaleString('fr-FR')}
-                </p>
+                    <p className="text-xs text-primary/70 text-center">
+                      ⏰ Expire le {new Date(downloadUrls.expiresAt).toLocaleString('fr-FR')}
+                    </p>
+                    
+                    {orderDetails && (
+                      <ResendEmailButton
+                        orderId={orderDetails.id}
+                        customerEmail={orderDetails.customerEmail}
+                        isMultiItem={false}
+                        className="mt-4"
+                      />
+                    )}
               </div>
                 )
             )}
@@ -469,20 +550,18 @@ function SuccessContent() {
         
             {/* Action Buttons */}
             <div className={`flex gap-4 ${session ? 'flex-col sm:flex-row' : 'justify-center'}`}>
-              <Link 
-                href="/beats"
-                className={`${session ? 'flex-1' : 'w-full max-w-xs'} bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-center font-semibold`}
-              >
-                Découvrir d&apos;autres beats
-              </Link>
+              <Button asChild variant="primary" className={`${session ? 'flex-1' : 'w-full max-w-xs'}`}>
+                <Link href="/beats">
+                  Découvrir d&apos;autres beats
+                </Link>
+              </Button>
               
               {session && (
-                <Link 
-                  href="/profile"
-                  className="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors text-center font-semibold"
-                >
-                  Aller au profil
-                </Link>
+                <Button asChild variant="card" className="flex-1">
+                  <Link href="/profile">
+                    Aller au profil
+                  </Link>
+                </Button>
               )}
             </div>
           </div>
@@ -495,10 +574,24 @@ function SuccessContent() {
 export default function SuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-400 mx-auto"></div>
-          <p className="mt-4 text-lg text-white">Loading...</p>
+      <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <DottedSurface className="size-full z-0" />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+              'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+              'blur-[30px]',
+            )}
+          />
+        </div>
+
+        <div className="text-center relative z-10">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg text-foreground">Loading...</p>
         </div>
       </div>
     }>

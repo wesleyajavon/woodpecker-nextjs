@@ -1,6 +1,7 @@
 "use client";
-import React, { JSX, useState } from "react";
+import React, { JSX, useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   motion,
   AnimatePresence,
@@ -23,20 +24,33 @@ export const FloatingNav = ({
   className?: string;
 }) => {
   const { scrollYProgress } = useScroll();
+  const pathname = usePathname();
 
   const [visible, setVisible] = useState(true);
+
+  // Always show navigation when pathname changes
+  useEffect(() => {
+    setVisible(true);
+  }, [pathname]);
 
   useMotionValueEvent(scrollYProgress, "change", (current) => {
     // Check if current is not undefined and is a number
     if (typeof current === "number") {
       const direction = current! - scrollYProgress.getPrevious()!;
+      const currentScroll = scrollYProgress.get();
 
-      // Always keep navigation visible, but hide when scrolling down
-      if (direction < 0) {
-        setVisible(true);
-      } else if (direction > 0 && scrollYProgress.get() > 0.1) {
-        setVisible(false);
+      // Check if page is actually scrollable (height > viewport)
+      const isPageScrollable = document.documentElement.scrollHeight > window.innerHeight;
+
+      // Only apply scroll-based hiding if page is actually scrollable
+      if (isPageScrollable) {
+        if (direction < 0) {
+          setVisible(true);
+        } else if (direction > 0 && currentScroll > 0.3) {
+          setVisible(false);
+        }
       }
+      // If page is not scrollable, keep navigation visible
     }
   });
 

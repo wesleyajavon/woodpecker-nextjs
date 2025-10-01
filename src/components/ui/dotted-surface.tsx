@@ -1,13 +1,14 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 type DottedSurfaceProps = Omit<React.ComponentProps<'div'>, 'ref'>;
 
 export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 	const { theme } = useTheme();
+	const [mounted, setMounted] = useState(false);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const sceneRef = useRef<{
@@ -19,8 +20,27 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		count: number;
 	} | null>(null);
 
+	// Track if component is mounted to prevent hydration issues
 	useEffect(() => {
-		if (!containerRef.current) return;
+		setMounted(true);
+	}, []);
+
+	useEffect(() => {
+		if (!containerRef.current || !mounted) return;
+
+		// Clean up any existing scene first
+		if (sceneRef.current) {
+			cancelAnimationFrame(sceneRef.current.animationId);
+			sceneRef.current.renderer.dispose();
+			if (containerRef.current && sceneRef.current.renderer.domElement) {
+				try {
+					containerRef.current.removeChild(sceneRef.current.renderer.domElement);
+				} catch (e) {
+					// Element might already be removed
+				}
+			}
+			sceneRef.current = null;
+		}
 
 		const SEPARATION = 150;
 		const AMOUNTX = 40;
@@ -63,10 +83,11 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 				const z = iy * SEPARATION - (AMOUNTY * SEPARATION) / 2;
 
 				positions.push(x, y, z);
-				if (theme === 'dark') {
-					colors.push(200, 200, 200);
-				} else {
+				// Use default dark theme colors during SSR, adapt after mounting
+				if (mounted && theme === 'light') {
 					colors.push(0, 0, 0);
+				} else {
+					colors.push(200, 200, 200);
 				}
 			}
 		}
@@ -173,13 +194,29 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 				sceneRef.current.renderer.dispose();
 
 				if (containerRef.current && sceneRef.current.renderer.domElement) {
-					containerRef.current.removeChild(
-						sceneRef.current.renderer.domElement,
-					);
+					try {
+						containerRef.current.removeChild(
+							sceneRef.current.renderer.domElement,
+						);
+					} catch (e) {
+						// Element might already be removed
+					}
 				}
+				
+				sceneRef.current = null;
 			}
 		};
-	}, [theme]);
+	}, [theme, mounted]);
+
+	// Don't render until mounted to prevent hydration issues
+	if (!mounted) {
+		return (
+			<div
+				className={cn('pointer-events-none absolute inset-0 z-0', className)}
+				{...props}
+			/>
+		);
+	}
 
 	return (
 		<div

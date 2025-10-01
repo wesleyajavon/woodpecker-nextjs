@@ -58,11 +58,11 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-700 rounded-xl border border-gray-500 p-8 text-center"
+        className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 p-8 text-center"
       >
-        <ShoppingCart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">Your cart is empty</h3>
-        <p className="text-gray-300 mb-6">
+        <ShoppingCart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-foreground mb-2">Your cart is empty</h3>
+        <p className="text-muted-foreground mb-6">
           Add some beats to get started with your music production journey!
         </p>
         <Button
@@ -79,10 +79,10 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gray-700 rounded-xl border border-gray-500 p-6 shadow-sm"
+      className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 p-6 shadow-sm"
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-white">Order Summary</h3>
+        <h3 className="text-xl font-semibold text-foreground">Order Summary</h3>
         <Button
           variant="outline"
           size="sm"
@@ -101,14 +101,14 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
           <div key={`${item.beat.id}-${item.licenseType}`} className="flex items-center justify-between text-sm">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-white">{item.beat.title}</span>
+                <span className="font-medium text-foreground">{item.beat.title}</span>
                 <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
                   {getLicenseDisplayName(item.licenseType)}
                 </span>
               </div>
-              <span className="text-gray-400 text-xs">× {item.quantity}</span>
+              <span className="text-muted-foreground text-xs">× {item.quantity}</span>
             </div>
-            <span className="font-medium text-white">
+            <span className="font-medium text-foreground">
               €{(getPriceByLicense(item.beat, item.licenseType) * item.quantity).toFixed(2)}
             </span>
           </div>
@@ -116,29 +116,29 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
       </div>
 
       {/* Divider */}
-      <div className="border-t border-gray-500 mb-6"></div>
+      <div className="border-t border-border/20 mb-6"></div>
 
       {/* Totals */}
       <div className="space-y-3 mb-6">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-300">Items ({cart.totalItems})</span>
-          <span className="text-white">€{cart.totalPrice.toFixed(2)}</span>
+          <span className="text-muted-foreground">Items ({cart.totalItems})</span>
+          <span className="text-foreground">€{cart.totalPrice.toFixed(2)}</span>
         </div>
         
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-300">Processing Fee</span>
-          <span className="text-white">€0.00</span>
+          <span className="text-muted-foreground">Processing Fee</span>
+          <span className="text-foreground">€0.00</span>
         </div>
         
         {/* <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-300">VAT (21%)</span>
-          <span className="text-white">€{(cart.totalPrice * 0.21).toFixed(2)}</span>
+          <span className="text-muted-foreground">VAT (21%)</span>
+          <span className="text-foreground">€{(cart.totalPrice * 0.21).toFixed(2)}</span>
         </div> */}
         
-        <div className="border-t border-gray-500 pt-3">
+        <div className="border-t border-border/20 pt-3">
           <div className="flex items-center justify-between text-lg font-semibold">
-            <span className="text-white">Total</span>
-            <span className="text-white">
+            <span className="text-foreground">Total</span>
+            <span className="text-foreground">
               {/* €{(cart.totalPrice * 1.21).toFixed(2)} */}
               €{cart.totalPrice.toFixed(2)}
             </span>
@@ -157,7 +157,7 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
       </Button>
 
       {/* Security Notice */}
-      <p className="text-xs text-gray-400 text-center mt-4">
+      <p className="text-xs text-muted-foreground text-center mt-4">
         🔒 Secure checkout powered by Stripe
       </p>
     </motion.div>

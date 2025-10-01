@@ -5,9 +5,27 @@ import { Button } from '@/components/ui/Button'
 import Image from 'next/image'
 import { User } from 'lucide-react'
 import UserMenu from './UserMenu'
+import { useState, useEffect } from 'react'
 
 export default function AuthButton({ variant = 'default' }: { variant?: 'default' | 'floating' } = {}) {
   const { data: session, status } = useSession()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Prevent hydration mismatch by showing loading state until mounted
+  if (!mounted) {
+    return (
+      <Button 
+        disabled 
+        className={`transition-all duration-300 ${variant === 'floating' ? 'bg-transparent text-muted-foreground border-none' : 'bg-muted text-muted-foreground'}`}
+      >
+        Chargement...
+      </Button>
+    )
+  }
 
   if (status === 'loading') {
     return (

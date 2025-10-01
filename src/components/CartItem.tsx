@@ -58,7 +58,7 @@ export default function CartItem({ item }: CartItemProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       transition={{ duration: 0.3 }}
-      className={`bg-gray-600 rounded-xl border border-gray-500 p-4 shadow-sm transition-all duration-300 ${
+      className={`bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 p-4 shadow-sm transition-all duration-300 ${
         isRemoving ? 'opacity-50 scale-95' : 'hover:shadow-md hover:shadow-gray-900/20'
       }`}
     >
@@ -78,10 +78,10 @@ export default function CartItem({ item }: CartItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white truncate">
+              <h3 className="text-lg font-semibold text-foreground truncate">
                 {item.beat.title}
               </h3>
-              <p className="text-sm text-gray-300 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 {item.beat.genre} • {item.beat.bpm} BPM • {item.beat.key}
               </p>
               
@@ -97,7 +97,7 @@ export default function CartItem({ item }: CartItemProps) {
               </div>
               
               {/* Beat Details */}
-              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-400">
+              <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
                   <span>{formatDuration(item.beat.duration)}</span>
@@ -123,10 +123,10 @@ export default function CartItem({ item }: CartItemProps) {
             
             {/* Price */}
             <div className="text-right">
-              <div className="text-xl font-bold text-white">
+              <div className="text-xl font-bold text-foreground">
                 €{(getPrice(item.beat, item.licenseType) * item.quantity).toFixed(2)}
               </div>
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-muted-foreground">
                 €{getPrice(item.beat, item.licenseType).toFixed(2)} each
               </div>
             </div>
@@ -135,19 +135,19 @@ export default function CartItem({ item }: CartItemProps) {
       </div>
 
       {/* Quantity Controls */}
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-500">
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/20">
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => handleQuantityChange(item.quantity - 1)}
             disabled={isRemoving}
-            className="h-8 w-8 p-0 rounded-full bg-gray-700 border-gray-500 text-white hover:bg-gray-600 hover:text-white"
+            className="h-8 w-8 p-0 rounded-full bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30"
           >
             <Minus className="h-4 w-4" />
           </Button>
           
-          <span className="text-lg font-medium text-white min-w-[2rem] text-center">
+          <span className="text-lg font-medium text-foreground min-w-[2rem] text-center">
             {item.quantity}
           </span>
           
@@ -156,7 +156,7 @@ export default function CartItem({ item }: CartItemProps) {
             size="sm"
             onClick={() => handleQuantityChange(item.quantity + 1)}
             disabled={isRemoving}
-            className="h-8 w-8 p-0 rounded-full bg-gray-700 border-gray-500 text-white hover:bg-gray-600 hover:text-white"
+            className="h-8 w-8 p-0 rounded-full bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30"
           >
             <Plus className="h-4 w-4" />
           </Button>

@@ -2,15 +2,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Grid3X3, List, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Grid3X3, List, ChevronLeft, ChevronRight, Music } from 'lucide-react';
 import Link from 'next/link';
 import { useBeats } from '@/hooks/useBeats';
 import BeatCard from '@/components/BeatCard';
+import { DottedSurface } from '@/components/ui/dotted-surface';
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
+import { cn } from '@/lib/utils';
 
 export default function BeatsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Utilisation du hook personnalisé
@@ -122,12 +125,26 @@ export default function BeatsPage() {
 
   if (loading && beats.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-background pt-20">
+        <DottedSurface className="size-full z-0" />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+              'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+              'blur-[30px]',
+            )}
+          />
+        </div>
+
+        <div className="container mx-auto px-4 py-8 relative z-10">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-              <p className="text-white text-lg">Chargement des beats...</p>
+              <p className="text-foreground text-lg">Chargement des beats...</p>
             </div>
           </div>
         </div>
@@ -137,12 +154,26 @@ export default function BeatsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-background pt-20">
+        <DottedSurface className="size-full z-0" />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+              'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+              'blur-[30px]',
+            )}
+          />
+        </div>
+
+        <div className="container mx-auto px-4 py-8 relative z-10">
           <div className="text-center">
             <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-6 max-w-md mx-auto">
               <p className="text-red-400 text-lg mb-4">Erreur de chargement</p>
-              <p className="text-gray-300 mb-4">{error}</p>
+              <p className="text-muted-foreground mb-4">{error}</p>
               <button
                 onClick={() => resetFilters()}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -157,14 +188,28 @@ export default function BeatsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background pt-20">
+      <DottedSurface className="size-full z-0" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
+        <div
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+            'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+            'blur-[30px]',
+          )}
+        />
+      </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-bold text-white mb-4"
+            className="text-5xl md:text-6xl font-bold text-foreground mb-4"
           >
             Mes Beats
           </motion.h1>
@@ -172,7 +217,7 @@ export default function BeatsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-300 max-w-2xl mx-auto"
+            className="text-xl text-muted-foreground max-w-2xl mx-auto"
           >
             Découvrez ma collection exclusive de beats originaux. Des instrumentaux uniques pour rappeurs, chanteurs et producteurs.
           </motion.p>
@@ -183,29 +228,29 @@ export default function BeatsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8"
+          className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-border/20"
         >
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             {/* Barre de recherche */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                               <input
                   type="text"
                   placeholder="Rechercher un beat..."
                   onChange={(e) => searchBeats(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 bg-card/20 border border-border/30 rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
             </div>
 
             {/* Filtre par genre */}
             <div className="flex items-center gap-2">
-              <Filter className="text-gray-400 w-5 h-5" />
+              <Filter className="text-muted-foreground w-5 h-5" />
               <select
                 onChange={(e) => filterByGenre(e.target.value)}
-                className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="bg-card/20 border border-border/30 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 {genres.map((genre) => (
-                  <option key={genre} value={genre} className="bg-gray-800 text-white">
+                  <option key={genre} value={genre} className="bg-card text-foreground">
                     {genre}
                   </option>
                 ))}
@@ -216,20 +261,20 @@ export default function BeatsPage() {
             <select
               value={itemsPerPage}
               onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="bg-card/20 border border-border/30 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value={6} className="bg-gray-800 text-white">6 par page</option>
-              <option value={12} className="bg-gray-800 text-white">12 par page</option>
-              <option value={24} className="bg-gray-800 text-white">24 par page</option>
-              <option value={48} className="bg-gray-800 text-white">48 par page</option>
+              <option value={4} className="bg-card text-foreground">4 par page</option>
+              <option value={8} className="bg-card text-foreground">8 par page</option>
+              <option value={12} className="bg-card text-foreground">12 par page</option>
+              <option value={24} className="bg-card text-foreground">24 par page</option>
             </select>
 
             {/* Toggle de vue */}
-            <div className="flex items-center gap-2 bg-white/20 rounded-lg p-1">
+            <div className="flex items-center gap-2 bg-card/20 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'grid' ? 'bg-purple-500 text-white' : 'text-gray-400 hover:text-white'
+                  viewMode === 'grid' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Grid3X3 className="w-5 h-5" />
@@ -237,7 +282,7 @@ export default function BeatsPage() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-gray-400 hover:text-white'
+                  viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <List className="w-5 h-5" />
@@ -253,21 +298,21 @@ export default function BeatsPage() {
           transition={{ delay: 0.3 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
         >
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-white">{totalBeats}</p>
-            <p className="text-gray-300">Beats</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
+            <p className="text-2xl font-bold text-foreground">{totalBeats}</p>
+            <p className="text-muted-foreground">Beats</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-white">{genres.length - 1}</p>
-            <p className="text-gray-300">Genres</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
+            <p className="text-2xl font-bold text-foreground">{genres.length - 1}</p>
+            <p className="text-muted-foreground">Genres</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-white">∞</p>
-            <p className="text-gray-300">Possibilités</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
+            <p className="text-2xl font-bold text-foreground">∞</p>
+            <p className="text-muted-foreground">Possibilités</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-white">24/7</p>
-            <p className="text-gray-300">Disponible</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
+            <p className="text-2xl font-bold text-foreground">24/7</p>
+            <p className="text-muted-foreground">Disponible</p>
           </div>
         </motion.div>
 
@@ -308,10 +353,10 @@ export default function BeatsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="flex items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 mt-12"
+                className="flex items-center justify-between bg-card/10 backdrop-blur-lg rounded-xl p-4 border border-border/20 mt-12"
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-gray-300 text-sm">
+                  <span className="text-muted-foreground text-sm">
                     Affichage de {startIndex} à {endIndex} sur {totalBeats} beats
                   </span>
                 </div>
@@ -321,7 +366,7 @@ export default function BeatsPage() {
                   <button
                     onClick={goToPreviousPage}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 bg-card/10 border border-border/20 rounded-lg text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Précédent
@@ -348,7 +393,7 @@ export default function BeatsPage() {
                           className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                             currentPage === pageNum
                               ? 'bg-purple-600 text-white'
-                              : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                              : 'bg-card/10 text-muted-foreground hover:bg-card/20'
                           }`}
                         >
                           {pageNum}
@@ -361,7 +406,7 @@ export default function BeatsPage() {
                   <button
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 bg-card/10 border border-border/20 rounded-lg text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Suivant
                     <ChevronRight className="w-4 h-4" />
@@ -376,7 +421,7 @@ export default function BeatsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-16"
           >
-            <div className="text-gray-400 text-lg mb-4">
+            <div className="text-muted-foreground text-lg mb-4">
               Aucun beat disponible pour le moment
             </div>
             <button
@@ -393,22 +438,19 @@ export default function BeatsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-center mt-16 bg-white/10 backdrop-blur-lg rounded-2xl p-8"
+          className="text-center flex justify-center mt-16"
         >
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Besoin d&apos;un beat personnalisé ?
-          </h2>
-          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Je peux créer un beat sur mesure selon vos besoins spécifiques. Contactez-moi pour discuter de votre projet.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/contact"
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 text-center"
+          <Link href="/contact">
+            <HoverBorderGradient
+              containerClassName="rounded-2xl"
+              className="inline-flex items-center gap-2 text-foreground px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300"
+              duration={1.5}
+              clockwise={true}
             >
               Commander un beat personnalisé
-            </Link>
-          </div>
+              <Music className="w-5 h-5" />
+            </HoverBorderGradient>
+          </Link>
         </motion.div>
       </div>
     </div>

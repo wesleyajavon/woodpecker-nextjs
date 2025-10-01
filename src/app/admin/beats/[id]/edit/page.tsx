@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import AdminRoute from '@/components/AdminRoute';
+import { DottedSurface } from '@/components/ui/dotted-surface';
+import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
 
 export default function BeatEditPage() {
@@ -203,14 +205,28 @@ export default function BeatEditPage() {
     if (loading) {
         return (
             <AdminRoute>
-                <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+                <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+                    <DottedSurface className="size-full z-0" />
+                    
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 z-0 flex items-center justify-center">
+                        <div
+                            aria-hidden="true"
+                            className={cn(
+                                'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+                                'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+                                'blur-[30px]',
+                            )}
+                        />
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-center"
+                        className="text-center relative z-10"
                     >
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-                        <p className="text-white text-lg">Chargement du beat...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <p className="text-foreground text-lg">Chargement du beat...</p>
                     </motion.div>
                 </div>
             </AdminRoute>
@@ -220,18 +236,32 @@ export default function BeatEditPage() {
     if (error || !beat) {
         return (
             <AdminRoute>
-                <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+                <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+                    <DottedSurface className="size-full z-0" />
+                    
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 z-0 flex items-center justify-center">
+                        <div
+                            aria-hidden="true"
+                            className={cn(
+                                'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+                                'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+                                'blur-[30px]',
+                            )}
+                        />
+                    </div>
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center max-w-md mx-auto p-6"
+                        className="text-center max-w-md mx-auto p-6 relative z-10"
                     >
                         <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
-                        <h1 className="text-2xl font-bold text-white mb-2">Beat non trouvé</h1>
-                        <p className="text-gray-300 mb-6">{error || 'Ce beat n\'existe pas ou a été supprimé'}</p>
+                        <h1 className="text-2xl font-bold text-foreground mb-2">Beat non trouvé</h1>
+                        <p className="text-muted-foreground mb-6">{error || 'Ce beat n\'existe pas ou a été supprimé'}</p>
                         <Link
                             href="/admin/upload"
-                            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg transition-all duration-300 border border-white/20 hover:border-white/30"
+                            className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-6 py-3 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
                         >
                             <ArrowLeft className="w-5 h-5" />
                             Retour à la gestion
@@ -244,8 +274,22 @@ export default function BeatEditPage() {
 
     return (
         <AdminRoute>
-            <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-                <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+                <DottedSurface className="size-full z-0" />
+                
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 z-0 flex items-center justify-center">
+                    <div
+                        aria-hidden="true"
+                        className={cn(
+                            'pointer-events-none absolute -top-10 left-1/2 size-full -translate-x-1/2 rounded-full',
+                            'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+                            'blur-[30px]',
+                        )}
+                    />
+                </div>
+
+                <div className="max-w-4xl mx-auto py-8 relative z-10">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
@@ -255,15 +299,15 @@ export default function BeatEditPage() {
                         <div className="flex items-center justify-between mb-6">
                             <Link
                                 href={`/admin/beats/${beatId}`}
-                                className="inline-flex mt-20 items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 border border-white/20 hover:border-white/30"
+                                className="inline-flex mt-20 items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-4 py-2 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
                             >
                                 <ArrowLeft className="w-5 h-5" />
                                 Retour
                             </Link>
                         </div>
 
-                        <h1 className="text-4xl font-bold text-white mb-2">Modifier les fichiers</h1>
-                        <p className="text-gray-300 text-lg">{beat.title}</p>
+                        <h1 className="text-4xl font-bold text-foreground mb-2">Modifier les fichiers</h1>
+                        <p className="text-muted-foreground text-lg">{beat.title}</p>
                     </motion.div>
 
                     {/* Affichage des erreurs */}
@@ -271,7 +315,7 @@ export default function BeatEditPage() {
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg"
+                            className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg"
                         >
                             <div className="flex items-center gap-2 text-red-400">
                                 <AlertCircle className="w-4 h-4" />
@@ -283,19 +327,19 @@ export default function BeatEditPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Section des fichiers */}
                         <div className="space-y-6">
-                            <h3 className="text-xl font-semibold text-white mb-4">Fichiers actuels</h3>
+                            <h3 className="text-xl font-semibold text-foreground mb-4">Fichiers actuels</h3>
 
                             {/* Preview Audio */}
-                            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                                <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
+                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                                     <Music className="w-5 h-5" />
                                     Preview Audio
                                 </h4>
 
                                 {beat.previewUrl ? (
                                     <div className="space-y-4">
-                                        <div className="p-3 bg-white/5 rounded-lg">
-                                            <p className="text-white text-sm">Fichier actuel disponible</p>
+                                        <div className="p-3 bg-card/5 rounded-lg">
+                                            <p className="text-foreground text-sm">Fichier actuel disponible</p>
                                         </div>
                                         <audio
                                             src={beat.previewUrl}
@@ -305,7 +349,7 @@ export default function BeatEditPage() {
                                         />
                                     </div>
                                 ) : (
-                                    <p className="text-gray-400">Aucun fichier preview</p>
+                                    <p className="text-muted-foreground">Aucun fichier preview</p>
                                 )}
 
                                 <div className="mt-4">
@@ -345,16 +389,16 @@ export default function BeatEditPage() {
                             </div>
 
                             {/* Master Audio */}
-                            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                                <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
+                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                                     <FileAudio className="w-5 h-5" />
                                     Master Audio
                                 </h4>
 
                                 {beat.fullUrl ? (
                                     <div className="space-y-4">
-                                        <div className="p-3 bg-white/5 rounded-lg">
-                                            <p className="text-white text-sm">Fichier actuel disponible</p>
+                                        <div className="p-3 bg-card/5 rounded-lg">
+                                            <p className="text-foreground text-sm">Fichier actuel disponible</p>
                                         </div>
                                         <audio
                                             src={beat.fullUrl}
@@ -363,7 +407,7 @@ export default function BeatEditPage() {
                                         />
                                     </div>
                                 ) : (
-                                    <p className="text-gray-400 mb-4">Aucun fichier master</p>
+                                    <p className="text-muted-foreground mb-4">Aucun fichier master</p>
                                 )}
 
                                 <div>
@@ -403,8 +447,8 @@ export default function BeatEditPage() {
                             </div>
 
                             {/* Artwork */}
-                            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                                <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
+                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                                     <Image className="w-5 h-5" />
                                     Artwork/Cover Image
                                 </h4>
@@ -412,7 +456,7 @@ export default function BeatEditPage() {
                                 {beat.artworkUrl ? (
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                            <p className="text-white text-sm">Image actuelle disponible</p>
+                                            <p className="text-foreground text-sm">Image actuelle disponible</p>
                                             <button
                                                 onClick={() => handleRemoveArtwork()}
                                                 className="text-red-400 hover:text-red-300 transition-colors"
@@ -430,7 +474,7 @@ export default function BeatEditPage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <p className="text-gray-400 mb-4">Aucune image de couverture</p>
+                                    <p className="text-muted-foreground mb-4">Aucune image de couverture</p>
                                 )}
 
                                 <div>
@@ -470,8 +514,8 @@ export default function BeatEditPage() {
                             </div>
 
                             {/* Stems */}
-                            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                                <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
+                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                                     <Archive className="w-5 h-5" />
                                     Stems (ZIP)
                                 </h4>
@@ -479,7 +523,7 @@ export default function BeatEditPage() {
                                 {beat.stemsUrl ? (
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                            <p className="text-white text-sm">Fichier stems disponible</p>
+                                            <p className="text-foreground text-sm">Fichier stems disponible</p>
                                             <button
                                                 onClick={() => handleRemoveStems()}
                                                 className="text-red-400 hover:text-red-300 transition-colors"
@@ -489,11 +533,11 @@ export default function BeatEditPage() {
                                             </button>
                                         </div>
                                         <div className="p-3 bg-white/5 rounded-lg">
-                                            <p className="text-white text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
+                                            <p className="text-foreground text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
                                         </div>
                                     </div>
                                 ) : (
-                                    <p className="text-gray-400 mb-4">Aucun fichier stems</p>
+                                    <p className="text-muted-foreground mb-4">Aucun fichier stems</p>
                                 )}
 
                                 <div>
@@ -536,17 +580,17 @@ export default function BeatEditPage() {
 
                         {/* Section des progrès et actions */}
                         <div className="space-y-6">
-                            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                                <h3 className="text-xl font-semibold text-white mb-4">Progrès d&apos;upload</h3>
+                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
+                                <h3 className="text-xl font-semibold text-foreground mb-4">Progrès d&apos;upload</h3>
 
                                 <div className="space-y-4">
                                     {uploadedFiles.preview && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-gray-300 mb-1">
+                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
                                                 <span>Preview</span>
                                                 <span>{uploadProgress.preview}%</span>
                                             </div>
-                                            <div className="w-full bg-gray-700 rounded-full h-2">
+                                            <div className="w-full bg-muted rounded-full h-2">
                                                 <div
                                                     className="bg-purple-500 h-2 rounded-full transition-all duration-300"
                                                     style={{ width: `${uploadProgress.preview}%` }}
@@ -557,11 +601,11 @@ export default function BeatEditPage() {
 
                                     {uploadedFiles.master && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-gray-300 mb-1">
+                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
                                                 <span>Master</span>
                                                 <span>{uploadProgress.master}%</span>
                                             </div>
-                                            <div className="w-full bg-gray-700 rounded-full h-2">
+                                            <div className="w-full bg-muted rounded-full h-2">
                                                 <div
                                                     className="bg-green-500 h-2 rounded-full transition-all duration-300"
                                                     style={{ width: `${uploadProgress.master}%` }}
@@ -572,11 +616,11 @@ export default function BeatEditPage() {
 
                                     {uploadedFiles.artwork && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-gray-300 mb-1">
+                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
                                                 <span>Artwork</span>
                                                 <span>{uploadProgress.artwork}%</span>
                                             </div>
-                                            <div className="w-full bg-gray-700 rounded-full h-2">
+                                            <div className="w-full bg-muted rounded-full h-2">
                                                 <div
                                                     className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                                     style={{ width: `${uploadProgress.artwork}%` }}
@@ -587,11 +631,11 @@ export default function BeatEditPage() {
 
                                     {uploadedFiles.stems && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-gray-300 mb-1">
+                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
                                                 <span>Stems</span>
                                                 <span>{uploadProgress.stems}%</span>
                                             </div>
-                                            <div className="w-full bg-gray-700 rounded-full h-2">
+                                            <div className="w-full bg-muted rounded-full h-2">
                                                 <div
                                                     className="bg-orange-500 h-2 rounded-full transition-all duration-300"
                                                     style={{ width: `${uploadProgress.stems}%` }}
@@ -603,18 +647,18 @@ export default function BeatEditPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                                <h3 className="text-xl font-semibold text-white mb-4">Actions</h3>
+                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
+                                <h3 className="text-xl font-semibold text-foreground mb-4">Actions</h3>
 
                                 <div className="space-y-4">
                                     <button
                                         onClick={handleUpload}
                                         disabled={isUploading || Object.keys(uploadedFiles).length === 0}
-                                        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:transform-none"
+                                        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-muted disabled:to-muted disabled:cursor-not-allowed text-primary-foreground font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:transform-none"
                                     >
                                         {isUploading ? (
                                             <div className="flex items-center justify-center gap-2">
-                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div>
                                                 Upload en cours...
                                             </div>
                                         ) : (
@@ -627,7 +671,7 @@ export default function BeatEditPage() {
 
                                     <Link
                                         href={`/admin/beats/${beatId}`}
-                                        className="block w-full px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-center rounded-lg transition-all duration-300 border border-white/20 hover:border-white/30"
+                                        className="block w-full px-6 py-3 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground text-center rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
                                     >
                                         Annuler
                                     </Link>
