@@ -63,7 +63,7 @@ export function Footer() {
 				<AnimatedContainer className="space-y-4">
 					<FrameIcon className="size-8" />
 					<p className="text-muted-foreground mt-8 text-sm md:mt-0">
-						© {new Date().getFullYear()} Woodpecker Beats. Tous droits réservés.
+						© {new Date().getFullYear()} l.outsider. Tous droits réservés.
 					</p>
 				</AnimatedContainer>
 

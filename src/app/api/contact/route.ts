@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
     // Configuration de l'email
     const mailOptions = {
       from: process.env.SMTP_USER,
-      to: process.env.CONTACT_EMAIL || 'contact@woodpecker.com',
-      subject: `[Woodpecker Beats] ${subject} - ${name}`,
+      to: process.env.CONTACT_EMAIL || 'contact@loutsider.com',
+      subject: `[l.outsider] ${subject} - ${name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #8b5cf6;">Nouveau message de contact</h2>
@@ -52,12 +52,12 @@ export async function POST(request: NextRequest) {
           </div>
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
           <p style="color: #6c757d; font-size: 14px;">
-            Ce message a été envoyé depuis le formulaire de contact de Woodpecker Beats.
+            Ce message a été envoyé depuis le formulaire de contact de l.outsider.
           </p>
         </div>
       `,
       text: `
-Nouveau message de contact - Woodpecker Beats
+Nouveau message de contact - l.outsider
 
 Nom: ${name}
 Email: ${email}
@@ -67,7 +67,7 @@ Message:
 ${message}
 
 ---
-Ce message a été envoyé depuis le formulaire de contact de Woodpecker Beats.
+Ce message a été envoyé depuis le formulaire de contact de l.outsider.
       `,
     };
 

@@ -1,11 +1,11 @@
 // Constantes de l'application Woodpecker Beats
 
 export const APP_CONFIG = {
-  name: 'Woodpecker Beats',
+  name: 'l.outsider',
   description: 'Plateforme de vente de beats professionnels',
   version: '1.0.0',
-  author: 'Woodpecker',
-  url: 'https://woodpecker-beats.com'
+  author: 'l.outsider',
+  url: 'https://loutsider.com'
 }
 
 export const BEAT_CONFIG = {

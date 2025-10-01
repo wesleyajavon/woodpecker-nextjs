@@ -84,7 +84,7 @@ export default function SignInPage() {
                 Bienvenue
               </h2>
               <p className="text-muted-foreground">
-                Connectez-vous à votre compte Woodpecker
+                Connectez-vous à votre compte l.outsider
               </p>
             </div>
 

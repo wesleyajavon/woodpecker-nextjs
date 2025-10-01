@@ -63,7 +63,7 @@ export default function AdminUploadPage() {
               Administration
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Gestion de la plateforme Woodpecker Beats
+              Gestion de la plateforme l.outsider
             </p>
           </motion.div>
 

@@ -89,7 +89,7 @@ const Footer = () => {
                   />
                 </div>
                 <span className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                  Woodpecker
+                  l.outsider
                 </span>
               </Link>
             </motion.div>
@@ -102,7 +102,7 @@ const Footer = () => {
             {/* Contact Info with enhanced design */}
             <motion.div variants={itemVariants} className="space-y-4">
               {[
-                { icon: Mail, details: 'contact@woodpecker.com', description: 'Envoyez-nous un message' },
+                { icon: Mail, details: 'contact@loutsider.com', description: 'Envoyez-nous un message' },
                 { icon: Phone, details: '+33 1 23 45 67 89', description: 'Lun-Ven, 9h-18h' },
                 { icon: MapPin, details: '123 Rue de la Musique', description: '75001 Paris, France' },
               ].map((info, index) => (

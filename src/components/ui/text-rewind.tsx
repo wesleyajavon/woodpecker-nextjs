@@ -16,7 +16,7 @@ interface AnimatedTextProps {
 }
 
 export function TextRewind({
-    text = "WOODPECKER",
+    text = "L.OUTSIDER",
     className = "",
     shadowColors = {
         first: "#8b5cf6",

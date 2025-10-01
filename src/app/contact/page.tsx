@@ -61,7 +61,7 @@ const ContactPage = () => {
     {
       icon: Mail,
       label: 'Email',
-      value: 'contact@woodpecker.com'
+      value: 'contact@loutsider.com'
     },
     {
       icon: Phone,

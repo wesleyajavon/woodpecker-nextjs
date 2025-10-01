@@ -37,7 +37,7 @@ class EmailService {
     try {
       const { customerEmail, customerName, orderId, totalAmount, currency, isMultiItem, beats, expiresAt } = data
 
-      const subject = `🎵 Woodpecker Beats - Votre commande #${orderId} est prête !`
+      const subject = `🎵 l.outsider - Votre commande #${orderId} est prête !`
       
       const html = this.generateOrderEmailHTML(data)
       const text = this.generateOrderEmailText(data)
@@ -70,7 +70,7 @@ class EmailService {
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); padding: 30px; text-align: center;">
           <h1 style="margin: 0; color: white; font-size: 28px; font-weight: bold;">
-            🎵 Woodpecker Beats
+            🎵 l.outsider
           </h1>
           <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">
             Votre musique, votre style
@@ -138,7 +138,7 @@ class EmailService {
               <li>Usage commercial autorisé</li>
               <li>Droits de streaming inclus</li>
               <li>Distribution limitée selon le type de licence</li>
-              <li>Crédit "Prod. Woodpecker Beats" requis</li>
+              <li>Crédit "Prod. l.outsider" requis</li>
             </ul>
           </div>
 
@@ -158,8 +158,8 @@ class EmailService {
         <!-- Footer -->
         <div style="background: #111827; padding: 20px; text-align: center; border-top: 1px solid #374151;">
           <p style="color: #9ca3af; font-size: 14px; margin: 0;">
-            Merci de faire confiance à Woodpecker Beats pour votre musique !<br>
-            <a href="${process.env.NEXTAUTH_URL}" style="color: #8b5cf6;">woodpeckerbeats.com</a>
+            Merci de faire confiance à l.outsider pour votre musique !<br>
+            <a href="${process.env.NEXTAUTH_URL}" style="color: #8b5cf6;">loutsider.com</a>
           </p>
         </div>
       </div>
@@ -174,7 +174,7 @@ class EmailService {
     const beatsText = isMultiItem ? `${beatsCount} beats` : 'votre beat'
 
     return `
-🎵 WOODPECKER BEATS - Commande confirmée !
+🎵 L.OUTSIDER - Commande confirmée !
 
 ${customerGreeting}
 
@@ -200,13 +200,13 @@ INFORMATIONS DE LICENCE:
 - Usage commercial autorisé
 - Droits de streaming inclus
 - Distribution limitée selon le type de licence
-- Crédit "Prod. Woodpecker Beats" requis
+- Crédit "Prod. l.outsider" requis
 
 LIENS UTILES:
 - Découvrir d'autres beats: ${process.env.NEXTAUTH_URL}/beats
 - Mon profil: ${process.env.NEXTAUTH_URL}/profile
 
-Merci de faire confiance à Woodpecker Beats pour votre musique !
+Merci de faire confiance à l.outsider pour votre musique !
 ${process.env.NEXTAUTH_URL}
     `.trim()
   }

@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Woodpecker Beats",
+  title: "l.outsider",
   description: "Plateforme de beats de qualité professionnelle",
 };
 

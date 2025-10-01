@@ -4,7 +4,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import { Beat } from '@/types/beat'
 import { CartItem, CartState, CartContextType, LicenseType } from '@/types/cart'
 
-const CART_STORAGE_KEY = 'woodpecker-cart'
+const CART_STORAGE_KEY = 'loutsider-cart'
 
 const initialState: CartState = {
   items: [],
