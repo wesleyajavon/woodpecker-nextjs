@@ -3,10 +3,11 @@ import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { ClientOnly } from '@/components/ClientOnly';
 
 type DottedSurfaceProps = Omit<React.ComponentProps<'div'>, 'ref'>;
 
-export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
+function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 	const { theme } = useTheme();
 
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -20,7 +21,7 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 	} | null>(null);
 
 	useEffect(() => {
-		if (!containerRef.current) return;
+		if (!containerRef.current || typeof window === 'undefined') return;
 
 		// Clean up any existing scene first
 		if (sceneRef.current) {
@@ -208,5 +209,20 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 			className={cn('pointer-events-none absolute inset-0 z-0', className)}
 			{...props}
 		/>
+	);
+}
+
+export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
+	return (
+		<ClientOnly
+			fallback={
+				<div
+					className={cn('pointer-events-none absolute inset-0 z-0', className)}
+					{...props}
+				/>
+			}
+		>
+			<DottedSurfaceInner className={className} {...props} />
+		</ClientOnly>
 	);
 }
