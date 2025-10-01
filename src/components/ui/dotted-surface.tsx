@@ -1,14 +1,13 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 type DottedSurfaceProps = Omit<React.ComponentProps<'div'>, 'ref'>;
 
 export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 	const { theme } = useTheme();
-	const [mounted, setMounted] = useState(false);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const sceneRef = useRef<{
@@ -20,13 +19,8 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		count: number;
 	} | null>(null);
 
-	// Track if component is mounted to prevent hydration issues
 	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	useEffect(() => {
-		if (!containerRef.current || !mounted) return;
+		if (!containerRef.current) return;
 
 		// Clean up any existing scene first
 		if (sceneRef.current) {
@@ -83,8 +77,8 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 				const z = iy * SEPARATION - (AMOUNTY * SEPARATION) / 2;
 
 				positions.push(x, y, z);
-				// Use default dark theme colors during SSR, adapt after mounting
-				if (mounted && theme === 'light') {
+				// Use theme-based colors
+				if (theme === 'light') {
 					colors.push(0, 0, 0);
 				} else {
 					colors.push(200, 200, 200);
@@ -206,17 +200,7 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 				sceneRef.current = null;
 			}
 		};
-	}, [theme, mounted]);
-
-	// Don't render until mounted to prevent hydration issues
-	if (!mounted) {
-		return (
-			<div
-				className={cn('pointer-events-none absolute inset-0 z-0', className)}
-				{...props}
-			/>
-		);
-	}
+	}, [theme]);
 
 	return (
 		<div
