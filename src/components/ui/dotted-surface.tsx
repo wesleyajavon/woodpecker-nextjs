@@ -4,11 +4,13 @@ import { useTheme } from 'next-themes';
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { ClientOnly } from '@/components/ClientOnly';
+import { WebGLDebug } from '@/components/WebGLDebug';
 
 type DottedSurfaceProps = Omit<React.ComponentProps<'div'>, 'ref'>;
 
 function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 	const { theme } = useTheme();
+	const [webglSupported, setWebglSupported] = React.useState(true);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const sceneRef = useRef<{
@@ -20,8 +22,30 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 		count: number;
 	} | null>(null);
 
+	// Check WebGL support
+	React.useEffect(() => {
+		if (typeof window === 'undefined') return;
+		
+		try {
+			const canvas = document.createElement('canvas');
+			const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+			if (!gl) {
+				setWebglSupported(false);
+				return;
+			}
+			
+			// Check for performance issues
+			const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+			if (isLowEndDevice) {
+				setWebglSupported(false);
+			}
+		} catch (e) {
+			setWebglSupported(false);
+		}
+	}, []);
+
 	useEffect(() => {
-		if (!containerRef.current || typeof window === 'undefined') return;
+		if (!containerRef.current || typeof window === 'undefined' || !webglSupported) return;
 
 		// Clean up any existing scene first
 		if (sceneRef.current) {
@@ -37,9 +61,9 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 			sceneRef.current = null;
 		}
 
-		const SEPARATION = 150;
-		const AMOUNTX = 40;
-		const AMOUNTY = 60;
+		const SEPARATION = 200;
+		const AMOUNTX = 25;
+		const AMOUNTY = 35;
 
 		// Scene setup
 		const scene = new THREE.Scene();
@@ -55,9 +79,10 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 
 		const renderer = new THREE.WebGLRenderer({
 			alpha: true,
-			antialias: true,
+			antialias: false, // Disable antialiasing for better performance
+			powerPreference: 'high-performance'
 		});
-		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor(scene.fog.color, 0);
 
@@ -108,10 +133,17 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 
 		let count = 0;
 		let animationId: number = 0;
+		let lastTime = 0;
 
-		// Animation function
-		const animate = () => {
+		// Animation function with throttling
+		const animate = (currentTime: number) => {
 			animationId = requestAnimationFrame(animate);
+
+			// Throttle animation to 30fps for better performance
+			if (currentTime - lastTime < 33) {
+				return;
+			}
+			lastTime = currentTime;
 
 			const positionAttribute = geometry.attributes.position;
 			const positions = positionAttribute.array as Float32Array;
@@ -121,28 +153,18 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 				for (let iy = 0; iy < AMOUNTY; iy++) {
 					const index = i * 3;
 
-					// Animate Y position with sine waves
+					// Animate Y position with sine waves (reduced intensity)
 					positions[index + 1] =
-						Math.sin((ix + count) * 0.3) * 50 +
-						Math.sin((iy + count) * 0.5) * 50;
+						Math.sin((ix + count) * 0.2) * 30 +
+						Math.sin((iy + count) * 0.3) * 30;
 
 					i++;
 				}
 			}
 
 			positionAttribute.needsUpdate = true;
-
-			// Update point sizes based on wave
-			const customMaterial = material as THREE.PointsMaterial & {
-				uniforms?: Record<string, THREE.IUniform>;
-			};
-			if (!customMaterial.uniforms) {
-				// For dynamic size changes, we'd need a custom shader
-				// For now, keeping constant size for performance
-			}
-
 			renderer.render(scene, camera);
-			count += 0.1;
+			count += 0.05; // Slower animation
 		};
 
 		// Handle window resize
@@ -155,7 +177,7 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 		window.addEventListener('resize', handleResize);
 
 		// Start animation
-		animate();
+		animate(0);
 
 		// Store references
 		sceneRef.current = {
@@ -201,7 +223,23 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 				sceneRef.current = null;
 			}
 		};
-	}, [theme]);
+	}, [theme, webglSupported]);
+
+	// Fallback for browsers without WebGL support
+	if (!webglSupported) {
+		return (
+			<div
+				className={cn('pointer-events-none absolute inset-0 z-0', className)}
+				style={{
+					background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+					backgroundSize: '20px 20px',
+					backgroundPosition: '0 0, 10px 10px',
+					opacity: 0.3
+				}}
+				{...props}
+			/>
+		);
+	}
 
 	return (
 		<div
@@ -214,15 +252,17 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 
 export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 	return (
-		<ClientOnly
-			fallback={
-				<div
-					className={cn('pointer-events-none absolute inset-0 z-0', className)}
-					{...props}
-				/>
-			}
-		>
-			<DottedSurfaceInner className={className} {...props} />
-		</ClientOnly>
+		<WebGLDebug>
+			<ClientOnly
+				fallback={
+					<div
+						className={cn('pointer-events-none absolute inset-0 z-0', className)}
+						{...props}
+					/>
+				}
+			>
+				<DottedSurfaceInner className={className} {...props} />
+			</ClientOnly>
+		</WebGLDebug>
 	);
 }
