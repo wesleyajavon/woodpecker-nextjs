@@ -511,7 +511,7 @@ export default function LicensesPage() {
             className="text-center"
           >
             <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 p-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Besoin d'une licence personnalisée ?</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Besoin d&apos;une licence personnalisée ?</h2>
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
                 Pour des projets spéciaux, des licences exclusives ou des besoins particuliers, 
                 n&apos;hésitez pas à nous contacter pour une solution sur mesure.
@@ -611,7 +611,7 @@ export default function LicensesPage() {
                     <div className="space-y-3 md:space-y-4">
                       <h4 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
                         <ExternalLink className="w-4 md:w-5 h-4 md:h-5 text-blue-400" />
-                        Cas d'usage
+                        Cas d&apos;usage
                       </h4>
                       <ul className="space-y-2">
                         {licenseDetails[selectedLicense].useCases.map((useCase, index) => (
