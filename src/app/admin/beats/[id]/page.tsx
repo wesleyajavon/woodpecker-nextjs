@@ -509,7 +509,7 @@ export default function BeatManagementPage() {
                         </button>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Appuyez sur Entrée ou cliquez sur "Ajouter" pour ajouter un tag
+                        Appuyez sur Entrée ou cliquez sur &quot;Ajouter&quot; pour ajouter un tag
                       </p>
                     </div>
                   ) : (
