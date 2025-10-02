@@ -15,6 +15,9 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // Translation files will be imported here
 import { translations } from '@/lib/translations';
 
+// Type for navigating through nested translation objects
+type TranslationValue = unknown;
+
 interface LanguageProviderProps {
   children: ReactNode;
 }
@@ -49,17 +52,17 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
   const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
-    let value: any = translations[language];
+    let value: TranslationValue = translations[language] as TranslationValue;
     
     for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+      if (value && typeof value === 'object' && !Array.isArray(value) && k in value) {
+        value = (value as Record<string, TranslationValue>)[k];
       } else {
         // Fallback to English if key not found in current language
-        value = translations.en;
+        value = translations.en as TranslationValue;
         for (const fallbackKey of keys) {
-          if (value && typeof value === 'object' && fallbackKey in value) {
-            value = value[fallbackKey];
+          if (value && typeof value === 'object' && !Array.isArray(value) && fallbackKey in value) {
+            value = (value as Record<string, TranslationValue>)[fallbackKey];
           } else {
             console.warn(`Translation key "${key}" not found`);
             return key; // Return the key itself as fallback
@@ -76,7 +79,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
     // Replace parameters in the translation
     if (params) {
-      return value.replace(/\{\{(\w+)\}\}/g, (match, paramKey) => {
+      return value.replace(/\{(\w+)\}/g, (match, paramKey) => {
         return params[paramKey]?.toString() || match;
       });
     }
