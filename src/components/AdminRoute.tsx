@@ -3,6 +3,9 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import { Shield, Home, Loader2 } from 'lucide-react'
+import { DottedSurface } from './ui/dotted-surface'
 
 interface AdminRouteProps {
   children: React.ReactNode
@@ -47,8 +50,22 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
   if (loading || isAdmin === null) {
     return (
       fallback || (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+        <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+          <DottedSurface />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center gap-4 relative z-10"
+          >
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-purple-500/20 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-foreground mb-1">Vérification des permissions</h3>
+              <p className="text-sm text-muted-foreground">Patientez un instant...</p>
+            </div>
+          </motion.div>
         </div>
       )
     )
@@ -60,31 +77,54 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8 text-center">
-          <div className="mx-auto h-12 w-12 text-red-500">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+      <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+        <DottedSurface />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full mx-4 relative z-10"
+        >
+          <div className="bg-card/50 backdrop-blur-lg rounded-2xl border border-border p-8 text-center">
+            {/* Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring" }}
+              className="mx-auto w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6"
+            >
+              <Shield className="w-8 h-8 text-red-500" />
+            </motion.div>
+
+            {/* Content */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-4"
+            >
+              <h2 className="text-2xl font-bold text-foreground">
+                Accès refusé
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">
+                Vous n&apos;avez pas les permissions administrateur nécessaires pour accéder à cette page.
+              </p>
+            </motion.div>
+
+            {/* Button */}
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/')}
+              className="mt-6 w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors font-medium flex items-center justify-center gap-2"
+            >
+              <Home className="w-4 h-4" />
+              Retour à l&apos;accueil
+            </motion.button>
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Accès refusé
-          </h2>
-          <p className="text-gray-600">
-            Vous n&apos;avez pas les permissions nécessaires pour accéder à cette page.
-          </p>
-          <button
-            onClick={() => router.push('/')}
-            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-          >
-            Retour à l&apos;accueil
-          </button>
-        </div>
+        </motion.div>
       </div>
     )
   }

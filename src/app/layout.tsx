@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import SessionProvider from "@/components/SessionProvider";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Footer } from "@/components/blocks/footer-section";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,8 +40,13 @@ export default function RootLayout({
         >
           <SessionProvider>
             <CartProvider>
-              <Navigation />
-              {children}
+              <div className="flex flex-col min-h-screen">
+                <Navigation />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </div>
             </CartProvider>
           </SessionProvider>
         </ThemeProvider>

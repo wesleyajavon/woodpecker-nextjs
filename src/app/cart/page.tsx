@@ -146,7 +146,7 @@ export default function CartPage() {
               <h2 className="text-3xl font-bold text-foreground mb-4">Your cart is empty</h2>
               <p className="text-lg text-muted-foreground mb-8">
                 Looks like you haven&apos;t added any beats to your cart yet. 
-                Start building your music collection!
+                Start shopping now!
               </p>
               
               <div className="space-y-4">
@@ -158,7 +158,7 @@ export default function CartPage() {
                 </Link>
                 
                 <div className="text-sm text-muted-foreground mt-2">
-                  Discover our collection of premium beats from talented producers
+                  All the beats you need to make your next hit, are here.
                 </div>
               </div>
             </div>

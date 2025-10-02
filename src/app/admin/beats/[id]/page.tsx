@@ -76,7 +76,7 @@ export default function BeatManagementPage() {
   };
 
   // Gestion des modifications
-  const handleEditChange = (field: keyof Beat, value: string | number | boolean) => {
+  const handleEditChange = (field: keyof Beat, value: string | number | boolean | string[]) => {
     // Exclure les prix des modifications inline
     if (field === 'wavLeasePrice' || field === 'trackoutLeasePrice' || field === 'unlimitedLeasePrice') {
       return;
@@ -450,22 +450,86 @@ export default function BeatManagementPage() {
                 </div>
 
                 {/* Tags */}
-                {beat.tags && beat.tags.length > 0 && (
-                  <div className="mt-6">
-                    <label className="text-sm text-muted-foreground mb-2 block">Tags</label>
-                    <div className="flex flex-wrap gap-2">
-                      {beat.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm"
+                <div className="mt-6">
+                  <label className="text-sm text-muted-foreground mb-2 block">Tags</label>
+                  {isEditing ? (
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-2">
+                        {(editData.tags || []).map((tag, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm"
+                          >
+                            <Tag className="w-3 h-3" />
+                            {tag}
+                            <button
+                              onClick={() => {
+                                const newTags = [...(editData.tags || [])];
+                                newTags.splice(index, 1);
+                                handleEditChange('tags', newTags);
+                              }}
+                              className="ml-1 text-primary/70 hover:text-red-400 transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Ajouter un tag..."
+                          className="flex-1 p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const input = e.target as HTMLInputElement;
+                              const newTag = input.value.trim();
+                              if (newTag && !(editData.tags || []).includes(newTag)) {
+                                const newTags = [...(editData.tags || []), newTag];
+                                handleEditChange('tags', newTags);
+                                input.value = '';
+                              }
+                            }
+                          }}
+                        />
+                        <button
+                          onClick={(e) => {
+                            const input = (e.target as HTMLButtonElement).previousElementSibling as HTMLInputElement;
+                            const newTag = input.value.trim();
+                            if (newTag && !(editData.tags || []).includes(newTag)) {
+                              const newTags = [...(editData.tags || []), newTag];
+                              handleEditChange('tags', newTags);
+                              input.value = '';
+                            }
+                          }}
+                          className="px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors"
                         >
-                          <Tag className="w-3 h-3" />
-                          {tag}
-                        </span>
-                      ))}
+                          Ajouter
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Appuyez sur Entrée ou cliquez sur "Ajouter" pour ajouter un tag
+                      </p>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    beat.tags && beat.tags.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {beat.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm"
+                          >
+                            <Tag className="w-3 h-3" />
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-sm">Aucun tag</p>
+                    )
+                  )}
+                </div>
               </div>
 
               {/* Fichiers disponibles */}
