@@ -9,7 +9,7 @@ import { useTranslation } from '@/contexts/LanguageContext'
 function AuthErrorContent() {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
-  const error = searchParams?.get('error')
+  const error = searchParams?.get('error') ?? null
 
   const getErrorMessage = (errorCode: string | null): string => {
     switch (errorCode) {
@@ -78,6 +78,8 @@ function AuthErrorContent() {
 }
 
 function LoadingFallback() {
+  const { t } = useTranslation()
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
