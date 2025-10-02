@@ -81,7 +81,7 @@ export default function AdminUploadPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${activeTab === tab.id
+                    className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:cursor-pointer ${activeTab === tab.id
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-card/20 backdrop-blur-lg text-foreground hover:bg-card/30 border border-border/20'
                       }`}

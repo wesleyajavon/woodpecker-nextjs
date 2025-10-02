@@ -70,13 +70,13 @@ const ContactPage = () => {
     },
     {
       icon: MapPin,
-      label: 'Adresse',
-      value: '123 Rue de la Musique, 75001 Paris'
+      label: 'Localisation',
+      value: 'Virton, Belgique'
     },
     {
       icon: Clock,
-      label: 'Horaires',
-      value: 'Lun-Ven, 9h-18h'
+      label: 'Temps de réponse',
+      value: 'Maximum 24h'
     }
   ];
 

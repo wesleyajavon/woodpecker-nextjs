@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, ShoppingCart, Star, Music, Archive, Crown, X, Check } from 'lucide-react';
+import { Play, Pause, ShoppingCart, Star, Music, Archive, Crown, X, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { Beat } from '@/types/beat';
 import { LicenseType } from '@/types/cart';
 import BeatPricing from './BeatPricing';
@@ -37,6 +37,7 @@ export default function BeatCard({
 }: BeatCardProps) {
   const [selectedLicense, setSelectedLicense] = useState<LicenseType>('WAV_LEASE');
   const [showLicenseModal, setShowLicenseModal] = useState(false);
+  const [expandedLicense, setExpandedLicense] = useState<LicenseType | null>(null);
 
   const getPrice = (licenseType: LicenseType): number => {
     switch (licenseType) {
@@ -72,12 +73,17 @@ export default function BeatCard({
 
   const closeLicenseModal = () => {
     setShowLicenseModal(false);
+    setExpandedLicense(null);
+  };
+
+  const toggleLicenseDetails = (license: LicenseType) => {
+    setExpandedLicense(expandedLicense === license ? null : license);
   };
 
   return (
+    <>
     <motion.div
-      className={`relative bg-card/50 backdrop-blur-lg rounded-xl border border-border overflow-hidden hover:border-border/80 transition-all duration-300 ${className}`}
-      style={{ position: 'relative' }}
+      className={`bg-card/50 backdrop-blur-lg rounded-xl border border-border overflow-hidden hover:border-border/80 transition-all duration-300 ${className}`}
       whileHover={{ y: -2 }}
     >
       {/* Image/Artwork */}
@@ -180,164 +186,253 @@ export default function BeatCard({
           </div>
         )}
       </div>
+    </motion.div>
 
-      {/* License Selection Modal */}
+      {/* License Selection Modal - Outside of BeatCard container */}
       <AnimatePresence>
         {showLicenseModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 rounded-2xl"
-            style={{ 
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 50
-            }}
-            onClick={closeLicenseModal}
-          >
+          <>
+            {/* Backdrop */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-card rounded-2xl p-6 w-full max-w-md border border-border"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              onClick={closeLicenseModal}
+            />
+            
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-full max-w-md mx-4"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-purple-400" />
-                  Choisir une licence
-                </h3>
-                <button
-                  onClick={closeLicenseModal}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <div className="bg-card/95 backdrop-blur-xl rounded-2xl p-6 border border-border/50 shadow-2xl">
+                {/* Modal Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-purple-400" />
+                    Choisir une licence
+                  </h3>
+                  <button
+                    onClick={closeLicenseModal}
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted/50 rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
 
-              {/* License Options */}
-              <div className="space-y-3 mb-6">
-                {/* WAV Lease */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setSelectedLicense('WAV_LEASE');
-                    closeLicenseModal();
-                  }}
-                  className={`w-full p-4 rounded-xl border-2 transition-all ${
+                {/* License Options */}
+                <div className="space-y-3 mb-6">
+                  {/* WAV Lease */}
+                  <div className={`w-full rounded-xl border-2 transition-all ${
                     selectedLicense === 'WAV_LEASE'
                       ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-border hover:border-border/80'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="text-left">
+                      : 'border-border hover:border-purple-400/50 hover:bg-purple-400/5'
+                  }`}>
+                    <div className="flex items-start justify-between p-4">
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => {
+                          setSelectedLicense('WAV_LEASE');
+                          closeLicenseModal();
+                        }}
+                        className="text-left flex-1 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold text-foreground">WAV Lease</h4>
+                          {selectedLicense === 'WAV_LEASE' && (
+                            <Check className="w-4 h-4 text-purple-400" />
+                          )}
+                        </div>
+                        <p className="font-medium text-sm text-foreground">WAV & MP3</p>
+                      </motion.div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-foreground">WAV Lease</h4>
-                        {selectedLicense === 'WAV_LEASE' && (
-                          <Check className="w-4 h-4 text-purple-400" />
-                        )}
+                        <span className="text-lg font-bold text-foreground">
+                          {formatPrice(beat.wavLeasePrice)}
+                        </span>
+                        <button
+                          onClick={() => toggleLicenseDetails('WAV_LEASE')}
+                          className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                        >
+                          {expandedLicense === 'WAV_LEASE' ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </button>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Fichiers WAV/MP3 uniquement
-                      </p>
                     </div>
-                    <span className="text-lg font-bold text-foreground">
-                      {formatPrice(beat.wavLeasePrice)}
-                    </span>
+                    
+                    <AnimatePresence>
+                      {expandedLicense === 'WAV_LEASE' && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3 mt-1">
+                            <p>• Used for Music Recording</p>
+                            <p>• Distribute up to 5 000 copies</p>
+                            <p>• 100 000 Online Audio Streams</p>
+                            <p>• 1 Music Video</p>
+                            <p>• UNLIMITED Non-profit Live Performances only</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </motion.button>
 
-                {/* Trackout Lease */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setSelectedLicense('TRACKOUT_LEASE');
-                    closeLicenseModal();
-                  }}
-                  className={`w-full p-4 rounded-xl border-2 transition-all ${
+                  {/* Trackout Lease */}
+                  <div className={`w-full rounded-xl border-2 transition-all ${
                     selectedLicense === 'TRACKOUT_LEASE'
                       ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-border hover:border-border/80'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="text-left">
+                      : 'border-border hover:border-purple-400/50 hover:bg-purple-400/5'
+                  }`}>
+                    <div className="flex items-start justify-between p-4">
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => {
+                          setSelectedLicense('TRACKOUT_LEASE');
+                          closeLicenseModal();
+                        }}
+                        className="text-left flex-1 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold text-foreground">Trackout Lease</h4>
+                          {selectedLicense === 'TRACKOUT_LEASE' && (
+                            <Check className="w-4 h-4 text-purple-400" />
+                          )}
+                        </div>
+                        <p className="font-medium text-sm text-foreground">WAV, STEMS & MP3</p>
+                      </motion.div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-foreground">Trackout Lease</h4>
-                        {selectedLicense === 'TRACKOUT_LEASE' && (
-                          <Check className="w-4 h-4 text-purple-400" />
-                        )}
+                        <span className="text-lg font-bold text-foreground">
+                          {formatPrice(beat.trackoutLeasePrice)}
+                        </span>
+                        <button
+                          onClick={() => toggleLicenseDetails('TRACKOUT_LEASE')}
+                          className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                        >
+                          {expandedLicense === 'TRACKOUT_LEASE' ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </button>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        WAV/MP3 + Stems
-                      </p>
                     </div>
-                    <span className="text-lg font-bold text-foreground">
-                      {formatPrice(beat.trackoutLeasePrice)}
-                    </span>
+                    
+                    <AnimatePresence>
+                      {expandedLicense === 'TRACKOUT_LEASE' && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3 mt-1">
+                            <p>• Used for Music Recording</p>
+                            <p>• Distribute up to 10 000 copies</p>
+                            <p>• 250 000 Online Audio Streams</p>
+                            <p>• 3 Music Video</p>
+                            <p>• UNLIMITED Non-profit Live Performances only</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </motion.button>
 
-                {/* Unlimited Lease */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    setSelectedLicense('UNLIMITED_LEASE');
-                    closeLicenseModal();
-                  }}
-                  className={`w-full p-4 rounded-xl border-2 transition-all ${
+                  {/* Unlimited Lease */}
+                  <div className={`w-full rounded-xl border-2 transition-all ${
                     selectedLicense === 'UNLIMITED_LEASE'
                       ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-border hover:border-border/80'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="text-left">
+                      : 'border-border hover:border-purple-400/50 hover:bg-purple-400/5'
+                  }`}>
+                    <div className="flex items-start justify-between p-4">
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => {
+                          setSelectedLicense('UNLIMITED_LEASE');
+                          closeLicenseModal();
+                        }}
+                        className="text-left flex-1 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold text-foreground">Unlimited Lease</h4>
+                          {selectedLicense === 'UNLIMITED_LEASE' && (
+                            <Check className="w-4 h-4 text-purple-400" />
+                          )}
+                        </div>
+                        <p className="font-medium text-sm text-foreground">WAV, STEMS & MP3</p>
+                      </motion.div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-foreground">Unlimited Lease</h4>
-                        {selectedLicense === 'UNLIMITED_LEASE' && (
-                          <Check className="w-4 h-4 text-purple-400" />
-                        )}
+                        <span className="text-lg font-bold text-foreground">
+                          {formatPrice(beat.unlimitedLeasePrice)}
+                        </span>
+                        <button
+                          onClick={() => toggleLicenseDetails('UNLIMITED_LEASE')}
+                          className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                        >
+                          {expandedLicense === 'UNLIMITED_LEASE' ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </button>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        WAV/MP3 + Stems + Distribution illimitée
-                      </p>
                     </div>
-                    <span className="text-lg font-bold text-foreground">
-                      {formatPrice(beat.unlimitedLeasePrice)}
-                    </span>
+                    
+                    <AnimatePresence>
+                      {expandedLicense === 'UNLIMITED_LEASE' && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3 mt-1">
+                            <p>• Used for Music Recording</p>
+                            <p>• Distribute up to UNLIMITED copies</p>
+                            <p>• UNLIMITED Online Audio Streams</p>
+                            <p>• UNLIMITED Music Video</p>
+                            <p>• UNLIMITED Non-profit Live Performances only</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </motion.button>
-              </div>
+                </div>
 
-              {/* Modal Footer */}
-              <div className="flex gap-3">
-                <button
-                  onClick={closeLicenseModal}
-                  className="flex-1 px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={closeLicenseModal}
-                  className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-foreground rounded-lg transition-colors"
-                >
-                  Confirmer
-                </button>
+                {/* Modal Footer */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={closeLicenseModal}
+                    className="flex-1 px-4 py-2 text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50 rounded-lg"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={closeLicenseModal}
+                    className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
+                  >
+                    Confirmer
+                  </button>
+                </div>
               </div>
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
-    </motion.div>
+    </>
   );
 }

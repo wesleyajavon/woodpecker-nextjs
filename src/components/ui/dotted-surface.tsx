@@ -245,7 +245,7 @@ function DottedSurfaceInner({ className, ...props }: DottedSurfaceProps) {
 
 export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 	return (
-		<WebGLDebug>
+		// <WebGLDebug>
 			<ClientOnly
 				fallback={
 					<div
@@ -256,6 +256,6 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 			>
 				<DottedSurfaceInner className={className} {...props} />
 			</ClientOnly>
-		</WebGLDebug>
+		// </WebGLDebug>
 	);
 }
