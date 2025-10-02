@@ -5,8 +5,11 @@ import Link from 'next/link';
 import { ArrowRight, Music } from 'lucide-react';
 import { TextRewind } from './ui/text-rewind';
 import { HoverBorderGradient } from './ui/hover-border-gradient';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 const Hero = () => {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden">
       {/* Main content */}
@@ -31,7 +34,7 @@ const Hero = () => {
           transition={{ duration: 1, delay: 0.2 }}
           className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
         >
-          Beatmaker professionnel - Des instrumentaux uniques pour rappeurs, chanteurs et producteurs
+          {t('hero.subtitle')}
         </motion.p>
 
         {/* CTA Button */}
@@ -48,7 +51,7 @@ const Hero = () => {
               duration={1.5}
               clockwise={true}
             >
-              <span>Écouter mes beats</span>
+              <span>{t('hero.cta')}</span>
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </HoverBorderGradient>
           </Link>

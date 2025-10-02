@@ -12,11 +12,13 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { LicenseType } from '@/types/cart'
 import { Beat } from '@/types/beat'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 export default function CartPage() {
   const { cart } = useCart()
   const { clearCart } = useCartActions()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const { t } = useTranslation()
 
   // Helper function to get the correct priceId based on license type
   const getPriceIdByLicense = (beat: Beat, licenseType: LicenseType): string | null => {
@@ -111,16 +113,16 @@ export default function CartPage() {
               <Link href="/beats">
                 <Button variant="outline" size="sm" className="flex items-center space-x-2 bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30">
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back to Beats</span>
+                  <span>{t('cart.backToBeats')}</span>
                 </Button>
               </Link>
               
               <div className="flex items-center space-x-3">
                 <ShoppingCart className="h-6 w-6 text-purple-400" />
-                <h1 className="text-2xl font-bold text-foreground">Shopping Cart</h1>
+                <h1 className="text-2xl font-bold text-foreground">{t('cart.title')}</h1>
                 {cart.totalItems > 0 && (
                   <span className="bg-purple-600 text-purple-100 text-sm font-medium px-2.5 py-0.5 rounded-full">
-                    {cart.totalItems} {cart.totalItems === 1 ? 'item' : 'items'}
+                    {cart.totalItems} {cart.totalItems === 1 ? t('cart.item') : t('cart.items_plural')}
                   </span>
                 )}
               </div>
@@ -143,22 +145,21 @@ export default function CartPage() {
                 <ShoppingCart className="h-12 w-12 text-muted-foreground" />
               </div>
               
-              <h2 className="text-3xl font-bold text-foreground mb-4">Your cart is empty</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('cart.empty')}</h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Looks like you haven&apos;t added any beats to your cart yet. 
-                Start shopping now!
+                {t('cart.emptyDescription')}
               </p>
               
               <div className="space-y-4">
                 <Link href="/beats">
                   <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-8 rounded-xl">
                     <Music className="h-5 w-5 mr-2" />
-                    Browse Beats
+                    {t('cart.browseBeat')}
                   </Button>
                 </Link>
                 
                 <div className="text-sm text-muted-foreground mt-2">
-                  All the beats you need to make your next hit, are here.
+                  {t('cart.allBeatsDescription')}
                 </div>
               </div>
             </div>
@@ -176,7 +177,7 @@ export default function CartPage() {
                 <div className="bg-card/10 backdrop-blur-lg rounded-xl p-6 border border-border/20">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold text-foreground">
-                      Cart Items ({cart.totalItems})
+                      {t('cart.cartItems', { count: cart.totalItems })}
                     </h2>
                   </div>
                   
@@ -208,8 +209,8 @@ export default function CartPage() {
         >
           <div className="bg-card/10 backdrop-blur-lg rounded-xl p-8 text-center border border-border/20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Processing Checkout</h3>
-            <p className="text-muted-foreground">Please wait while we prepare your order...</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">{t('cart.processingCheckout')}</h3>
+            <p className="text-muted-foreground">{t('cart.processingDescription')}</p>
           </div>
         </motion.div>
       )}

@@ -9,8 +9,10 @@ import BeatCard from '@/components/BeatCard';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 export default function BeatsPage() {
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
   const [itemsPerPage, setItemsPerPage] = useState(4);
@@ -32,7 +34,7 @@ export default function BeatsPage() {
   } = useBeats(1, itemsPerPage);
 
   // Genres disponibles
-  const genres = ['Tous', 'Trap', 'Hip-Hop', 'Drill', 'Jazz', 'Electronic', 'Boom Bap', 'Synthwave', 'R&B', 'Pop', 'Rock'];
+  const genres = [t('beats.allGenres'), 'Trap', 'Hip-Hop', 'Drill', 'Jazz', 'Electronic', 'Boom Bap', 'Synthwave', 'R&B', 'Pop', 'Rock'];
 
   // Gestion de la lecture/arrêt
   const togglePlay = async (beatId: string, previewUrl?: string) => {
@@ -144,7 +146,7 @@ export default function BeatsPage() {
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-              <p className="text-foreground text-lg">Chargement des beats...</p>
+              <p className="text-foreground text-lg">{t('beats.loadingBeats')}</p>
             </div>
           </div>
         </div>
@@ -172,13 +174,13 @@ export default function BeatsPage() {
         <div className="container mx-auto px-4 py-8 relative z-10">
           <div className="text-center">
             <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-6 max-w-md mx-auto">
-              <p className="text-red-400 text-lg mb-4">Erreur de chargement</p>
+              <p className="text-red-400 text-lg mb-4">{t('beats.errorLoading')}</p>
               <p className="text-muted-foreground mb-4">{error}</p>
               <button
                 onClick={() => resetFilters()}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
               >
-                Réessayer
+                {t('beats.retry')}
               </button>
             </div>
           </div>
@@ -211,7 +213,7 @@ export default function BeatsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-6xl font-bold text-foreground mb-4"
           >
-            Mes Beats
+{t('beats.title')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -219,7 +221,7 @@ export default function BeatsPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-muted-foreground max-w-2xl mx-auto"
           >
-            Découvrez ma collection exclusive de beats originaux. Des instrumentaux uniques pour rappeurs, chanteurs et producteurs.
+{t('beats.description')}
           </motion.p>
         </div>
 
@@ -236,7 +238,7 @@ export default function BeatsPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                               <input
                   type="text"
-                  placeholder="Rechercher un beat..."
+                  placeholder={t('beats.searchPlaceholder')}
                   onChange={(e) => searchBeats(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-card/20 border border-border/30 rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
@@ -263,10 +265,10 @@ export default function BeatsPage() {
               onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
               className="bg-card/20 border border-border/30 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value={4} className="bg-card text-foreground">4 par page</option>
-              <option value={8} className="bg-card text-foreground">8 par page</option>
-              <option value={12} className="bg-card text-foreground">12 par page</option>
-              <option value={24} className="bg-card text-foreground">24 par page</option>
+              <option value={4} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '4' })}</option>
+              <option value={8} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '8' })}</option>
+              <option value={12} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '12' })}</option>
+              <option value={24} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '24' })}</option>
             </select>
 
             {/* Toggle de vue */}
@@ -300,19 +302,19 @@ export default function BeatsPage() {
         >
           <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
             <p className="text-2xl font-bold text-foreground">{totalBeats}</p>
-            <p className="text-muted-foreground">Beats</p>
+            <p className="text-muted-foreground">{t('beats.stats.beats')}</p>
           </div>
           <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
             <p className="text-2xl font-bold text-foreground">{genres.length - 1}</p>
-            <p className="text-muted-foreground">Genres</p>
+            <p className="text-muted-foreground">{t('beats.stats.genres')}</p>
           </div>
           <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
             <p className="text-2xl font-bold text-foreground">∞</p>
-            <p className="text-muted-foreground">Possibilités</p>
+            <p className="text-muted-foreground">{t('beats.stats.possibilities')}</p>
           </div>
           <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
             <p className="text-2xl font-bold text-foreground">24/7</p>
-            <p className="text-muted-foreground">Disponible</p>
+            <p className="text-muted-foreground">{t('beats.stats.available')}</p>
           </div>
         </motion.div>
 
@@ -357,7 +359,7 @@ export default function BeatsPage() {
               >
                 <div className="flex items-center gap-4">
                   <span className="text-muted-foreground text-sm">
-                    Affichage de {startIndex} à {endIndex} sur {totalBeats} beats
+                    {t('beats.showingResults', { start: startIndex.toString(), end: endIndex.toString(), total: totalBeats.toString() })}
                   </span>
                 </div>
                 
@@ -369,7 +371,7 @@ export default function BeatsPage() {
                     className="flex items-center gap-1 px-3 py-2 bg-card/10 border border-border/20 rounded-lg text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    Précédent
+{t('pagination.previous')}
                   </button>
 
                   {/* Page numbers */}
@@ -408,7 +410,7 @@ export default function BeatsPage() {
                     disabled={currentPage === totalPages}
                     className="flex items-center gap-1 px-3 py-2 bg-card/10 border border-border/20 rounded-lg text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    Suivant
+{t('pagination.next')}
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -422,13 +424,13 @@ export default function BeatsPage() {
             className="text-center py-16"
           >
             <div className="text-muted-foreground text-lg mb-4">
-              Aucun beat disponible pour le moment
+              {t('beats.noBeatsAvailable')}
             </div>
             <button
               onClick={resetFilters}
               className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
             >
-              Réinitialiser les filtres
+              {t('beats.resetFilters')}
             </button>
           </motion.div>
         )}
@@ -447,7 +449,7 @@ export default function BeatsPage() {
               duration={1.5}
               clockwise={true}
             >
-              Commander un beat personnalisé
+{t('beats.customBeatCTA')}
               <Music className="w-5 h-5" />
             </HoverBorderGradient>
           </Link>

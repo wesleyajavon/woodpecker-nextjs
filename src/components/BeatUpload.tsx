@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, Music, FileAudio, X, AlertCircle, Image, Archive } from 'lucide-react';
 import { BEAT_CONFIG } from '@/config/constants';
-
+import { useTranslation } from '@/contexts/LanguageContext';
 import { Beat } from '@/types/beat';
 
 interface BeatUploadProps {
@@ -20,6 +20,7 @@ interface UploadProgress {
 }
 
 export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploadProps) {
+  const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({
     preview: 0,
@@ -92,18 +93,18 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
   const validateForm = (): boolean => {
     const newErrors: string[] = [];
 
-    if (!formData.title.trim()) newErrors.push('Le titre est requis');
+    if (!formData.title.trim()) newErrors.push(t('upload.titleRequired'));
     if (formData.title.length > BEAT_CONFIG.maxTitleLength) {
-      newErrors.push(`Le titre ne peut pas dépasser ${BEAT_CONFIG.maxTitleLength} caractères`);
+      newErrors.push(t('upload.titleTooLong', { max: BEAT_CONFIG.maxTitleLength }));
     }
     if (formData.description && formData.description.length > BEAT_CONFIG.maxDescriptionLength) {
-      newErrors.push(`La description ne peut pas dépasser ${BEAT_CONFIG.maxDescriptionLength} caractères`);
+      newErrors.push(t('upload.descriptionTooLong', { max: BEAT_CONFIG.maxDescriptionLength }));
     }
-    if (!uploadedFiles.preview) newErrors.push('La preview audio est requise');
-    if (formData.wavLeasePrice <= 0) newErrors.push('Le prix WAV Lease doit être supérieur à 0');
-    if (formData.trackoutLeasePrice <= 0) newErrors.push('Le prix Trackout Lease doit être supérieur à 0');
-    if (formData.unlimitedLeasePrice <= 0) newErrors.push('Le prix Unlimited Lease doit être supérieur à 0');
-    if (formData.bpm < 60 || formData.bpm > 200) newErrors.push('Le BPM doit être entre 60 et 200');
+    if (!uploadedFiles.preview) newErrors.push(t('upload.previewRequired'));
+    if (formData.wavLeasePrice <= 0) newErrors.push(t('upload.wavPriceRequired'));
+    if (formData.trackoutLeasePrice <= 0) newErrors.push(t('upload.trackoutPriceRequired'));
+    if (formData.unlimitedLeasePrice <= 0) newErrors.push(t('upload.unlimitedPriceRequired'));
+    if (formData.bpm < 60 || formData.bpm > 200) newErrors.push(t('upload.bpmRange'));
 
     setErrors(newErrors);
     return newErrors.length === 0;
@@ -153,7 +154,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de l\'upload');
+        throw new Error(errorData.error || t('upload.uploadError'));
       }
 
       const result = await response.json();
@@ -180,7 +181,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       }
 
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      const errorMessage = error instanceof Error ? error.message : t('errors.generic');
       onUploadError?.(errorMessage);
       setErrors([errorMessage]);
     } finally {
@@ -191,7 +192,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white/10 backdrop-blur-lg rounded-2xl">
       <h2 className="text-3xl font-bold text-white mb-6 text-center">
-        Upload d&apos;un nouveau beat
+        {t('admin.uploadNewBeat')}
       </h2>
 
       {/* Affichage des erreurs */}
@@ -213,12 +214,12 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Section des fichiers */}
         <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Fichiers</h3>
+          <h3 className="text-xl font-semibold text-white mb-4">{t('upload.files')}</h3>
 
           {/* Preview Audio (Requis) */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Preview Audio <span className="text-red-400">*</span>
+              {t('upload.previewAudio')} <span className="text-red-400">*</span>
             </label>
             <div className="relative">
               <input
@@ -249,7 +250,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 ) : (
                   <div className="flex items-center gap-2 text-gray-400">
                     <Upload className="w-5 h-5" />
-                    <span>Cliquez pour sélectionner un fichier audio</span>
+                    <span>{t('upload.selectAudioFile')}</span>
                   </div>
                 )}
               </div>
@@ -267,7 +268,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           {/* Master Audio */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Master Audio <span className="text-red-400">*</span>
+              {t('upload.masterAudio')} <span className="text-red-400">*</span>
             </label>
             <div className="relative">
               <input
@@ -298,7 +299,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 ) : (
                   <div className="flex items-center gap-2 text-gray-400">
                     <Upload className="w-5 h-5" />
-                    <span>Fichier master haute qualité</span>
+                    <span>{t('upload.highQualityMaster')}</span>
                   </div>
                 )}
               </div>
@@ -308,7 +309,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           {/* Artwork */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Artwork/Cover Image
+              {t('upload.artwork')}
             </label>
             <div className="relative">
               <input
@@ -339,7 +340,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 ) : (
                   <div className="flex items-center gap-2 text-gray-400">
                     <Upload className="w-5 h-5" />
-                    <span>Image de couverture (optionnel)</span>
+                    <span>{t('upload.coverImageOptional')}</span>
                   </div>
                 )}
               </div>
@@ -357,7 +358,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           {/* Stems */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Stems (ZIP)
+              {t('upload.stems')}
             </label>
             <div className="relative">
               <input
@@ -388,7 +389,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 ) : (
                   <div className="flex items-center gap-2 text-gray-400">
                     <Upload className="w-5 h-5" />
-                    <span>Fichier ZIP contenant les stems (optionnel)</span>
+                    <span>{t('upload.stemsZipOptional')}</span>
                   </div>
                 )}
               </div>
@@ -407,19 +408,19 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
         {/* Section des informations */}
         <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Informations</h3>
+          <h3 className="text-xl font-semibold text-white mb-4">{t('upload.information')}</h3>
 
           {/* Titre */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Titre <span className="text-red-400">*</span>
+              {t('upload.title')} <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
               className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Nom du beat"
+              placeholder={t('upload.beatName')}
               maxLength={BEAT_CONFIG.maxTitleLength}
             />
           </div>
@@ -427,13 +428,13 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           {/* Description */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Description
+              {t('upload.description')}
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Description du beat"
+              placeholder={t('upload.beatDescription')}
               rows={3}
               maxLength={BEAT_CONFIG.maxDescriptionLength}
             />
@@ -443,7 +444,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-300">
-                Genre <span className="text-red-400">*</span>
+                {t('upload.genre')} <span className="text-red-400">*</span>
               </label>
               <select
                 value={formData.genre}
@@ -460,7 +461,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-300">
-                BPM <span className="text-red-400">*</span>
+                {t('upload.bpm')} <span className="text-red-400">*</span>
               </label>
               <input
                 type="number"
@@ -477,7 +478,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-300">
-                Tonalité <span className="text-red-400">*</span>
+                {t('upload.key')} <span className="text-red-400">*</span>
               </label>
               <select
                 value={formData.key}
@@ -494,7 +495,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-300">
-                Durée <span className="text-red-400">*</span>
+                {t('upload.duration')} <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
@@ -508,7 +509,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
           {/* Prix par licence */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white">Prix par type de licence</h4>
+            <h4 className="text-lg font-semibold text-white">{t('upload.pricePerLicense')}</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* WAV Lease */}
@@ -561,7 +562,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           {/* Tags */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
-              Tags ({formData.tags.length}/{BEAT_CONFIG.maxTags})
+              {t('upload.tags')} ({formData.tags.length}/{BEAT_CONFIG.maxTags})
             </label>
             <div className="flex gap-2">
               <input
@@ -570,7 +571,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 onChange={(e) => setCurrentTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && addTag()}
                 className="flex-1 p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Ajouter un tag"
+                placeholder={t('upload.addTag')}
                 maxLength={20}
               />
               <button
@@ -578,7 +579,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 disabled={!currentTag.trim() || formData.tags.length >= BEAT_CONFIG.maxTags}
                 className="px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
               >
-                Ajouter
+{t('common.add')}
               </button>
             </div>
             {formData.tags.length > 0 && (
@@ -610,7 +611,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 onChange={(e) => handleInputChange('isExclusive', e.target.checked)}
                 className="w-4 h-4 text-purple-600 bg-white/20 border-white/30 rounded focus:ring-purple-500"
               />
-              Beat exclusif
+              {t('upload.exclusiveBeat')}
             </label>
 
             <label className="flex items-center gap-2 text-gray-300">
@@ -620,7 +621,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 onChange={(e) => handleInputChange('featured', e.target.checked)}
                 className="w-4 h-4 text-purple-600 bg-white/20 border-white/30 rounded focus:ring-purple-500"
               />
-              Mettre en vedette
+              {t('upload.featured')}
             </label>
           </div>
         </div>
@@ -636,12 +637,12 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           {isUploading ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              Upload en cours...
+{t('upload.uploading')}
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Upload className="w-5 h-5" />
-              Uploader le beat
+{t('upload.uploadBeat')}
             </div>
           )}
         </button>

@@ -13,8 +13,10 @@ import AdminRoute from '@/components/AdminRoute';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 export default function AdminUploadPage() {
+  const { t } = useTranslation();
   type TabId = 'upload' | 'manage' | 'stats' | 'orders';
 
   const [activeTab, setActiveTab] = useState<TabId>('upload');
@@ -25,14 +27,14 @@ export default function AdminUploadPage() {
   };
 
   const handleUploadError = (error: string) => {
-    console.error('Erreur d\'upload:', error);
+    console.error('Upload error:', error);
   };
 
   const tabs: Array<{ id: TabId; label: string; icon: React.ComponentType<{ className?: string }> }> = [
-    { id: 'upload', label: 'Upload de Beats', icon: Upload },
-    { id: 'manage', label: 'Gestion des Beats', icon: Music },
-    { id: 'orders', label: 'Commandes', icon: ShoppingBag },
-    { id: 'stats', label: 'Statistiques', icon: BarChart3 }
+    { id: 'upload', label: t('admin.upload'), icon: Upload },
+    { id: 'manage', label: t('admin.beats'), icon: Music },
+    { id: 'orders', label: t('admin.orders'), icon: ShoppingBag },
+    { id: 'stats', label: t('admin.stats'), icon: BarChart3 }
   ];
 
   return (
@@ -60,10 +62,10 @@ export default function AdminUploadPage() {
             className="text-center mb-12"
           >
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Administration
+              {t('admin.title')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Gestion de la plateforme l.outsider
+              {t('admin.dashboard')}
             </p>
           </motion.div>
 
@@ -107,7 +109,7 @@ export default function AdminUploadPage() {
                 <div>
                   <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                     <Plus className="w-6 h-6" />
-                    Upload d&apos;un nouveau beat
+                    {t('admin.uploadNewBeat')}
                   </h2>
                   <BeatUpload
                     onUploadSuccess={handleUploadSuccess}
@@ -119,7 +121,7 @@ export default function AdminUploadPage() {
                 {uploadedBeats.length > 0 && (
                   <div>
                     <h3 className="text-xl font-semibold text-foreground mb-4">
-                      Beats récemment uploadés
+                      {t('admin.recentlyUploaded')}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {uploadedBeats.slice(0, 6).map((beat, index) => (
@@ -150,7 +152,7 @@ export default function AdminUploadPage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                   <Music className="w-6 h-6" />
-                  Gestion des Beats
+                  {t('admin.beats')}
                 </h2>
 
                 <BeatManager
@@ -174,7 +176,7 @@ export default function AdminUploadPage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                   <ShoppingBag className="w-6 h-6" />
-                  Commandes
+                  {t('admin.orders')}
                 </h2>
 
                 <AdminOrders />
@@ -185,7 +187,7 @@ export default function AdminUploadPage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
                   <BarChart3 className="w-6 h-6" />
-                  Statistiques
+                  {t('admin.stats')}
                 </h2>
 
                 <AdminStats />
@@ -206,7 +208,7 @@ export default function AdminUploadPage() {
               className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-6 py-3 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
             >
               <Settings className="w-5 h-5" />
-              <span>Retour à la page principale</span>
+              <span>{t('admin.backToHome')}</span>
             </Link>
           </motion.div>
         </div>

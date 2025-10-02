@@ -7,6 +7,7 @@ import { Beat } from '@/types/beat';
 import { LicenseType } from '@/types/cart';
 import BeatPricing from './BeatPricing';
 import AddToCartButton from './AddToCartButton';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface BeatCardProps {
   beat: Beat;
@@ -38,6 +39,7 @@ export default function BeatCard({
   const [selectedLicense, setSelectedLicense] = useState<LicenseType>('WAV_LEASE');
   const [showLicenseModal, setShowLicenseModal] = useState(false);
   const [expandedLicense, setExpandedLicense] = useState<LicenseType | null>(null);
+  const { t } = useTranslation();
 
   const getPrice = (licenseType: LicenseType): number => {
     switch (licenseType) {
@@ -115,7 +117,9 @@ export default function BeatCard({
         {/* License Badge */}
         <div className="absolute top-2 right-2">
           <div className={`px-2 py-1 rounded-full text-xs font-medium bg-card/80 ${licenseColors[selectedLicense]}`}>
-            {selectedLicense.replace('_', ' ')}
+            {selectedLicense === 'WAV_LEASE' ? t('licenses.wavLease') :
+             selectedLicense === 'TRACKOUT_LEASE' ? t('licenses.trackoutLease') :
+             t('licenses.unlimitedLease')}
           </div>
         </div>
 
@@ -123,7 +127,7 @@ export default function BeatCard({
         {beat.stemsUrl && (
           <div className="absolute top-2 left-2">
             <div className="px-2 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/50">
-              Stems
+              {t('beatCard.stems')}
             </div>
           </div>
         )}
@@ -139,9 +143,9 @@ export default function BeatCard({
 
         {/* BPM and Key */}
         <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
-          <span>{beat.bpm} BPM</span>
-          <span>{beat.key}</span>
-          <span>{beat.duration}</span>
+          <span>{t('beatCard.bpm', { bpm: beat.bpm.toString() })}</span>
+          <span>{t('beatCard.key', { key: beat.key })}</span>
+          <span>{t('beatCard.duration', { duration: beat.duration })}</span>
         </div>
 
         {/* Price Display */}
@@ -155,7 +159,7 @@ export default function BeatCard({
               className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
             >
               <Crown className="w-4 h-4" />
-              Changer de licence
+              {t('beatCard.changeLicense')}
             </button>
           </div>
         </div>
@@ -214,7 +218,7 @@ export default function BeatCard({
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                     <Crown className="w-5 h-5 text-purple-400" />
-                    Choisir une licence
+                    {t('beatCard.selectLicense')}
                   </h3>
                   <button
                     onClick={closeLicenseModal}
@@ -419,13 +423,13 @@ export default function BeatCard({
                     onClick={closeLicenseModal}
                     className="flex-1 px-4 py-2 text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50 rounded-lg"
                   >
-                    Annuler
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={closeLicenseModal}
                     className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
                   >
-                    Confirmer
+                    {t('common.confirm')}
                   </button>
                 </div>
               </div>

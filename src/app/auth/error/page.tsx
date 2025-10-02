@@ -3,19 +3,28 @@
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
+import { useTranslation } from '@/contexts/LanguageContext'
 
-const errorMessages: Record<string, string> = {
-  Configuration: 'Il y a un problème avec la configuration du serveur.',
-  AccessDenied: 'Vous n\'avez pas l\'autorisation de vous connecter.',
-  Verification: 'Le token de vérification a expiré ou a déjà été utilisé.',
-  Default: 'Une erreur inattendue s\'est produite.'
-}
 
 function AuthErrorContent() {
+  const { t } = useTranslation()
   const searchParams = useSearchParams()
   const error = searchParams?.get('error')
 
-  const errorMessage = error ? errorMessages[error] || errorMessages.Default : errorMessages.Default
+  const getErrorMessage = (errorCode: string | null): string => {
+    switch (errorCode) {
+      case 'Configuration':
+        return t('auth.errors.configuration')
+      case 'AccessDenied':
+        return t('auth.errors.accessDenied')
+      case 'Verification':
+        return t('auth.errors.verification')
+      default:
+        return t('auth.errors.default')
+    }
+  }
+
+  const errorMessage = getErrorMessage(error)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -32,7 +41,7 @@ function AuthErrorContent() {
             </svg>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Erreur de connexion
+            {t('auth.errors.title')}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             {errorMessage}
@@ -44,7 +53,7 @@ function AuthErrorContent() {
             onClick={() => window.location.href = '/auth/signin'}
             className="w-full"
           >
-            Réessayer
+{t('errors.tryAgain')}
           </Button>
           
           <Button
@@ -52,14 +61,14 @@ function AuthErrorContent() {
             variant="outline"
             className="w-full"
           >
-            Retour à l&apos;accueil
+{t('errors.goHome')}
           </Button>
         </div>
 
         {error && (
           <div className="mt-4 p-4 bg-gray-100 rounded-md">
             <p className="text-xs text-gray-600">
-              Code d&apos;erreur: <code className="font-mono">{error}</code>
+              {t('auth.errors.errorCode')}: <code className="font-mono">{error}</code>
             </p>
           </div>
         )}
@@ -77,7 +86,7 @@ function LoadingFallback() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-400"></div>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Chargement...
+            {t('common.loading')}
           </h2>
         </div>
       </div>

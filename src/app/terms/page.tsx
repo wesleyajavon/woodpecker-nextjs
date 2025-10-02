@@ -1,10 +1,24 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { Shield, FileText, Scale, AlertTriangle, Users, Clock, Mail } from 'lucide-react';
+import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
 
 export default function TermsPage() {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  const [lastUpdated, setLastUpdated] = useState('2 janvier 2025');
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+  }, [language]);
+
   const sections = [
     {
       id: 'acceptance',
@@ -223,20 +237,15 @@ export default function TermsPage() {
                   <FileText className="w-8 h-8 text-purple-400" />
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-                  Conditions d&apos;Utilisation
+                  {t('terms.title')}
                 </h1>
               </div>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Veuillez lire attentivement ces conditions d&apos;utilisation avant d&apos;utiliser nos services.
-                En utilisant l.outsider, vous acceptez d&apos;être lié par ces conditions.
+                {t('terms.subtitle')}
               </p>
               <div className="mt-8 p-4 bg-card/50 backdrop-blur-lg rounded-xl border border-border/50">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Dernière mise à jour :</strong> {new Date().toLocaleDateString('fr-FR', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
+                  <strong>{t('terms.lastUpdated')}:</strong> {lastUpdated}
                 </p>
               </div>
             </motion.div>
@@ -304,14 +313,13 @@ export default function TermsPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-3">
-                    Notice Importante
+                    {t('terms.importantNotice')}
                   </h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Ces conditions d&apos;utilisation constituent un accord légalement contraignant entre vous et l.outsider. 
-                    En utilisant notre site web ou nos services, vous reconnaissez avoir lu, compris et accepté d&apos;être lié par ces conditions.
+                    {t('terms.importantNoticeDescription')}
                   </p>
                   <p className="text-muted-foreground leading-relaxed">
-                    Si vous avez des questions concernant ces conditions, n&apos;hésitez pas à nous contacter à 
+                    {t('terms.questionsContact')}
                     <a href="mailto:contact@loutsider.com" className="text-purple-400 hover:text-purple-300 transition-colors ml-1">
                       contact@loutsider.com
                     </a>

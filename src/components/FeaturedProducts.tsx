@@ -8,9 +8,13 @@ import { useFeaturedBeats } from '@/hooks/useFeaturedBeats';
 import BeatCard from '@/components/BeatCard';
 import { HoverBorderGradient } from './ui/hover-border-gradient';
 import { LayoutTextFlip } from './ui/layout-text-flip';
+import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
+import { translations } from '@/lib/translations';
 
 export default function FeaturedProducts() {
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
+  const { t } = useTranslation();
+  const { language } = useLanguage();
 
   // Utilisation du hook personnalisé
   const { featuredBeats, loading, error } = useFeaturedBeats(4);
@@ -82,13 +86,14 @@ export default function FeaturedProducts() {
         >
           <motion.div className="relative mx-4 my-4 flex flex-col items-center justify-center gap-4 text-center sm:mx-0 sm:mb-0 sm:flex-row">
             <LayoutTextFlip
-              text="Les beats "
-              words={["en feu", "masterclass", "en pétard", "pépites", "bouillants", "crackito"]}
+              text={`${t('featured.title')} `}
+              words={translations[language].featured.words}
               duration={2500}
             />
           </motion.div>
           <p className="mt-4 text-center text-xl text-foreground max-w-2xl mx-auto">
-            Que des bangers dans cette sélection d&apos;instrus qui retournent tout en ce moment.          </p>
+            {t('featured.description')}
+          </p>
         </motion.div>
 
         {/* Grille des beats */}
@@ -128,7 +133,7 @@ export default function FeaturedProducts() {
               duration={1.5}
               clockwise={true}
             >
-              Voir tous mes beats
+              {t('featured.viewAllBeats')}
               <Music className="w-5 h-5" />
             </HoverBorderGradient>
           </Link>

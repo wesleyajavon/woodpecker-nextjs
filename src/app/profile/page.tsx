@@ -8,6 +8,7 @@ import Avatar from '@/components/Avatar'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { DottedSurface } from '@/components/ui/dotted-surface'
 import { cn } from '@/lib/utils'
+import { useTranslation, useLanguage } from '@/contexts/LanguageContext'
 
 interface UserProfile {
   id: string
@@ -20,6 +21,8 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+  const { t } = useTranslation()
+  const { language } = useLanguage()
   const { data: session, status } = useSession()
   const router = useRouter()
   const [user, setUser] = useState<UserProfile | null>(null)
@@ -42,7 +45,7 @@ export default function ProfilePage() {
     try {
       const response = await fetch('/api/user/profile')
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération du profil')
+        throw new Error(t('profile.fetchError'))
       }
       
       const data = await response.json()
@@ -52,7 +55,7 @@ export default function ProfilePage() {
         image: data.user.image || ''
       })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue')
+      setError(err instanceof Error ? err.message : t('errors.generic'))
     } finally {
       setLoading(false)
     }
@@ -74,14 +77,14 @@ export default function ProfilePage() {
       })
 
       if (!response.ok) {
-        throw new Error('Erreur lors de la mise à jour du profil')
+        throw new Error(t('profile.updateError'))
       }
 
       const data = await response.json()
       setUser(data.user)
-      setSuccess('Profil mis à jour avec succès!')
+      setSuccess(t('profile.updateSuccess'))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue')
+      setError(err instanceof Error ? err.message : t('errors.generic'))
     } finally {
       setUpdating(false)
     }
@@ -111,7 +114,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-center py-20">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-400 mx-auto mb-4"></div>
-                    <p className="text-foreground">Chargement du profil...</p>
+                    <p className="text-foreground">{t('profile.loading')}</p>
                   </div>
                 </div>
               ) : (
@@ -128,11 +131,11 @@ export default function ProfilePage() {
                   />
                 </div>
                 <h1 className="text-3xl font-bold text-foreground mb-2">
-                  {user?.name || 'Utilisateur'}
+                  {user?.name || t('profile.user')}
                 </h1>
                 <p className="text-lg text-muted-foreground mb-2">{user?.email}</p>
                 <p className="text-sm text-muted-foreground">
-                  Membre depuis {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
+                  {t('profile.memberSince')} {user?.createdAt ? new Date(user.createdAt).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US') : 'N/A'}
                 </p>
               </div>
 
@@ -150,12 +153,12 @@ export default function ProfilePage() {
 
               {/* Profile Edit Form */}
               <div className="bg-card/10 backdrop-blur-lg rounded-xl p-6 mb-8 border border-border/20">
-                <h2 className="text-xl font-semibold text-foreground mb-6">Modifier le profil</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-6">{t('profile.editProfile')}</h2>
                 <form onSubmit={handleUpdateProfile} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                        Nom d&apos;affichage
+                        {t('profile.displayName')}
                       </label>
                       <input
                         type="text"
@@ -163,13 +166,13 @@ export default function ProfilePage() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground"
-                        placeholder="Votre nom d'affichage"
+                        placeholder={t('profile.displayNamePlaceholder')}
                       />
                     </div>
 
                     <div>
                       <label htmlFor="image" className="block text-sm font-medium text-foreground mb-2">
-                        URL de l&apos;avatar
+                        {t('profile.avatarUrl')}
                       </label>
                       <input
                         type="url"
@@ -180,7 +183,7 @@ export default function ProfilePage() {
                         placeholder="https://example.com/avatar.jpg"
                       />
                       <p className="mt-2 text-sm text-muted-foreground">
-                        Laissez vide pour utiliser l&apos;avatar par défaut
+                        {t('profile.avatarUrlHelp')}
                       </p>
                     </div>
                   </div>
@@ -199,7 +202,7 @@ export default function ProfilePage() {
                       disabled={updating}
                       className="w-full sm:w-auto"
                     >
-                      {updating ? 'Mise à jour...' : 'Mettre à jour'}
+{updating ? t('profile.updating') : t('profile.update')}
                     </Button>
                   </div>
                 </form>
@@ -208,30 +211,30 @@ export default function ProfilePage() {
               {/* Account Information */}
               <div className="bg-card/10 backdrop-blur-lg border border-border/20 rounded-xl p-6">
                 <h3 className="text-xl font-semibold text-foreground mb-6">
-                  Informations du compte
+                  {t('profile.accountInformation')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div className="bg-card/20 rounded-lg p-4 border border-border/10">
-                      <dt className="text-sm font-medium text-muted-foreground mb-1">Email</dt>
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">{t('common.email')}</dt>
                       <dd className="text-sm text-foreground break-all">{user?.email}</dd>
                     </div>
                     <div className="bg-card/20 rounded-lg p-4 border border-border/10">
-                      <dt className="text-sm font-medium text-muted-foreground mb-1">Email vérifié</dt>
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">{t('profile.emailVerified')}</dt>
                       <dd className="text-sm">
                         {user?.emailVerified ? (
                           <span className="inline-flex items-center text-green-600">
                             <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
-                            Vérifié
+{t('profile.verified')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center text-red-600">
                             <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                             </svg>
-                            Non vérifié
+{t('profile.notVerified')}
                           </span>
                         )}
                       </dd>
@@ -239,13 +242,13 @@ export default function ProfilePage() {
                   </div>
                   <div className="space-y-4">
                     <div className="bg-card/20 rounded-lg p-4 border border-border/10">
-                      <dt className="text-sm font-medium text-muted-foreground mb-1">ID utilisateur</dt>
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">{t('profile.userId')}</dt>
                       <dd className="text-sm text-foreground font-mono break-all">{user?.id}</dd>
                     </div>
                     <div className="bg-card/20 rounded-lg p-4 border border-border/10">
-                      <dt className="text-sm font-medium text-muted-foreground mb-1">Dernière mise à jour</dt>
+                      <dt className="text-sm font-medium text-muted-foreground mb-1">{t('profile.lastUpdated')}</dt>
                       <dd className="text-sm text-foreground">
-                        {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString('fr-FR') : 'N/A'}
+                        {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US') : 'N/A'}
                       </dd>
                     </div>
                   </div>

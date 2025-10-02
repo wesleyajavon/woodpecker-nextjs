@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User, Settings, LogOut, ShoppingBag } from 'lucide-react'
 import Avatar from './Avatar'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 export default function UserMenu() {
+  const { t } = useTranslation()
   const { data: session } = useSession()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
@@ -33,7 +35,7 @@ export default function UserMenu() {
   const menuItems = [
     {
       icon: User,
-      label: 'Profil',
+      label: t('userMenu.profile'),
       onClick: () => {
         router.push('/profile')
         setIsOpen(false)
@@ -57,7 +59,7 @@ export default function UserMenu() {
     // },
     {
       icon: LogOut,
-      label: 'Déconnexion',
+      label: t('userMenu.signOut'),
       onClick: () => {
         signOut({ callbackUrl: '/' })
         setIsOpen(false)

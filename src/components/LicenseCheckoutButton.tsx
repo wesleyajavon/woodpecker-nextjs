@@ -118,7 +118,7 @@ export default function LicenseCheckoutButton({
       disabled={isLoading}
       className={className}
     >
-      {isLoading ? 'Loading...' : children || (showPrice ? `Acheter - ${formatPrice(price)}` : 'Acheter')}
+      {isLoading ? 'Chargement...' : children || (showPrice ? `Acheter - ${formatPrice(price)}` : 'Acheter')}
     </Button>
   )
 }

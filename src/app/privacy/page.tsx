@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { 
@@ -20,8 +21,21 @@ import {
   Download,
   Share2
 } from 'lucide-react';
+import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
 
 export default function PrivacyPage() {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  const [lastUpdated, setLastUpdated] = useState('2 janvier 2025');
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+  }, [language]);
+
   const sections = [
     {
       id: 'introduction',
@@ -427,23 +441,18 @@ export default function PrivacyPage() {
                   <Shield className="w-8 h-8 text-blue-400" />
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-                  Politique de{' '}
+                  {t('privacy.title')}{' '}
                   <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Confidentialité
+                    {t('privacy.titleHighlight')}
                   </span>
                 </h1>
               </div>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Nous nous engageons à protéger votre vie privée et vos données personnelles. 
-                Cette politique explique comment nous collectons, utilisons et protégeons vos informations.
+                {t('privacy.subtitle')}
               </p>
               <div className="mt-8 p-4 bg-card/50 backdrop-blur-lg rounded-xl border border-border/50">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Dernière mise à jour :</strong> {new Date().toLocaleDateString('fr-FR', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })} • <strong>Conforme RGPD</strong>
+                  <strong>{t('privacy.lastUpdated')}:</strong> {lastUpdated} • <strong>{t('privacy.gdprCompliant')}</strong>
                 </p>
               </div>
             </motion.div>
@@ -521,11 +530,10 @@ export default function PrivacyPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-3">
-                    Questions sur vos Données ?
+                    {t('privacy.questionsTitle')}
                   </h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Notre équipe est à votre disposition pour répondre à toutes vos questions concernant 
-                    la protection de vos données personnelles et l&apos;exercice de vos droits.
+                    {t('privacy.questionsDescription')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <a
@@ -533,14 +541,14 @@ export default function PrivacyPage() {
                       className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors font-medium"
                     >
                       <Mail className="w-4 h-4" />
-                      Nous contacter
+                      {t('common.contactUs')}
                     </a>
                     <a
                       href="/contact"
                       className="inline-flex items-center gap-2 bg-card/20 hover:bg-card/30 text-foreground px-6 py-3 rounded-xl transition-colors font-medium border border-border/50"
                     >
                       <Eye className="w-4 h-4" />
-                      Exercer mes droits
+                      {t('privacy.exerciseRights')}
                     </a>
                   </div>
                 </div>
@@ -556,7 +564,7 @@ export default function PrivacyPage() {
             >
               <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-400 px-4 py-2 rounded-full border border-green-500/20">
                 <CheckCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Conforme RGPD • Données protégées</span>
+                <span className="text-sm font-medium">{t('privacy.gdprBadge')}</span>
               </div>
             </motion.div>
           </div>

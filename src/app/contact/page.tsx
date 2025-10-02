@@ -5,8 +5,10 @@ import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { ContactCard } from '@/components/ui/contact-card';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 const ContactPage = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -40,11 +42,11 @@ const ContactPage = () => {
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
         setSubmitStatus('error');
-        setErrorMessage(result.error || 'Une erreur est survenue');
+        setErrorMessage(result.error || t('contact.form.error'));
       }
     } catch (error) {
       setSubmitStatus('error');
-      setErrorMessage('Erreur de connexion. Veuillez réessayer.');
+      setErrorMessage(t('errors.network'));
     } finally {
       setIsSubmitting(false);
     }
@@ -60,23 +62,23 @@ const ContactPage = () => {
   const contactInfo = [
     {
       icon: Mail,
-      label: 'Email',
+      label: t('contact.info.email'),
       value: 'contact@loutsider.com'
     },
     {
       icon: Phone,
-      label: 'Téléphone',
+      label: t('common.phone'),
       value: '+33 1 23 45 67 89'
     },
     {
       icon: MapPin,
-      label: 'Localisation',
+      label: t('contact.info.location'),
       value: 'Virton, Belgique'
     },
     {
       icon: Clock,
-      label: 'Temps de réponse',
-      value: 'Maximum 24h'
+      label: t('contact.info.response'),
+      value: t('contact.info.responseTime')
     }
   ];
 
@@ -98,8 +100,8 @@ const ContactPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <ContactCard
-          title="Contactez-nous"
-          description="Nous sommes là pour vous aider. N'hésitez pas à nous contacter pour toute question concernant nos beats et services."
+          title={t('contact.title')}
+          description={t('contact.subtitle')}
           contactInfo={contactInfo}
           className="shadow-2xl"
         >
@@ -107,7 +109,7 @@ const ContactPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-                  Nom complet *
+                  {t('contact.form.name')} *
                 </label>
                 <input
                   type="text"
@@ -117,13 +119,13 @@ const ContactPage = () => {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground"
-                  placeholder="Votre nom"
+                  placeholder={t('contact.form.namePlaceholder')}
                 />
               </div>
               
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                  Email *
+                  {t('contact.form.email')} *
                 </label>
                 <input
                   type="email"
@@ -140,7 +142,7 @@ const ContactPage = () => {
 
             <div>
               <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
-                Sujet *
+                {t('contact.form.subject')} *
               </label>
               <select
                 id="subject"
@@ -150,17 +152,17 @@ const ContactPage = () => {
                 required
                 className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
               >
-                <option value="">Sélectionnez un sujet</option>
-                <option value="support">Support technique</option>
-                <option value="sales">Ventes</option>
-                <option value="partnership">Partenariat</option>
-                <option value="other">Autre</option>
+                <option value="">{t('contact.form.selectSubject')}</option>
+                <option value="support">{t('contact.form.subjects.support')}</option>
+                <option value="sales">{t('contact.form.subjects.sales')}</option>
+                <option value="partnership">{t('contact.form.subjects.partnership')}</option>
+                <option value="other">{t('contact.form.subjects.other')}</option>
               </select>
             </div>
 
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                Message *
+                {t('contact.form.message')} *
               </label>
               <textarea
                 id="message"
@@ -170,14 +172,14 @@ const ContactPage = () => {
                 required
                 rows={6}
                 className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none placeholder-muted-foreground"
-                placeholder="Décrivez votre demande..."
+                placeholder={t('contact.form.messagePlaceholder')}
               />
             </div>
 
             {/* Messages de statut */}
             {submitStatus === 'success' && (
               <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg text-sm">
-                ✅ Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.
+                {t('contact.form.success')}
               </div>
             )}
 
@@ -200,12 +202,12 @@ const ContactPage = () => {
               {isSubmitting ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
-                  Envoi en cours...
+                  {t('contact.form.sending')}
                 </>
               ) : (
                 <>
                   <Send className="h-5 w-5" />
-                  Envoyer le message
+                  {t('contact.form.send')}
                 </>
               )}
             </button>

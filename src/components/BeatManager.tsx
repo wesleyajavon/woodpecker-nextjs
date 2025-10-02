@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Edit, Trash2, Eye, Play, Pause, Star, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Beat } from '@/types/beat';
+import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
 
 interface BeatManagerProps {
   onEdit?: (beat: Beat) => void;
@@ -13,6 +14,8 @@ interface BeatManagerProps {
 }
 
 export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatManagerProps) {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
   const [beats, setBeats] = useState<Beat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +43,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
       const response = await fetch('/api/admin/beats?limit=100&includeInactive=true');
 
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des beats');
+        throw new Error(t('admin.beatsLoadError'));
       }
 
       const result = await response.json();
@@ -48,10 +51,10 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
       if (result.success) {
         setBeats(result.data);
       } else {
-        throw new Error(result.error || 'Erreur inconnue');
+        throw new Error(result.error || t('errors.generic'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -90,7 +93,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
   // Formatage du prix
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat(language === 'fr' ? 'fr-FR' : 'en-US', {
       style: 'currency',
       currency: 'EUR'
     }).format(price);
@@ -98,7 +101,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
   // Gestion de la suppression
   const handleDelete = async (beatId: string) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce beat ?')) {
+    if (confirm(t('admin.confirmDelete'))) {
       try {
         const response = await fetch(`/api/beats/${beatId}`, {
           method: 'DELETE'
@@ -108,11 +111,11 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
           setBeats(prev => prev.filter(beat => beat.id !== beatId));
           onDelete?.(beatId);
         } else {
-          throw new Error('Erreur lors de la suppression');
+          throw new Error(t('admin.deleteError'));
         }
       } catch (error) {
         console.error('Erreur de suppression:', error);
-        alert('Erreur lors de la suppression du beat');
+        alert(t('admin.deleteError'));
       }
     }
   };
@@ -134,11 +137,11 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
         ));
         onToggleStatus?.(beatId, !currentStatus);
       } else {
-        throw new Error('Erreur lors de la mise à jour');
+        throw new Error(t('admin.updateError'));
       }
     } catch (error) {
       console.error('Erreur de mise à jour:', error);
-      alert('Erreur lors de la mise à jour du statut');
+      alert(t('admin.updateError'));
     }
   };
 
@@ -147,7 +150,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-white text-lg">Chargement des beats...</p>
+          <p className="text-white text-lg">{t('admin.loadingBeats')}</p>
         </div>
       </div>
     );
@@ -157,13 +160,13 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
     return (
       <div className="text-center">
         <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-6 max-w-md mx-auto">
-          <p className="text-red-400 text-lg mb-4">Erreur de chargement</p>
+          <p className="text-red-400 text-lg mb-4">{t('admin.loadingError')}</p>
           <p className="text-gray-300 mb-4">{error}</p>
           <button
             onClick={fetchBeats}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
-            Réessayer
+{t('errors.tryAgain')}
           </button>
         </div>
       </div>
@@ -178,7 +181,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
           <div className="relative flex-1 max-w-md">
             <input
               type="text"
-              placeholder="Rechercher un beat..."
+              placeholder={t('admin.searchBeats')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-4 pr-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -190,7 +193,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
             onChange={(e) => setFilterGenre(e.target.value)}
             className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            <option value="Tous" className="bg-gray-800 text-white">Tous les genres</option>
+            <option value="Tous" className="bg-gray-800 text-white">{t('beats.allGenres')}</option>
             {Array.from(new Set(beats.map(beat => beat.genre))).map(genre => (
               <option key={genre} value={genre} className="bg-gray-800 text-white">
                 {genre}
@@ -206,14 +209,14 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
             }}
             className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            <option value={5} className="bg-gray-800 text-white">5 par page</option>
-            <option value={10} className="bg-gray-800 text-white">10 par page</option>
-            <option value={25} className="bg-gray-800 text-white">25 par page</option>
-            <option value={50} className="bg-gray-800 text-white">50 par page</option>
+            <option value={5} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 5 })}</option>
+            <option value={10} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 10 })}</option>
+            <option value={25} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 25 })}</option>
+            <option value={50} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 50 })}</option>
           </select>
 
           <div className="text-sm text-gray-300">
-            {filteredBeats.length} beat{filteredBeats.length > 1 ? 's' : ''} trouvé{filteredBeats.length > 1 ? 's' : ''}
+{t('admin.beatsFound', { count: filteredBeats.length })}
           </div>
         </div>
       </div>
@@ -234,19 +237,19 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
                   <h3 className="text-xl font-bold text-white">{beat.title}</h3>
                   {beat.isExclusive && (
                     <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-bold">
-                      EXCLUSIF
+{t('beatCard.exclusive').toUpperCase()}
                     </span>
                   )}
                   {beat.featured && (
                     <span className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                      VEDETTE
+{t('admin.featured').toUpperCase()}
                     </span>
                   )}
                   <span className={`text-xs px-2 py-1 rounded-full ${beat.isActive
                       ? 'bg-green-500/20 text-green-300 border border-green-500/30'
                       : 'bg-red-500/20 text-red-300 border border-red-500/30'
                     }`}>
-                    {beat.isActive ? 'Actif' : 'Inactif'}
+{beat.isActive ? t('admin.active') : t('admin.inactive')}
                   </span>
                 </div>
 
@@ -336,7 +339,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
         <div className="flex items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
           <div className="flex items-center gap-4">
             <span className="text-gray-300 text-sm">
-              Affichage de {startIndex + 1} à {Math.min(endIndex, filteredBeats.length)} sur {filteredBeats.length} beats
+  {t('beats.showingResults', { start: startIndex + 1, end: Math.min(endIndex, filteredBeats.length), total: filteredBeats.length })}
             </span>
           </div>
           
@@ -348,7 +351,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
               className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
-              Précédent
+{t('pagination.previous')}
             </button>
 
             {/* Page numbers */}
@@ -387,7 +390,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
               disabled={currentPage === totalPages}
               className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Suivant
+{t('pagination.next')}
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -399,8 +402,8 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
         <div className="text-center py-16">
           <div className="text-gray-400 text-lg mb-4">
             {searchTerm || filterGenre !== 'Tous'
-              ? 'Aucun beat trouvé avec ces critères'
-              : 'Aucun beat disponible'
+              ? t('admin.noBeatsWithCriteria')
+              : t('beats.noBeatsAvailable')
             }
           </div>
           {(searchTerm || filterGenre !== 'Tous') && (
@@ -411,7 +414,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
               }}
               className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
             >
-              Réinitialiser les filtres
+{t('beats.resetFilters')}
             </button>
           )}
         </div>

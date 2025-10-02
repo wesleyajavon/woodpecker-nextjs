@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Order, MultiItemOrder } from '@/types/order';
+import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
 
 type OrderWithType = (Order & { type: 'single' }) | (MultiItemOrder & { type: 'multi' });
 
@@ -25,6 +26,8 @@ interface AdminOrdersProps {
 }
 
 export default function AdminOrders({ className = '' }: AdminOrdersProps) {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
   const [orders, setOrders] = useState<OrderWithType[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<OrderWithType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,7 +128,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
   };
 
   const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('fr-FR', {
+    return new Date(date).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -135,7 +138,10 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
   };
 
   const formatAmount = (amount: number | string) => {
-    return `€${Number(amount).toFixed(2)}`;
+    return new Intl.NumberFormat(language === 'fr' ? 'fr-FR' : 'en-US', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(Number(amount));
   };
 
   const getStatusColor = (status: string) => {
@@ -191,7 +197,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Rechercher..."
+              placeholder={t('admin.searchOrders')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -204,9 +210,9 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             onChange={(e) => setFilterType(e.target.value as 'all' | 'single' | 'multi')}
             className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            <option value="all">Toutes les commandes</option>
-            <option value="single">Commandes simples</option>
-            <option value="multi">Commandes multiples</option>
+            <option value="all">{t('admin.allOrders')}</option>
+            <option value="single">{t('admin.singleOrders')}</option>
+            <option value="multi">{t('admin.multiOrders')}</option>
           </select>
 
           {/* Sort by */}
@@ -215,9 +221,9 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             onChange={(e) => setSortBy(e.target.value as 'date' | 'amount' | 'status')}
             className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            <option value="date">Trier par date</option>
-            <option value="amount">Trier par montant</option>
-            <option value="status">Trier par statut</option>
+            <option value="date">{t('admin.sortByDate')}</option>
+            <option value="amount">{t('admin.sortByAmount')}</option>
+            <option value="status">{t('admin.sortByStatus')}</option>
           </select>
 
           {/* Sort order */}
@@ -226,7 +232,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             className="flex items-center justify-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors"
           >
             {sortOrder === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            {sortOrder === 'asc' ? 'Croissant' : 'Décroissant'}
+{sortOrder === 'asc' ? t('admin.ascending') : t('admin.descending')}
           </button>
 
           {/* Items per page */}
@@ -238,10 +244,10 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             }}
             className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
-            <option value={5}>5 par page</option>
-            <option value={10}>10 par page</option>
-            <option value={25}>25 par page</option>
-            <option value={50}>50 par page</option>
+            <option value={5}>{t('admin.itemsPerPage', { count: 5 })}</option>
+            <option value={10}>{t('admin.itemsPerPage', { count: 10 })}</option>
+            <option value={25}>{t('admin.itemsPerPage', { count: 25 })}</option>
+            <option value={50}>{t('admin.itemsPerPage', { count: 50 })}</option>
           </select>
         </div>
       </div>
@@ -251,7 +257,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
         {filteredOrders.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-300 text-lg">Aucune commande trouvée</p>
+            <p className="text-gray-300 text-lg">{t('admin.noOrdersFound')}</p>
           </div>
         ) : (
           paginatedOrders.map((order, index) => (
@@ -278,7 +284,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-white">
-                        {order.type === 'single' ? order.beat.title : `Commande multiple (${(order as MultiItemOrder).items.length} items)`}
+                        {order.type === 'single' ? order.beat.title : t('admin.multiOrderTitle', { count: (order as MultiItemOrder).items.length })}
                       </h3>
                       <div className="flex items-center gap-4 text-sm text-gray-300 mt-1">
                         <span className="flex items-center gap-1">
@@ -324,26 +330,26 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Order Information */}
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-4">Informations de commande</h4>
+                      <h4 className="text-lg font-semibold text-white mb-4">{t('admin.orderInformation')}</h4>
                       <div className="space-y-3">
                         <div className="flex justify-between">
-                          <span className="text-gray-300">ID de commande:</span>
+                          <span className="text-gray-300">{t('success.orderId')}:</span>
                           <span className="text-white font-mono text-sm">{order.id}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-300">Email client:</span>
+                          <span className="text-gray-300">{t('admin.customerEmail')}:</span>
                           <span className="text-white">{order.customerEmail}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-300">Date de commande:</span>
+                          <span className="text-gray-300">{t('admin.orderDate')}:</span>
                           <span className="text-white">{formatDate(order.createdAt)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-300">Montant total:</span>
+                          <span className="text-gray-300">{t('common.totalAmount')}:</span>
                           <span className="text-white font-semibold">{formatAmount(order.totalAmount)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-300">Statut:</span>
+                          <span className="text-gray-300">{t('common.status')}:</span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                             {order.status}
                           </span>
@@ -353,7 +359,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
 
                     {/* Order Items */}
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-4">Articles commandés</h4>
+                      <h4 className="text-lg font-semibold text-white mb-4">{t('admin.orderedItems')}</h4>
                       {order.type === 'single' ? (
                         <div className="bg-white/10 rounded-lg p-4">
                           <div className="flex items-center justify-between">
@@ -363,7 +369,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                             </div>
                             <div className="text-right">
                               <div className="text-white font-semibold">{formatAmount(order.beat.wavLeasePrice)}</div>
-                              <div className="text-sm text-gray-300">Quantité: 1</div>
+                              <div className="text-sm text-gray-300">{t('admin.quantity')}: 1</div>
                             </div>
                           </div>
                         </div>
@@ -378,9 +384,9 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                                 </div>
                                 <div className="text-right">
                                   <div className="text-white font-semibold">{formatAmount(item.unitPrice)}</div>
-                                  <div className="text-sm text-gray-300">Quantité: {item.quantity}</div>
+                                  <div className="text-sm text-gray-300">{t('admin.quantity')}: {item.quantity}</div>
                                   <div className="text-sm text-purple-300 font-medium">
-                                    Total: {formatAmount(item.totalPrice)}
+                                    {t('common.total')}: {formatAmount(item.totalPrice)}
                                   </div>
                                 </div>
                               </div>
@@ -395,11 +401,11 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                   <div className="flex gap-3 mt-6 pt-4 border-t border-white/20">
                     <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
                       <Eye className="w-4 h-4" />
-                      Voir les détails
+{t('admin.viewDetails')}
                     </button>
                     <button className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
                       <Download className="w-4 h-4" />
-                      Télécharger
+{t('common.download')}
                     </button>
                   </div>
                 </motion.div>
@@ -414,7 +420,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
         <div className="flex items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
           <div className="flex items-center gap-4">
             <span className="text-gray-300 text-sm">
-              Affichage de {startIndex + 1} à {Math.min(endIndex, filteredOrders.length)} sur {filteredOrders.length} commandes
+{t('admin.showingOrders', { start: startIndex + 1, end: Math.min(endIndex, filteredOrders.length), total: filteredOrders.length })}
             </span>
           </div>
           
@@ -426,7 +432,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
               className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
-              Précédent
+{t('pagination.previous')}
             </button>
 
             {/* Page numbers */}
@@ -465,7 +471,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
               disabled={currentPage === totalPages}
               className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Suivant
+{t('pagination.next')}
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

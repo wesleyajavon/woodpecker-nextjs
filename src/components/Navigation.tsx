@@ -7,28 +7,31 @@ import { ShoppingCart, Music, Sparkles, Upload } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { FloatingNav } from './ui/floating-navbar';
 import { useCartCount } from '@/hooks/useCart';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 const Navigation = () => {
   const cartCount = useCartCount();
+  const { t } = useTranslation();
 
   const navItems = [
     { 
-      name: 'Home', 
+      name: t('nav.home'), 
       link: '/', 
       icon: <Music className="h-4 w-4 text-foreground" />
     },
     { 
-      name: 'Beats', 
+      name: t('nav.beats'), 
       link: '/beats', 
       icon: <Music className="h-4 w-4 text-foreground" />
     },
     { 
-      name: 'Contact', 
+      name: t('nav.contact'), 
       link: '/contact', 
       icon: <Sparkles className="h-4 w-4 text-foreground" />
     },
     { 
-      name: 'Admin', 
+      name: t('nav.admin'), 
       link: '/admin/upload', 
       icon: <Upload className="h-4 w-4 text-foreground" />
     },
@@ -39,8 +42,9 @@ const Navigation = () => {
       {/* Floating Navigation */}
       <FloatingNav navItems={navItems} />
       
-      {/* Fixed elements for cart, theme toggle, and auth */}
+      {/* Fixed elements for cart, theme toggle, language switcher, and auth */}
       <div className="fixed top-4 right-4 z-[5001] flex items-center space-x-3">
+        <LanguageSwitcher variant="icon-only" />
         {/* <ThemeToggle /> */}
         
         <Link href="/cart">

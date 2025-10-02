@@ -13,6 +13,7 @@ import ResendEmailButton from '@/components/ResendEmailButton'
 import { DottedSurface } from '@/components/ui/dotted-surface'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 interface DownloadUrls {
   master: string
@@ -37,6 +38,7 @@ function SuccessContent() {
   const { data: session } = useSession()
   const searchParams = useSearchParams()
   const sessionId = searchParams?.get('session_id')
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(true)
   const [orderDetails, setOrderDetails] = useState<Order | null>(null)
   const [multiOrderDetails, setMultiOrderDetails] = useState<MultiItemOrder | null>(null)
@@ -174,7 +176,7 @@ function SuccessContent() {
 
         <div className="text-center relative z-10">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-lg text-foreground">Processing your order...</p>
+          <p className="mt-4 text-lg text-foreground">{t('success.processing')}</p>
         </div>
       </div>
     )
@@ -206,10 +208,10 @@ function SuccessContent() {
             </div>
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-4">
-            Invalid Session
+            {t('success.invalidSession')}
           </h1>
           <p className="text-muted-foreground mb-6">
-            No session ID found. Please complete your purchase to access this page.
+            {t('success.noSessionId')}
           </p>
           <Button asChild variant="primary" className="w-full">
             <Link href="/beats">
@@ -307,13 +309,13 @@ function SuccessContent() {
             </motion.div>
         
             <h1 className="text-3xl font-bold text-white mb-4">
-          Paiement réussi !
+          {t('success.title')}
         </h1>
         
             <p className="text-green-100 text-lg">
               {isMultiItemOrder 
-                ? `Merci pour votre achat ! Vos ${multiOrderDetails?.items.length || 0} beats sont maintenant disponibles au téléchargement.`
-                : 'Merci pour votre achat ! Votre beat est maintenant disponible au téléchargement.'
+                ? t('success.descriptionMulti', { count: (multiOrderDetails?.items.length || 0).toString() })
+                : t('success.description')
               }
             </p>
           </div>
@@ -591,7 +593,7 @@ export default function SuccessPage() {
 
         <div className="text-center relative z-10">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-lg text-foreground">Loading...</p>
+          <p className="mt-4 text-lg text-foreground">Chargement...</p>
         </div>
       </div>
     }>

@@ -28,8 +28,10 @@ import { DottedSurface } from '@/components/ui/dotted-surface';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 export default function BeatManagementPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
   const beatId = params?.id as string;
@@ -170,7 +172,7 @@ export default function BeatManagementPage() {
             className="text-center relative z-10"
           >
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-foreground text-lg">Chargement du beat...</p>
+            <p className="text-foreground text-lg">{t('admin.loadingBeat')}</p>
           </motion.div>
         </div>
       </AdminRoute>
@@ -201,14 +203,14 @@ export default function BeatManagementPage() {
             className="text-center max-w-md mx-auto p-6 relative z-10"
           >
             <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-foreground mb-2">Beat non trouvé</h1>
-            <p className="text-muted-foreground mb-6">{error || 'Ce beat n\'existe pas ou a été supprimé'}</p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">{t('admin.beatNotFound')}</h1>
+            <p className="text-muted-foreground mb-6">{error || t('admin.beatNotFoundDescription')}</p>
             <Link
               href="/admin/upload"
               className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-6 py-3 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
             >
               <ArrowLeft className="w-5 h-5" />
-              Retour à la gestion
+{t('admin.backToManagement')}
             </Link>
           </motion.div>
         </div>
@@ -246,7 +248,7 @@ export default function BeatManagementPage() {
                 className="inline-flex items-center mt-20 gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-4 py-2 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
               >
                 <ArrowLeft className="w-5 h-5" />
-                Retour
+{t('common.back')}
               </Link>
               
               <div className="flex items-center gap-3 mt-20">
@@ -259,7 +261,7 @@ export default function BeatManagementPage() {
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       <Edit className="w-4 h-4" />
-                      {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+                      {isSaving ? t('common.saving') : t('common.save')}
                     </Button>
                     
                     <Button
@@ -268,7 +270,7 @@ export default function BeatManagementPage() {
                       variant="card"
                     >
                       <X className="w-4 h-4" />
-                      Annuler
+{t('common.cancel')}
                     </Button>
                   </>
                 ) : (
@@ -278,7 +280,7 @@ export default function BeatManagementPage() {
                       variant="card"
                     >
                       <Edit className="w-4 h-4" />
-                      Modifier
+                      {t('common.edit')}
                     </Button>
                     
                     <Button
@@ -287,7 +289,7 @@ export default function BeatManagementPage() {
                     >
                       <Link href={`/admin/beats/${beatId}/edit`}>
                         <Upload className="w-4 h-4" />
-                        Modifier les fichiers
+{t('admin.editFiles')}
                       </Link>
                     </Button>
                     
@@ -297,7 +299,7 @@ export default function BeatManagementPage() {
                       variant="destructive"
                     >
                       <Trash2 className="w-4 h-4" />
-                      {isDeleting ? 'Suppression...' : 'Supprimer'}
+                      {isDeleting ? t('common.deleting') : t('common.delete')}
                     </Button>
                   </>
                 )}

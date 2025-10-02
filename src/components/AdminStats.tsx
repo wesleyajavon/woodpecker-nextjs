@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Music, ShoppingCart, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface AdminStatsData {
   totalBeats: number;
@@ -12,6 +13,7 @@ interface AdminStatsData {
 }
 
 export default function AdminStats() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<AdminStatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function AdminStats() {
       const response = await fetch('/api/admin/stats');
       
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des statistiques');
+        throw new Error(t('admin.statsError'));
       }
 
       const result = await response.json();
@@ -34,10 +36,10 @@ export default function AdminStats() {
       if (result.success) {
         setStats(result.data);
       } else {
-        throw new Error(result.error || 'Erreur inconnue');
+        throw new Error(result.error || t('errors.generic'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -72,7 +74,7 @@ export default function AdminStats() {
           onClick={fetchStats}
           className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
         >
-          Réessayer
+{t('errors.tryAgain')}
         </button>
       </div>
     );
@@ -86,7 +88,7 @@ export default function AdminStats() {
     {
       icon: Music,
       value: stats.totalBeats,
-      label: 'Total Beats',
+      label: t('admin.totalBeats'),
       color: 'purple',
       bgColor: 'bg-purple-500/20',
       textColor: 'text-purple-400',
@@ -95,7 +97,7 @@ export default function AdminStats() {
     {
       icon: ShoppingCart,
       value: stats.totalOrders,
-      label: 'Total Commandes',
+      label: t('admin.totalOrders'),
       color: 'blue',
       bgColor: 'bg-blue-500/20',
       textColor: 'text-blue-400',
@@ -104,7 +106,7 @@ export default function AdminStats() {
     {
       icon: DollarSign,
       value: `${stats.totalRevenue}€`,
-      label: 'Chiffre d\'affaires',
+      label: t('admin.totalRevenue'),
       color: 'green',
       bgColor: 'bg-green-500/20',
       textColor: 'text-green-400',
@@ -113,7 +115,7 @@ export default function AdminStats() {
     {
       icon: Users,
       value: stats.uniqueCustomers,
-      label: 'Utilisateurs',
+      label: t('admin.totalUsers'),
       color: 'yellow',
       bgColor: 'bg-yellow-500/20',
       textColor: 'text-yellow-400',

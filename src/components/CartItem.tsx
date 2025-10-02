@@ -7,6 +7,7 @@ import { CartItem as CartItemType } from '@/types/cart'
 import { Beat } from '@/types/beat'
 import { useCartActions } from '@/hooks/useCart'
 import { Button } from './ui/Button'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 interface CartItemProps {
   item: CartItemType
@@ -15,6 +16,7 @@ interface CartItemProps {
 export default function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeFromCart } = useCartActions()
   const [isRemoving, setIsRemoving] = useState(false)
+  const { t } = useTranslation()
 
   const getPrice = (beat: Beat, licenseType: string): number => {
     switch (licenseType) {
@@ -92,7 +94,9 @@ export default function CartItem({ item }: CartItemProps) {
                   item.licenseType === 'TRACKOUT_LEASE' ? 'bg-purple-500/20 text-purple-300' :
                   'bg-orange-500/20 text-orange-300'
                 }`}>
-                  {item.licenseType.replace('_', ' ')}
+                  {item.licenseType === 'WAV_LEASE' ? t('licenses.wavLease') :
+                   item.licenseType === 'TRACKOUT_LEASE' ? t('licenses.trackoutLease') :
+                   t('licenses.unlimitedLease')}
                 </span>
               </div>
               
@@ -109,13 +113,13 @@ export default function CartItem({ item }: CartItemProps) {
                 {item.beat.isExclusive && (
                   <div className="flex items-center space-x-1 text-purple-400">
                     <Tag className="h-4 w-4" />
-                    <span className="font-medium">Exclusive</span>
+                    <span className="font-medium">{t('beatCard.exclusive')}</span>
                   </div>
                 )}
                 {item.beat.stemsUrl && (
                   <div className="flex items-center space-x-1 text-orange-400">
                     <Archive className="h-4 w-4" />
-                    <span className="font-medium">Stems</span>
+                    <span className="font-medium">{t('beatCard.stems')}</span>
                   </div>
                 )}
               </div>
@@ -127,7 +131,7 @@ export default function CartItem({ item }: CartItemProps) {
                 €{(getPrice(item.beat, item.licenseType) * item.quantity).toFixed(2)}
               </div>
               <div className="text-sm text-muted-foreground">
-                €{getPrice(item.beat, item.licenseType).toFixed(2)} each
+                €{getPrice(item.beat, item.licenseType).toFixed(2)} {t('cart.each')}
               </div>
             </div>
           </div>
@@ -170,7 +174,7 @@ export default function CartItem({ item }: CartItemProps) {
           className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-500/50"
         >
           <Trash2 className="h-4 w-4 mr-1" />
-          Remove
+          {t('common.remove')}
         </Button>
       </div>
     </motion.div>

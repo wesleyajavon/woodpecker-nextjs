@@ -7,6 +7,7 @@ import { Beat } from '@/types/beat'
 import { LicenseType } from '@/types/cart'
 import { useAddToCart } from '@/hooks/useCart'
 import { Button } from './ui/Button'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 interface AddToCartButtonProps {
   beat: Beat
@@ -30,6 +31,7 @@ export default function AddToCartButton({
   const [isAdded, setIsAdded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const addToCart = useAddToCart()
+  const { t } = useTranslation()
 
   const handleAddToCart = async () => {
     try {
@@ -93,12 +95,12 @@ export default function AddToCartButton({
       ) : isAdded ? (
         <>
           {showIcon && <Check className={`${getIconSize()} ${showText ? 'mr-2' : ''}`} />}
-          {showText && 'Added!'}
+          {showText && t('cart.added')}
         </>
       ) : (
         <>
           {showIcon && <ShoppingCart className={`${getIconSize()} ${showText ? 'mr-2' : ''}`} />}
-          {showText && 'Add to Cart'}
+          {showText && t('cart.addToCart')}
         </>
       )}
     </Button>

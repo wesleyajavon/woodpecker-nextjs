@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface FAQItem {
   id: string;
@@ -25,14 +26,7 @@ interface FAQItem {
   category: string;
 }
 
-const faqCategories = [
-  { id: 'all', name: 'Toutes', icon: HelpCircle },
-  { id: 'licenses', name: 'Licences', icon: Shield },
-  { id: 'payment', name: 'Paiement', icon: CreditCard },
-  { id: 'download', name: 'Téléchargement', icon: Download },
-  { id: 'usage', name: 'Utilisation', icon: Music },
-  { id: 'account', name: 'Compte', icon: Users }
-];
+// Categories will be defined inside the component to use translations
 
 const faqData: FAQItem[] = [
   // Licences
@@ -173,10 +167,20 @@ const faqData: FAQItem[] = [
 ];
 
 export default function FAQPage() {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  const faqCategories = [
+    { id: 'all', name: t('faq.categories.all'), icon: HelpCircle },
+    { id: 'licenses', name: t('faq.categories.licenses'), icon: Shield },
+    { id: 'payment', name: t('faq.categories.payment'), icon: CreditCard },
+    { id: 'download', name: t('faq.categories.download'), icon: Download },
+    { id: 'usage', name: t('faq.categories.usage'), icon: Music },
+    { id: 'account', name: t('faq.categories.account'), icon: Users }
+  ];
   
   const ITEMS_PER_PAGE = 6;
 
@@ -247,13 +251,13 @@ export default function FAQPage() {
             className="text-center mb-12"
           >
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Questions{' '}
+              {t('faq.title')}{' '}
               <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent">
-                Fréquentes
+                {t('faq.titleHighlight')}
               </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Trouvez rapidement les réponses à vos questions sur nos beats, licences et services.
+              {t('faq.subtitle')}
             </p>
           </motion.div>
 
@@ -268,7 +272,7 @@ export default function FAQPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Rechercher une question..."
+                placeholder={t('faq.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-card/10 backdrop-blur-lg border border-border/20 rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -311,9 +315,12 @@ export default function FAQPage() {
               className="mb-6 text-center"
             >
               <p className="text-sm text-muted-foreground">
-                {filteredFAQs.length} question{filteredFAQs.length > 1 ? 's' : ''} trouvée{filteredFAQs.length > 1 ? 's' : ''}
+                {filteredFAQs.length === 1 
+                  ? t('faq.resultsCountSingle') 
+                  : t('faq.resultsCount', { count: filteredFAQs.length })
+                }
                 {totalPages > 1 && (
-                  <span> • Page {currentPage} sur {totalPages}</span>
+                  <span> • {t('faq.pageInfo', { current: currentPage, total: totalPages })}</span>
                 )}
               </p>
             </motion.div>
@@ -330,9 +337,9 @@ export default function FAQPage() {
             {filteredFAQs.length === 0 ? (
               <div className="text-center py-12">
                 <HelpCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">Aucune question trouvée</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{t('faq.noQuestionsFound')}</h3>
                 <p className="text-muted-foreground">
-                  Essayez de modifier votre recherche ou sélectionner une autre catégorie.
+                  {t('faq.noQuestionsFoundDescription')}
                 </p>
               </div>
             ) : (
@@ -399,7 +406,7 @@ export default function FAQPage() {
                   )}
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Précédent
+                  {t('pagination.previous')}
                 </button>
 
                 {/* Page Numbers */}
@@ -454,7 +461,7 @@ export default function FAQPage() {
                       : 'bg-card/10 backdrop-blur-lg text-foreground hover:bg-card/20'
                   )}
                 >
-                  Suivant
+                  {t('pagination.next')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -470,15 +477,15 @@ export default function FAQPage() {
           >
             <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 p-8">
               <HelpCircle className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-foreground mb-4">Vous ne trouvez pas votre réponse ?</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">{t('faq.needHelp')}</h2>
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Notre équipe est là pour vous aider. N&apos;hésitez pas à nous contacter pour toute question spécifique.
+                {t('faq.needHelpDescription')}
               </p>
               <a
                 href="/contact"
                 className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl transition-colors font-medium"
               >
-                Nous contacter
+                {t('common.contactUs')}
               </a>
             </div>
           </motion.div>

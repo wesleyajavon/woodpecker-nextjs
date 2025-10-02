@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface LicenseFeature {
   id: string;
@@ -286,6 +287,7 @@ const importantNotes = [
 ];
 
 export default function LicensesPage() {
+  const { t } = useTranslation();
   const [selectedLicense, setSelectedLicense] = useState<'wav' | 'trackout' | 'unlimited' | null>(null);
 
   const openModal = (licenseType: 'wav' | 'trackout' | 'unlimited') => {
@@ -321,13 +323,13 @@ export default function LicensesPage() {
             className="text-center mb-16"
           >
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Informations sur les{' '}
+              {t('licenses.pageTitle')}{' '}
               <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent">
-                Licences
+                {t('licenses.pageTitleHighlight')}
               </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Découvrez nos différents types de licences et choisissez celle qui correspond le mieux à vos besoins musicaux.
+              {t('licenses.pageSubtitle')}
             </p>
           </motion.div>
 
@@ -340,26 +342,26 @@ export default function LicensesPage() {
           >
             <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 overflow-hidden">
               <div className="p-6 border-b border-border/20">
-                <h2 className="text-2xl font-bold text-foreground mb-2">Comparaison des Licences</h2>
-                <p className="text-muted-foreground">Tableau détaillé des droits et limitations pour chaque type de licence</p>
+                <h2 className="text-2xl font-bold text-foreground mb-2">{t('licenses.comparisonTitle')}</h2>
+                <p className="text-muted-foreground">{t('licenses.comparisonSubtitle')}</p>
               </div>
               
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border/20">
-                      <th className="text-left p-4 text-foreground font-semibold">Fonctionnalités</th>
+                      <th className="text-left p-4 text-foreground font-semibold">{t('licenses.features')}</th>
                       <th className="text-center p-4">
                         <div className="flex flex-col items-center gap-2">
                           <Music className="w-6 h-6 text-blue-400" />
                           <span className="font-semibold text-foreground">WAV Lease</span>
-                          <span className="text-sm text-muted-foreground">Basique</span>
+                          <span className="text-sm text-muted-foreground">{t('licenses.basic')}</span>
                           <button
                             onClick={() => openModal('wav')}
                             className="mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg"
                           >
                             <Info className="w-3 h-3" />
-                            Lire plus
+                            {t('licenses.readMore')}
                           </button>
                         </div>
                       </th>
@@ -367,13 +369,13 @@ export default function LicensesPage() {
                         <div className="flex flex-col items-center gap-2">
                           <Archive className="w-6 h-6 text-purple-400" />
                           <span className="font-semibold text-foreground">Trackout Lease</span>
-                          <span className="text-sm text-muted-foreground">Avancé</span>
+                          <span className="text-sm text-muted-foreground">{t('licenses.advanced')}</span>
                           <button
                             onClick={() => openModal('trackout')}
                             className="mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg"
                           >
                             <Info className="w-3 h-3" />
-                            Lire plus
+                            {t('licenses.readMore')}
                           </button>
                         </div>
                       </th>
@@ -381,13 +383,13 @@ export default function LicensesPage() {
                         <div className="flex flex-col items-center gap-2">
                           <Crown className="w-6 h-6 text-orange-400" />
                           <span className="font-semibold text-foreground">Unlimited Lease</span>
-                          <span className="text-sm text-muted-foreground">Premium</span>
+                          <span className="text-sm text-muted-foreground">{t('licenses.premium')}</span>
                           <button
                             onClick={() => openModal('unlimited')}
                             className="mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg"
                           >
                             <Info className="w-3 h-3" />
-                            Lire plus
+                            {t('licenses.readMore')}
                           </button>
                         </div>
                       </th>
@@ -446,8 +448,8 @@ export default function LicensesPage() {
             className="mb-16"
           >
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Exemples d&apos;Usage</h2>
-              <p className="text-muted-foreground">Découvrez comment utiliser vos beats selon le type de licence</p>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{t('licenses.usageExamples')}</h2>
+              <p className="text-muted-foreground">{t('licenses.usageExamplesSubtitle')}</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -488,7 +490,7 @@ export default function LicensesPage() {
             <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <AlertCircle className="w-6 h-6 text-yellow-400" />
-                <h2 className="text-2xl font-bold text-foreground">Points Importants</h2>
+                <h2 className="text-2xl font-bold text-foreground">{t('licenses.importantPoints')}</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -511,16 +513,15 @@ export default function LicensesPage() {
             className="text-center"
           >
             <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 p-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Besoin d&apos;une licence personnalisée ?</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">{t('licenses.customLicenseTitle')}</h2>
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Pour des projets spéciaux, des licences exclusives ou des besoins particuliers, 
-                n&apos;hésitez pas à nous contacter pour une solution sur mesure.
+                {t('licenses.customLicenseDescription')}
               </p>
               <a
                 href="/contact"
                 className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl transition-colors font-medium"
               >
-                Nous contacter
+                {t('common.contactUs')}
               </a>
             </div>
           </motion.div>
@@ -579,7 +580,7 @@ export default function LicensesPage() {
                     <div className="space-y-3 md:space-y-4">
                       <h4 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
                         <Check className="w-4 md:w-5 h-4 md:h-5 text-green-400" />
-                        Fonctionnalités incluses
+                        {t('licenses.includedFeatures')}
                       </h4>
                       <ul className="space-y-2">
                         {licenseDetails[selectedLicense].features.map((feature, index) => (
@@ -595,7 +596,7 @@ export default function LicensesPage() {
                     <div className="space-y-3 md:space-y-4">
                       <h4 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
                         <AlertCircle className="w-4 md:w-5 h-4 md:h-5 text-yellow-400" />
-                        Limitations
+                        {t('licenses.limitations')}
                       </h4>
                       <ul className="space-y-2">
                         {licenseDetails[selectedLicense].limitations.map((limitation, index) => (
@@ -611,7 +612,7 @@ export default function LicensesPage() {
                     <div className="space-y-3 md:space-y-4">
                       <h4 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
                         <ExternalLink className="w-4 md:w-5 h-4 md:h-5 text-blue-400" />
-                        Cas d&apos;usage
+                        {t('licenses.useCases')}
                       </h4>
                       <ul className="space-y-2">
                         {licenseDetails[selectedLicense].useCases.map((useCase, index) => (
@@ -629,20 +630,20 @@ export default function LicensesPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between p-4 md:p-6 border-t border-border/20 bg-card/20 flex-shrink-0 gap-3 sm:gap-0">
                   <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
                     <Info className="w-4 h-4" />
-                    <span>Informations complètes sur cette licence</span>
+                    <span>{t('licenses.completeInformation')}</span>
                   </div>
                   <div className="flex gap-3">
                     <a
                       href="/contact"
                       className="px-3 md:px-4 py-2 text-sm text-primary hover:text-primary/80 transition-colors"
                     >
-                      Questions ?
+                      {t('licenses.questions')}
                     </a>
                     <button
                       onClick={closeModal}
                       className="px-3 md:px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
                     >
-                      Fermer
+                      {t('common.close')}
                     </button>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Archive, Loader2 } from 'lucide-react';
 import { Button } from './ui/Button';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface DownloadStemsButtonProps {
   beatId: string;
@@ -16,6 +17,7 @@ export default function DownloadStemsButton({
   beatTitle, 
   className = '' 
 }: DownloadStemsButtonProps) {
+  const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +30,7 @@ export default function DownloadStemsButton({
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors du téléchargement');
+        throw new Error(errorData.error || t('download.downloadError'));
       }
 
       const data = await response.json();
@@ -44,7 +46,7 @@ export default function DownloadStemsButton({
       }
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+      const errorMessage = err instanceof Error ? err.message : t('errors.generic');
       setError(errorMessage);
     } finally {
       setIsDownloading(false);
@@ -61,12 +63,12 @@ export default function DownloadStemsButton({
         {isDownloading ? (
           <div className="flex items-center justify-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin" />
-            Téléchargement...
+{t('download.downloading')}
           </div>
         ) : (
           <div className="flex items-center justify-center gap-2">
             <Archive className="w-4 h-4" />
-            Télécharger les Stems
+{t('download.downloadStems')}
           </div>
         )}
       </Button>

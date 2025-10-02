@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Music, ShoppingCart, DollarSign, Users, TrendingUp, BarChart3, PieChart } from 'lucide-react';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface AdminStatsData {
   totalBeats: number;
@@ -12,6 +13,7 @@ interface AdminStatsData {
 }
 
 export default function AdminStatsGraphics() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<AdminStatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function AdminStatsGraphics() {
       const response = await fetch('/api/admin/stats');
       
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des statistiques');
+        throw new Error(t('admin.statsError'));
       }
 
       const result = await response.json();
@@ -34,10 +36,10 @@ export default function AdminStatsGraphics() {
       if (result.success) {
         setStats(result.data);
       } else {
-        throw new Error(result.error || 'Erreur inconnue');
+        throw new Error(result.error || t('errors.generic'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -46,7 +48,7 @@ export default function AdminStatsGraphics() {
   if (loading) {
     return (
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
-        <h3 className="text-xl font-semibold text-white mb-4">Graphiques</h3>
+        <h3 className="text-xl font-semibold text-white mb-4">{t('admin.charts')}</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[...Array(4)].map((_, index) => (
             <motion.div
@@ -70,14 +72,14 @@ export default function AdminStatsGraphics() {
   if (error) {
     return (
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
-        <h3 className="text-xl font-semibold text-white mb-4">Graphiques</h3>
+        <h3 className="text-xl font-semibold text-white mb-4">{t('admin.charts')}</h3>
         <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-6 text-center">
           <p className="text-red-400">{error}</p>
           <button
             onClick={fetchStats}
             className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
           >
-            Réessayer
+{t('errors.tryAgain')}
           </button>
         </div>
       </div>
@@ -94,22 +96,22 @@ export default function AdminStatsGraphics() {
 
   // Data for pie chart (revenue distribution simulation)
   const pieChartData = [
-    { label: 'Beats Premium', value: Math.round((stats?.totalRevenue || 0) * 0.6), color: 'bg-purple-500' },
-    { label: 'Beats Standard', value: Math.round((stats?.totalRevenue || 0) * 0.3), color: 'bg-blue-500' },
-    { label: 'Beats Gratuits', value: Math.round((stats?.totalRevenue || 0) * 0.1), color: 'bg-green-500' }
+    { label: t('admin.premiumBeats'), value: Math.round((stats?.totalRevenue || 0) * 0.6), color: 'bg-purple-500' },
+    { label: t('admin.standardBeats'), value: Math.round((stats?.totalRevenue || 0) * 0.3), color: 'bg-blue-500' },
+    { label: t('admin.freeBeats'), value: Math.round((stats?.totalRevenue || 0) * 0.1), color: 'bg-green-500' }
   ];
 
   // Data for bar chart (monthly simulation)
   const barChartData = [
-    { month: 'Jan', beats: Math.floor((stats?.totalBeats || 0) * 0.1), orders: Math.floor((stats?.totalOrders || 0) * 0.08) },
-    { month: 'Fév', beats: Math.floor((stats?.totalBeats || 0) * 0.12), orders: Math.floor((stats?.totalOrders || 0) * 0.1) },
-    { month: 'Mar', beats: Math.floor((stats?.totalBeats || 0) * 0.15), orders: Math.floor((stats?.totalOrders || 0) * 0.12) },
-    { month: 'Avr', beats: Math.floor((stats?.totalBeats || 0) * 0.18), orders: Math.floor((stats?.totalOrders || 0) * 0.15) },
-    { month: 'Mai', beats: Math.floor((stats?.totalBeats || 0) * 0.2), orders: Math.floor((stats?.totalOrders || 0) * 0.2) },
-    { month: 'Juin', beats: Math.floor((stats?.totalBeats || 0) * 0.25), orders: Math.floor((stats?.totalOrders || 0) * 0.35) },
-    { month: 'Juil', beats: Math.floor((stats?.totalBeats || 0) * 0.3), orders: Math.floor((stats?.totalOrders || 0) * 0.4) },
-    { month: 'Août', beats: Math.floor((stats?.totalBeats || 0) * 0.35), orders: Math.floor((stats?.totalOrders || 0) * 0.45) },
-    { month: 'Sep', beats: Math.floor((stats?.totalBeats || 0) * 0.4), orders: Math.floor((stats?.totalOrders || 0) * 0.5) }
+    { month: t('months.jan'), beats: Math.floor((stats?.totalBeats || 0) * 0.1), orders: Math.floor((stats?.totalOrders || 0) * 0.08) },
+    { month: t('months.feb'), beats: Math.floor((stats?.totalBeats || 0) * 0.12), orders: Math.floor((stats?.totalOrders || 0) * 0.1) },
+    { month: t('months.mar'), beats: Math.floor((stats?.totalBeats || 0) * 0.15), orders: Math.floor((stats?.totalOrders || 0) * 0.12) },
+    { month: t('months.apr'), beats: Math.floor((stats?.totalBeats || 0) * 0.18), orders: Math.floor((stats?.totalOrders || 0) * 0.15) },
+    { month: t('months.may'), beats: Math.floor((stats?.totalBeats || 0) * 0.2), orders: Math.floor((stats?.totalOrders || 0) * 0.2) },
+    { month: t('months.jun'), beats: Math.floor((stats?.totalBeats || 0) * 0.25), orders: Math.floor((stats?.totalOrders || 0) * 0.35) },
+    { month: t('months.jul'), beats: Math.floor((stats?.totalBeats || 0) * 0.3), orders: Math.floor((stats?.totalOrders || 0) * 0.4) },
+    { month: t('months.aug'), beats: Math.floor((stats?.totalBeats || 0) * 0.35), orders: Math.floor((stats?.totalOrders || 0) * 0.45) },
+    { month: t('months.sep'), beats: Math.floor((stats?.totalBeats || 0) * 0.4), orders: Math.floor((stats?.totalOrders || 0) * 0.5) }
   ];
 
   const maxValue = barChartData.length > 0 ? Math.max(...barChartData.map(d => Math.max(d.beats, d.orders))) : 1;
@@ -118,7 +120,7 @@ export default function AdminStatsGraphics() {
     <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
       <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
         <BarChart3 className="w-6 h-6 text-purple-400" />
-        Graphiques et Analyses
+{t('admin.chartsAndAnalytics')}
       </h3>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -130,7 +132,7 @@ export default function AdminStatsGraphics() {
         >
           <div className="flex items-center gap-2 mb-4">
             <PieChart className="w-5 h-5 text-purple-400" />
-            <h4 className="text-lg font-semibold text-white">Répartition du CA</h4>
+            <h4 className="text-lg font-semibold text-white">{t('admin.revenueDistribution')}</h4>
           </div>
           <div className="flex items-center justify-center mb-4">
             <div className="relative w-32 h-32">
@@ -194,7 +196,7 @@ export default function AdminStatsGraphics() {
         >
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-5 h-5 text-blue-400" />
-            <h4 className="text-lg font-semibold text-white">Tendances Mensuelles</h4>
+            <h4 className="text-lg font-semibold text-white">{t('admin.monthlyTrends')}</h4>
           </div>
           <div className="h-48 flex items-end justify-between gap-2">
             {barChartData.map((data, index) => (
@@ -216,11 +218,11 @@ export default function AdminStatsGraphics() {
           <div className="flex items-center justify-center gap-4 mt-4">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-purple-500 rounded"></div>
-              <span className="text-sm text-gray-300">Beats</span>
+              <span className="text-sm text-gray-300">{t('admin.totalBeats')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded"></div>
-              <span className="text-sm text-gray-300">Commandes</span>
+              <span className="text-sm text-gray-300">{t('admin.totalOrders')}</span>
             </div>
           </div>
         </motion.div>
@@ -234,25 +236,25 @@ export default function AdminStatsGraphics() {
         >
           <div className="flex items-center gap-2 mb-4">
             <DollarSign className="w-5 h-5 text-green-400" />
-            <h4 className="text-lg font-semibold text-white">Métriques Clés</h4>
+            <h4 className="text-lg font-semibold text-white">{t('admin.keyMetrics')}</h4>
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Panier moyen</span>
+              <span className="text-gray-300">{t('admin.averageOrderValue')}</span>
               <span className="text-white font-semibold">{averageOrderValue.toFixed(2)}€</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Taux de conversion</span>
+              <span className="text-gray-300">{t('admin.conversionRate')}</span>
               <span className="text-white font-semibold">{conversionRate.toFixed(1)}%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">CA par beat</span>
+              <span className="text-gray-300">{t('admin.revenuePerBeat')}</span>
               <span className="text-white font-semibold">
                 {stats.totalBeats > 0 ? (stats.totalRevenue / stats.totalBeats).toFixed(2) : 0}€
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Commandes par client</span>
+              <span className="text-gray-300">{t('admin.ordersPerCustomer')}</span>
               <span className="text-white font-semibold">
                 {stats.uniqueCustomers > 0 ? (stats.totalOrders / stats.uniqueCustomers).toFixed(1) : 0}
               </span>
@@ -269,12 +271,12 @@ export default function AdminStatsGraphics() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Users className="w-5 h-5 text-yellow-400" />
-            <h4 className="text-lg font-semibold text-white">Indicateurs de Performance</h4>
+            <h4 className="text-lg font-semibold text-white">{t('admin.performanceIndicators')}</h4>
           </div>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-300">Satisfaction clients</span>
+                <span className="text-gray-300">{t('admin.customerSatisfaction')}</span>
                 <span className="text-white font-semibold">92%</span>
               </div>
               <div className="w-full bg-gray-700 rounded-full h-2">
@@ -283,7 +285,7 @@ export default function AdminStatsGraphics() {
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-300">Taux de rétention</span>
+                <span className="text-gray-300">{t('admin.retentionRate')}</span>
                 <span className="text-white font-semibold">78%</span>
               </div>
               <div className="w-full bg-gray-700 rounded-full h-2">
@@ -292,7 +294,7 @@ export default function AdminStatsGraphics() {
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-300">Croissance mensuelle</span>
+                <span className="text-gray-300">{t('admin.monthlyGrowth')}</span>
                 <span className="text-white font-semibold">+15%</span>
               </div>
               <div className="w-full bg-gray-700 rounded-full h-2">

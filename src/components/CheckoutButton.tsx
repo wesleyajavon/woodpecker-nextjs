@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from './ui/Button'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 interface CheckoutButtonProps {
   priceId: string
@@ -14,6 +15,7 @@ interface CheckoutButtonProps {
 
 export default function CheckoutButton({ priceId, beatTitle, price, className, children, showPrice = true }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { t } = useTranslation()
 
   const handleCheckout = async () => {
     try {
@@ -43,7 +45,7 @@ export default function CheckoutButton({ priceId, beatTitle, price, className, c
       
     } catch (error) {
       console.error('Checkout error:', error)
-      alert('Failed to start checkout. Please try again.')
+      alert(t('errors.checkoutFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -55,7 +57,7 @@ export default function CheckoutButton({ priceId, beatTitle, price, className, c
       disabled={isLoading}
       className={className}
     >
-      {isLoading ? 'Loading...' : children || (showPrice ? `Buy Now - €${price.toFixed(2)}` : 'Buy Now')}
+      {isLoading ? t('common.loading') : children || (showPrice ? `${t('beatCard.buy')} - €${price.toFixed(2)}` : t('beatCard.buy'))}
     </Button>
   )
 }

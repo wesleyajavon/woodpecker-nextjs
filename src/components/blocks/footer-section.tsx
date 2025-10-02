@@ -1,8 +1,9 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { FacebookIcon, FrameIcon, InstagramIcon, LinkedinIcon, YoutubeIcon } from 'lucide-react';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface FooterLink {
 	title: string;
@@ -15,39 +16,46 @@ interface FooterSection {
 	links: FooterLink[];
 }
 
-const footerLinks: FooterSection[] = [
-	{
-		label: 'Produits',
-		links: [
-			{ title: 'Beats', href: '/beats' },
-		],
-	},
-	{
-		label: 'Entreprise',
-		links: [
-			{ title: 'Contact', href: '/contact' },
-
-		],
-	},
-	{
-		label: 'Support',
-		links: [
-			{ title: 'FAQ', href: '/faq' },
-			{ title: 'Conditions d\'utilisation', href: '/terms' },
-			{ title: 'Licences', href: '/licenses' },
-			{ title: 'Politique de confidentialité', href: '/privacy' },
-		],
-	},
-	{
-		label: 'Réseaux sociaux',
-		links: [
-			{ title: 'Instagram', href: 'https://www.instagram.com/_l.outsider._/', icon: InstagramIcon },
-			{ title: 'YouTube', href: 'https://www.youtube.com/@l.outsider', icon: YoutubeIcon },
-		],
-	},
-];
 
 export function Footer() {
+	const [currentYear, setCurrentYear] = useState(2025);
+	const { t } = useTranslation();
+
+	const footerLinks: FooterSection[] = [
+		{
+			label: t('footer.sections.products'),
+			links: [
+				{ title: t('footer.links.beats'), href: '/beats' },
+			],
+		},
+		{
+			label: t('footer.sections.company'),
+			links: [
+				{ title: t('footer.links.contact'), href: '/contact' },
+			],
+		},
+		{
+			label: t('footer.sections.support'),
+			links: [
+				{ title: t('footer.links.faq'), href: '/faq' },
+				{ title: t('footer.links.terms'), href: '/terms' },
+				{ title: t('footer.links.licenses'), href: '/licenses' },
+				{ title: t('footer.links.privacy'), href: '/privacy' },
+			],
+		},
+		{
+			label: t('footer.sections.social'),
+			links: [
+				{ title: t('footer.links.instagram'), href: 'https://www.instagram.com/_l.outsider._/', icon: InstagramIcon },
+				{ title: t('footer.links.youtube'), href: 'https://www.youtube.com/@l.outsider', icon: YoutubeIcon },
+			],
+		},
+	];
+
+	useEffect(() => {
+		setCurrentYear(new Date().getFullYear());
+	}, []);
+
 	return (
 		<footer className="md:rounded-t-6xl relative w-full max-w-6xl mx-auto flex flex-col items-center justify-center rounded-t-4xl border-t bg-[radial-gradient(35%_128px_at_50%_0%,theme(backgroundColor.white/8%),transparent)] px-6 py-12 lg:py-16">
 			<div className="bg-foreground/20 absolute top-0 right-1/2 left-1/2 h-px w-1/3 -translate-x-1/2 -translate-y-1/2 rounded-full blur" />
@@ -56,7 +64,7 @@ export function Footer() {
 				<AnimatedContainer className="space-y-4">
 					<FrameIcon className="size-8" />
 					<p className="text-muted-foreground mt-8 text-sm md:mt-0">
-						© {new Date().getFullYear()} l.outsider. Tous droits réservés.
+						{t('footer.copyright', { year: currentYear.toString() })}
 					</p>
 				</AnimatedContainer>
 

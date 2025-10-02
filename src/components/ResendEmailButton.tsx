@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 interface ResendEmailButtonProps {
   orderId: string
@@ -17,6 +18,7 @@ export default function ResendEmailButton({
   isMultiItem = false,
   className = '' 
 }: ResendEmailButtonProps) {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
@@ -43,14 +45,14 @@ export default function ResendEmailButton({
 
       if (response.ok && result.success) {
         setStatus('success')
-        setMessage('Email de confirmation renvoyé avec succès !')
+        setMessage(t('resendEmail.success'))
       } else {
         setStatus('error')
-        setMessage(result.error || 'Erreur lors de l\'envoi de l\'email')
+        setMessage(result.error || t('resendEmail.sendError'))
       }
     } catch (error) {
       setStatus('error')
-      setMessage('Erreur de connexion. Veuillez réessayer.')
+      setMessage(t('resendEmail.connectionError'))
     } finally {
       setIsLoading(false)
     }
@@ -67,12 +69,12 @@ export default function ResendEmailButton({
         {isLoading ? (
           <>
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
-            Envoi en cours...
+            {t('resendEmail.sending')}
           </>
         ) : (
           <>
             <Mail className="w-4 h-4 mr-2" />
-            Renvoyer l&apos;email de confirmation
+            {t('resendEmail.resendEmail')}
           </>
         )}
       </Button>

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Check, Music, Archive, Crown } from 'lucide-react';
 import { Beat } from '@/types/beat';
 import { LicenseType } from './LicenseSelector';
+import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
 
 interface BeatPricingProps {
   beat: Beat;
@@ -12,31 +13,11 @@ interface BeatPricingProps {
   className?: string;
 }
 
-const licenseConfig = {
-  WAV_LEASE: {
-    name: 'WAV Lease',
-    description: 'Fichier WAV/MP3 uniquement',
-    icon: Music,
-    color: 'from-blue-600 to-blue-700',
-    features: ['Fichier WAV haute qualité', 'Fichier MP3', 'Usage commercial limité']
-  },
-  TRACKOUT_LEASE: {
-    name: 'Trackout Lease',
-    description: 'WAV + Stems inclus',
-    icon: Archive,
-    color: 'from-purple-600 to-purple-700',
-    features: ['Fichier WAV haute qualité', 'Fichier MP3', 'Stems séparés', 'Usage commercial étendu']
-  },
-  UNLIMITED_LEASE: {
-    name: 'Unlimited Lease',
-    description: 'WAV + Stems + Distribution illimitée',
-    icon: Crown,
-    color: 'from-orange-600 to-orange-700',
-    features: ['Fichier WAV haute qualité', 'Fichier MP3', 'Stems séparés', 'Distribution illimitée', 'Usage commercial complet']
-  }
-};
+// License config will be moved to use translations
 
 export default function BeatPricing({ beat, onLicenseSelect, className = '' }: BeatPricingProps) {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
   const [selectedLicense, setSelectedLicense] = useState<LicenseType>('WAV_LEASE');
 
   const getPrice = (license: LicenseType): number => {
@@ -53,11 +34,50 @@ export default function BeatPricing({ beat, onLicenseSelect, className = '' }: B
   };
 
   const formatPrice = (price: number): string => {
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat(language === 'fr' ? 'fr-FR' : 'en-US', {
       style: 'currency',
       currency: 'EUR'
     }).format(price);
   };
+
+  const getLicenseConfig = () => ({
+    WAV_LEASE: {
+      name: t('licenses.wavLease'),
+      description: t('licenses.wavLeaseDescription'),
+      icon: Music,
+      color: 'from-blue-600 to-blue-700',
+      features: [
+        t('licenses.wavLeaseFeatures.highQualityWav'),
+        t('licenses.wavLeaseFeatures.mp3File'),
+        t('licenses.wavLeaseFeatures.limitedCommercial')
+      ]
+    },
+    TRACKOUT_LEASE: {
+      name: t('licenses.trackoutLease'),
+      description: t('licenses.trackoutLeaseDescription'),
+      icon: Archive,
+      color: 'from-purple-600 to-purple-700',
+      features: [
+        t('licenses.trackoutLeaseFeatures.highQualityWav'),
+        t('licenses.trackoutLeaseFeatures.mp3File'),
+        t('licenses.trackoutLeaseFeatures.separateStems'),
+        t('licenses.trackoutLeaseFeatures.extendedCommercial')
+      ]
+    },
+    UNLIMITED_LEASE: {
+      name: t('licenses.unlimitedLease'),
+      description: t('licenses.unlimitedLeaseDescription'),
+      icon: Crown,
+      color: 'from-orange-600 to-orange-700',
+      features: [
+        t('licenses.unlimitedLeaseFeatures.highQualityWav'),
+        t('licenses.unlimitedLeaseFeatures.mp3File'),
+        t('licenses.unlimitedLeaseFeatures.separateStems'),
+        t('licenses.unlimitedLeaseFeatures.unlimitedDistribution'),
+        t('licenses.unlimitedLeaseFeatures.fullCommercial')
+      ]
+    }
+  });
 
   const handleLicenseChange = (license: LicenseType) => {
     setSelectedLicense(license);
@@ -66,10 +86,10 @@ export default function BeatPricing({ beat, onLicenseSelect, className = '' }: B
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <h3 className="text-lg font-semibold text-white mb-4">Choisissez votre licence</h3>
+      <h3 className="text-lg font-semibold text-white mb-4">{t('beatCard.selectLicense')}</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {Object.entries(licenseConfig).map(([license, config]) => {
+        {Object.entries(getLicenseConfig()).map(([license, config]) => {
           const Icon = config.icon;
           const isSelected = selectedLicense === license;
           const price = getPrice(license as LicenseType);
@@ -125,7 +145,7 @@ export default function BeatPricing({ beat, onLicenseSelect, className = '' }: B
               {license !== 'WAV_LEASE' && !beat.stemsUrl && (
                 <div className="mt-3 p-2 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
                   <p className="text-xs text-yellow-400 text-center">
-                    Stems non disponibles
+                    {t('licenses.stemsNotAvailable')}
                   </p>
                 </div>
               )}

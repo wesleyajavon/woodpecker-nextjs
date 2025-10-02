@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Shield, Home, Loader2 } from 'lucide-react'
 import { DottedSurface } from './ui/dotted-surface'
+import { useTranslation } from '@/contexts/LanguageContext'
 
 interface AdminRouteProps {
   children: React.ReactNode
@@ -15,6 +16,7 @@ interface AdminRouteProps {
 export default function AdminRoute({ children, fallback }: AdminRouteProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { t } = useTranslation()
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -103,10 +105,10 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
               className="space-y-4"
             >
               <h2 className="text-2xl font-bold text-foreground">
-                Accès refusé
+                {t('admin.accessDenied')}
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                Vous n&apos;avez pas les permissions administrateur nécessaires pour accéder à cette page.
+                {t('admin.accessDeniedDescription')}
               </p>
             </motion.div>
 
@@ -121,7 +123,7 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
               className="mt-6 w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Home className="w-4 h-4" />
-              Retour à l&apos;accueil
+{t('admin.backToHome')}
             </motion.button>
           </div>
         </motion.div>
