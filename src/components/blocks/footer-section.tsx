@@ -20,36 +20,29 @@ const footerLinks: FooterSection[] = [
 		label: 'Produits',
 		links: [
 			{ title: 'Beats', href: '/beats' },
-			{ title: 'Collections', href: '/collections' },
-			{ title: 'Kits', href: '/kits' },
-			{ title: 'Vidéos', href: '/videos' },
 		],
 	},
 	{
 		label: 'Entreprise',
 		links: [
-			{ title: 'À propos', href: '/about' },
 			{ title: 'Contact', href: '/contact' },
-			{ title: 'Blog', href: '/blog' },
-			{ title: 'Carrières', href: '/careers' },
+
 		],
 	},
 	{
 		label: 'Support',
 		links: [
-			{ title: 'FAQ', href: '/faqs' },
-			{ title: 'Aide', href: '/help' },
+			{ title: 'FAQ', href: '/faq' },
 			{ title: 'Conditions d\'utilisation', href: '/terms' },
+			{ title: 'Licences', href: '/licenses' },
 			{ title: 'Politique de confidentialité', href: '/privacy' },
 		],
 	},
 	{
 		label: 'Réseaux sociaux',
 		links: [
-			{ title: 'Facebook', href: '#', icon: FacebookIcon },
-			{ title: 'Instagram', href: '#', icon: InstagramIcon },
-			{ title: 'YouTube', href: '#', icon: YoutubeIcon },
-			{ title: 'LinkedIn', href: '#', icon: LinkedinIcon },
+			{ title: 'Instagram', href: 'https://www.instagram.com/_l.outsider._/', icon: InstagramIcon },
+			{ title: 'YouTube', href: 'https://www.youtube.com/@l.outsider', icon: YoutubeIcon },
 		],
 	},
 ];
