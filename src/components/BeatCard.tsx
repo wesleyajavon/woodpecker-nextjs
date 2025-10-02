@@ -76,7 +76,7 @@ export default function BeatCard({
 
   return (
     <motion.div
-      className={`bg-card/50 backdrop-blur-lg rounded-xl border border-border overflow-hidden hover:border-border/80 transition-all duration-300 ${className}`}
+      className={`relative bg-card/50 backdrop-blur-lg rounded-xl border border-border overflow-hidden hover:border-border/80 transition-all duration-300 ${className}`}
       whileHover={{ y: -2 }}
     >
       {/* Image/Artwork */}
@@ -187,7 +187,7 @@ export default function BeatCard({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 rounded-2xl"
             onClick={closeLicenseModal}
           >
             <motion.div
