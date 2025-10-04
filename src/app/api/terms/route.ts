@@ -210,7 +210,7 @@ Nous privilégions la résolution amiable. En cas de litige persistant, le droit
         );
       }
     },
-    TERMS_CACHE_CONFIG.ttl
+    { ttl: TERMS_CACHE_CONFIG.ttl }
   );
 }
 

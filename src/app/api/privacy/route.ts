@@ -149,7 +149,7 @@ Nous nous engageons à répondre dans les 48h.`,
         );
       }
     },
-    PRIVACY_CACHE_CONFIG.ttl
+    { ttl: PRIVACY_CACHE_CONFIG.ttl }
   );
 }
 
