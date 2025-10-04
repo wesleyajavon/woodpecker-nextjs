@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, DependencyList } from 'react';
 
 // Configuration pour le cache côté client
 const CLIENT_CACHE_CONFIG = {
@@ -13,13 +13,15 @@ interface CacheItem<T> {
 }
 
 class ClientCache {
-  private cache = new Map<string, CacheItem<any>>();
+  private cache = new Map<string, CacheItem<unknown>>();
   
   set<T>(key: string, data: T, ttl: number = CLIENT_CACHE_CONFIG.DEFAULT_TTL): void {
     // Supprimer les anciens items si on atteint la limite
     if (this.cache.size >= CLIENT_CACHE_CONFIG.MAX_SIZE) {
       const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
+      if (oldestKey) {
+        this.cache.delete(oldestKey);
+      }
     }
     
     this.cache.set(key, {
@@ -30,7 +32,7 @@ class ClientCache {
   }
   
   get<T>(key: string): T | null {
-    const item = this.cache.get(key);
+    const item = this.cache.get(key) as CacheItem<T> | undefined;
     if (!item) return null;
     
     // Vérifier si l'item n'est pas expiré
@@ -39,7 +41,7 @@ class ClientCache {
       return null;
     }
     
-    return item.data;
+    return item.data as T;
   }
   
   delete(key: string): void {
@@ -73,7 +75,7 @@ export function useCache<T>(
   options: {
     ttl?: number;
     skipCache?: boolean;
-    dependencies?: any[];
+    dependencies?: DependencyList;
   } = {}
 ) {
   const { ttl = CLIENT_CACHE_CONFIG.DEFAULT_TTL, skipCache = false, dependencies = [] } = options;
@@ -154,7 +156,7 @@ export function useStaticPageCache<T>(
   fetcher: () => Promise<T>,
   options: {
     skipCache?: boolean;
-    dependencies?: any[];
+    dependencies?: DependencyList;
   } = {}
 ) {
   return useCache(
