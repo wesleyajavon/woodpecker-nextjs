@@ -82,6 +82,8 @@ export default function BeatCard({
     setExpandedLicense(expandedLicense === license ? null : license);
   };
 
+  const isListMode = className.includes('flex items-center');
+
   return (
     <>
     <motion.div
@@ -89,7 +91,7 @@ export default function BeatCard({
       whileHover={{ y: -2 }}
     >
       {/* Image/Artwork */}
-      <div className="relative aspect-square bg-gradient-to-br from-purple-900/20 to-blue-900/20">
+      <div className={`relative bg-gradient-to-br from-purple-900/20 to-blue-900/20 ${isListMode ? 'w-20 h-20 rounded-lg flex-shrink-0' : 'aspect-square'}`}>
         {beat.artworkUrl ? (
           <img
             src={beat.artworkUrl}
@@ -98,33 +100,35 @@ export default function BeatCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Music className="w-16 h-16 text-muted-foreground" />
+            <Music className={`${isListMode ? 'w-6 h-6' : 'w-16 h-16'} text-muted-foreground`} />
           </div>
         )}
         
         {/* Play/Pause Button */}
         <button
           onClick={handlePlay}
-          className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity duration-300"
+          className={`absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity duration-300 ${isListMode ? 'rounded-lg' : ''}`}
         >
           {isPlaying ? (
-            <Pause className="w-12 h-12 text-foreground" />
+            <Pause className={`${isListMode ? 'w-4 h-4' : 'w-12 h-12'} text-foreground`} />
           ) : (
-            <Play className="w-12 h-12 text-foreground ml-1" />
+            <Play className={`${isListMode ? 'w-4 h-4' : 'w-12 h-12'} ${isListMode ? '' : 'ml-1'} text-foreground`} />
           )}
         </button>
 
-        {/* License Badge */}
-        <div className="absolute top-2 right-2">
-          <div className={`px-2 py-1 rounded-full text-xs font-medium bg-card/80 ${licenseColors[selectedLicense]}`}>
-            {selectedLicense === 'WAV_LEASE' ? t('licenses.wavLease') :
-             selectedLicense === 'TRACKOUT_LEASE' ? t('licenses.trackoutLease') :
-             t('licenses.unlimitedLease')}
+        {/* License Badge - Only show in grid mode */}
+        {!isListMode && (
+          <div className="absolute top-2 right-2">
+            <div className={`px-2 py-1 rounded-full text-xs font-medium bg-card/80 ${licenseColors[selectedLicense]}`}>
+              {selectedLicense === 'WAV_LEASE' ? t('licenses.wavLease') :
+               selectedLicense === 'TRACKOUT_LEASE' ? t('licenses.trackoutLease') :
+               t('licenses.unlimitedLease')}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Stems Available Badge */}
-        {beat.stemsUrl && (
+        {beat.stemsUrl && !isListMode && (
           <div className="absolute top-2 left-2">
             <div className="px-2 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/50">
               {t('beatCard.stems')}
@@ -134,45 +138,90 @@ export default function BeatCard({
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className={`${isListMode ? 'p-3 flex-1 min-w-0' : 'p-4'}`}>
         {/* Title and Genre */}
-        <div className="mb-3">
-          <h3 className="text-lg font-semibold text-foreground truncate">{beat.title}</h3>
-          <p className="text-sm text-muted-foreground">{beat.genre}</p>
+        <div className={`${isListMode ? 'mb-2' : 'mb-3'}`}>
+          <h3 className={`${isListMode ? 'text-sm' : 'text-lg'} font-semibold text-foreground truncate`}>{beat.title}</h3>
+          <p className={`text-sm text-muted-foreground ${isListMode ? 'text-xs' : ''}`}>{beat.genre}</p>
         </div>
 
-        {/* BPM and Key */}
-        <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
-          <span>{t('beatCard.bpm', { bpm: beat.bpm.toString() })}</span>
-          <span>{t('beatCard.key', { key: beat.key })}</span>
-          <span>{t('beatCard.duration', { duration: beat.duration })}</span>
-        </div>
-
-        {/* Price Display */}
-        <div className="mb-4">
+        {isListMode ? (
           <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-foreground">
-              {formatPrice(getPrice(selectedLicense))}
-            </span>
-            <button
-              onClick={openLicenseModal}
-              className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
-            >
-              <Crown className="w-4 h-4" />
-              {t('beatCard.changeLicense')}
-            </button>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>{beat.bpm}BPM</span>
+              <span>•</span>
+              <span>{beat.key}</span>
+              <span>•</span>
+              <span>{beat.duration}</span>
+              {beat.stemsUrl && <span className="text-orange-400">• STEMS</span>}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${licenseColors[selectedLicense].replace('text-', 'bg-')}`}></span>
+              <span className="text-xs text-muted-foreground">
+                {selectedLicense === 'WAV_LEASE' ? 'WAV' :
+                 selectedLicense === 'TRACKOUT_LEASE' ? 'TRK' : 'UNL'}
+              </span>
+              <span className="text-sm font-bold text-foreground ml-2">
+                {formatPrice(getPrice(selectedLicense))}
+              </span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* BPM and Key */}
+            <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
+              <span>{t('beatCard.bpm', { bpm: beat.bpm.toString() })}</span>
+              <span>{t('beatCard.key', { key: beat.key })}</span>
+              <span>{t('beatCard.duration', { duration: beat.duration })}</span>
+            </div>
+
+            {/* Price Display */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-foreground">
+                  {formatPrice(getPrice(selectedLicense))}
+                </span>
+                <button
+                  onClick={openLicenseModal}
+                  className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
+                >
+                  <Crown className="w-4 h-4" />
+                  {t('beatCard.changeLicense')}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Add to Cart Button */}
-        <AddToCartButton
-          beat={beat}
-          licenseType={selectedLicense}
-          className="w-full"
-        />
+        <div className={`mt-3 ${isListMode ? 'flex gap-1' : ''}`}>
+          {isListMode ? (
+            <>
+              <button
+                onClick={openLicenseModal}
+                className="flex-shrink-0 p-1.5 text-purple-400 hover:text-purple-300 transition-colors"
+                title={t('beatCard.changeLicense')}
+              >
+                <Crown className="w-3 h-3" />
+              </button>
+              <AddToCartButton
+                beat={beat}
+                licenseType={selectedLicense}
+                className="flex-1"
+              />
+            </>
+          ) : (
+            <AddToCartButton
+              beat={beat}
+              licenseType={selectedLicense}
+              className="w-full"
+            />
+          )}
+        </div>
 
-        {/* Tags */}
-        {beat.tags.length > 0 && (
+        {/* Tags - Only show in grid mode */}
+        {!isListMode && beat.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1">
             {beat.tags.slice(0, 3).map((tag, index) => (
               <span
