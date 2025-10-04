@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  HelpCircle, 
-  Music, 
-  CreditCard, 
-  Download, 
-  Shield, 
+import {
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
+  Music,
+  CreditCard,
+  Download,
+  Shield,
   Users,
   Loader2,
   AlertCircle,
@@ -36,7 +36,7 @@ export default function FAQPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const faqCategories = [
     { id: 'all', name: t('faq.categories.all'), icon: HelpCircle },
     { id: 'licenses', name: t('faq.categories.licenses'), icon: Shield },
@@ -45,7 +45,7 @@ export default function FAQPage() {
     { id: 'usage', name: t('faq.categories.usage'), icon: Music },
     { id: 'account', name: t('faq.categories.account'), icon: Users }
   ];
-  
+
   const ITEMS_PER_PAGE = 6;
 
   // Fetch FAQ data from API
@@ -73,7 +73,7 @@ export default function FAQPage() {
 
   const filteredFAQs = faqData.filter(faq => {
     const matchesCategory = selectedCategory === 'all' || faq.category === selectedCategory;
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -97,8 +97,8 @@ export default function FAQPage() {
   };
 
   function toggleExpanded(id: string) {
-    setExpandedItems(prev => 
-      prev.includes(id) 
+    setExpandedItems(prev =>
+      prev.includes(id)
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
@@ -124,8 +124,8 @@ export default function FAQPage() {
           <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">Failed to load FAQs</h2>
           <p className="text-muted-foreground mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
             Retry
@@ -136,16 +136,29 @@ export default function FAQPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-background relative overflow-hidden">
       <DottedSurface />
       
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
+        <div
+          aria-hidden="true"
+          className={cn(
+            'pointer-events-none absolute -top-10 left-1/2 size-full .translate-x-1/2 rounded-full',
+            'bg-[radial-gradient(ellipse_at_center,var(--theme-gradient),transparent_50%)]',
+            'blur-[30px]',
+          )}
+        />
+      </div>
+
+      <div className="relative z-10 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
               {t('faq.title')}{' '}
@@ -163,7 +176,7 @@ export default function FAQPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-8"
+            className="mt-8 mb-8"
           >
             <div className="relative max-w-md mx-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -176,27 +189,24 @@ export default function FAQPage() {
               />
             </div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Filter Section */}
-      <motion.section
+          {/* Category Filter */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="max-w-6xl mx-auto pb-12"
+            transition={{ delay: 0.3}}
+            className="mb-16"
           >
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
+            <div className="flex flex-wrap justify-center gap-2">
               {faqCategories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => handleCategoryChange(category.id)}
                   className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg border transition-all",
+                    "flex items-center gap-2 px-4 py-2 rounded-lg border transition-all",
                     selectedCategory === category.id
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-card/10 text-foreground border-border hover:bg-card/20"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card/10 text-foreground border-border hover:bg-card/20"
                   )}
                 >
                   <category.icon className="w-4 h-4" />
@@ -204,62 +214,62 @@ export default function FAQPage() {
                 </button>
               ))}
             </div>
-      </motion.section>
+          </motion.div>
 
           {/* FAQ Items */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-        className="space-y-4 max-w-4xl mx-auto px-4"
+            className="space-y-4 mb-16"
           >
-            {filteredFAQs.length === 0 ? (
-              <div className="text-center py-12">
-                <HelpCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+        {filteredFAQs.length === 0 ? (
+          <div className="text-center py-12">
+            <HelpCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-foreground mb-2">No questions found</h3>
-                <p className="text-muted-foreground">
+            <p className="text-muted-foreground">
               Try adjusting your search or category filter.
-                </p>
-              </div>
-            ) : (
-              paginatedFAQs.map((faq, index) => (
-                <motion.div
-                  key={faq.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.05 }}
-                  className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 overflow-hidden"
-                >
-                  <button
-                    onClick={() => toggleExpanded(faq.id)}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-card/5 transition-colors"
-                  >
-                    <h3 className="font-semibold text-foreground pr-4">{faq.question}</h3>
-                    {expandedItems.includes(faq.id) ? (
-                      <ChevronUp className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                    )}
-                  </button>
-                  
-                  <AnimatePresence>
-                    {expandedItems.includes(faq.id) && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
+            </p>
+          </div>
+        ) : (
+          paginatedFAQs.map((faq, index) => (
+            <motion.div
+              key={faq.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 + index * 0.05 }}
+              className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 overflow-hidden"
+            >
+              <button
+                onClick={() => toggleExpanded(faq.id)}
+                className="w-full p-6 text-left flex items-center justify-between hover:bg-card/5 transition-colors"
+              >
+                <h3 className="font-semibold text-foreground pr-4">{faq.question}</h3>
+                {expandedItems.includes(faq.id) ? (
+                  <ChevronUp className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                )}
+              </button>
+
+              <AnimatePresence>
+                {expandedItems.includes(faq.id) && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
+                    exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
+                    className="overflow-hidden"
+                  >
                     <div className="px-6 pb-6 text-muted-foreground">
                       <p>{faq.answer}</p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              ))
-            )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))
+          )}
           </motion.div>
 
           {/* Pagination */}
@@ -267,27 +277,29 @@ export default function FAQPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="flex justify-center mt-12"
+              transition={{ delay: 0.6 }}
+              className="flex justify-center"
             >
-          <div className="flex gap-2">
-            {Array.from({ length: totalPages }).map((_, index) => (
-                <button
-                key={index}
-                onClick={() => setCurrentPage(index + 1)}
-                  className={cn(
-                  "px-3 py-2 rounded-lg border transition-all",
-                  currentPage === index + 1
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card/10 text-foreground border-border hover:bg-card/20"
-                )}
-              >
-                {index + 1}
-                </button>
-            ))}
+              <div className="flex gap-2">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentPage(index + 1)}
+                    className={cn(
+                      "px-3 py-2 rounded-lg border transition-all",
+                      currentPage === index + 1
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card/10 text-foreground border-border hover:bg-card/20"
+                    )}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
               </div>
             </motion.div>
           )}
-    </main>
+        </div>
+      </div>
+    </div>
   );
 }
