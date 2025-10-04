@@ -238,7 +238,7 @@ export default function AdminStatsGraphics() {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-gray-300">{t('admin.averageOrderValue')}:</span>
-              <span className="text-white font-semibold">{averageOrderValue}€</span>
+              <span className="text-white font-semibold">{averageOrderValue.toFixed(2)}€</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-300">{t('admin.revenuePerBeat')}:</span>

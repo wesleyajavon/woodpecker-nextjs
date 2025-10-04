@@ -54,6 +54,8 @@ export const fr = {
     date: 'Date',
     time: 'Heure',
     contactUs: 'Nous contacter',
+    totalAmount: 'Montant total',
+    status: 'Statut',
   },
 
   // Navigation
