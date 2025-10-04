@@ -1,14 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRequiredAuthSession } from '@/lib/auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { getUserIdFromEmail } from '@/lib/userUtils';
+import { isUserAdmin } from '@/lib/roleUtils';
 import { CacheService } from '@/services/cacheService';
 import { UpstashCacheManager } from '@/lib/cache-upstash';
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getRequiredAuthSession();
-    
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Vérification de l'authentification
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      );
+    }
+
+    // Vérification du rôle admin
+                const isAdmin = await isUserAdmin(session.user.email);
+                if (!isAdmin) {
+      return NextResponse.json(
+        { error: 'Accès refusé. Rôle admin requis.' },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -53,10 +68,22 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getRequiredAuthSession();
-    
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Vérification de l'authentification
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      );
+    }
+
+    // Vérification du rôle admin
+    const isAdmin = await isUserAdmin(session.user.email);
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: 'Accès refusé. Rôle admin requis.' },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();
@@ -64,10 +91,12 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case 'invalidate-faq':
-        await CacheService.invalidateFAQOnUpdate();
+        const faqId = body.faqId || 'all';
+        const faqCategory = body.category;
+        await CacheService.invalidateFAQOnUpdate(faqId, faqCategory);
         return NextResponse.json({
           success: true,
-          message: 'FAQ cache invalidated successfully'
+          message: `FAQ cache invalidated successfully${faqId === 'all' ? ' (all FAQs)' : ` (FAQ: ${faqId})`}`
         });
 
       case 'invalidate-licenses':
@@ -213,10 +242,22 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getRequiredAuthSession();
-    
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Vérification de l'authentification
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401 }
+      );
+    }
+
+    // Vérification du rôle admin
+    const isAdmin = await isUserAdmin(session.user.email);
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: 'Accès refusé. Rôle admin requis.' },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);

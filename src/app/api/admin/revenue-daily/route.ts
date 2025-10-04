@@ -87,13 +87,13 @@ export async function GET(request: NextRequest) {
     // Process single orders
     singleOrders.forEach(order => {
       const dateKey = order.createdAt.toISOString().split('T')[0];
-      dailyRevenue[dateKey] = (dailyRevenue[dateKey] || 0) + (order.totalAmount || 0);
+      dailyRevenue[dateKey] = (dailyRevenue[dateKey] || 0) + Number(order.totalAmount || 0);
     });
 
     // Process multi-item orders
     multiOrders.forEach(order => {
       const dateKey = order.createdAt.toISOString().split('T')[0];
-      dailyRevenue[dateKey] = (dailyRevenue[dateKey] || 0) + (order.totalAmount || 0);
+      dailyRevenue[dateKey] = (dailyRevenue[dateKey] || 0) + Number(order.totalAmount || 0);
     });
 
     // Convert to array format and fill missing days with 0
