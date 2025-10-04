@@ -26,7 +26,7 @@ export interface CacheConfig {
 // Classe de gestion du cache pour Woodpecker
 export class UpstashCacheManager {
   // Générer une clé de cache unique avec préfixe
-  static generateKey(prefix: string, params: Record<string, any> = {}): string {
+  static generateKey(prefix: string, params: Record<string, string | number | boolean> = {}): string {
     if (Object.keys(params).length === 0) {
       return `woodpecker:${prefix}`;
     }
@@ -54,7 +54,7 @@ export class UpstashCacheManager {
   }
 
   // Stocker une valeur dans le cache
-  static async set(key: string, value: any, expiration?: number): Promise<void> {
+  static async set<T>(key: string, value: T, expiration?: number): Promise<void> {
     try {
       // Upstash Redis gère automatiquement la sérialisation JSON
       await redis.set(key, value, {
@@ -276,7 +276,7 @@ export interface CacheOptions {
  * Cache pour les données FAQ avec invalidation intelligente
  */
 export async function withFAQCache<T>(
-  params: Record<string, any>,
+  params: Record<string, string | number | boolean>,
   fetchFunction: () => Promise<T>
 ): Promise<T> {
   const key = UpstashCacheManager.generateKey('faq', params);
@@ -289,7 +289,7 @@ export async function withFAQCache<T>(
  * Cache pour les données de licences
  */
 export async function withLicenseCache<T>(
-  params: Record<string, any>,
+  params: Record<string, string | number | boolean>,
   fetchFunction: () => Promise<T>
 ): Promise<T> {
   const key = UpstashCacheManager.generateKey('licenses', params);
@@ -302,7 +302,7 @@ export async function withLicenseCache<T>(
  * Cache pour les données de confidentialité
  */
 export async function withPrivacyCache<T>(
-  params: Record<string, any>,
+  params: Record<string, string | number | boolean>,
   fetchFunction: () => Promise<T>
 ): Promise<T> {
   const key = UpstashCacheManager.generateKey('privacy', params);
@@ -315,7 +315,7 @@ export async function withPrivacyCache<T>(
  * Cache pour les données de beats
  */
 export async function withBeatCache<T>(
-  params: Record<string, any>,
+  params: Record<string, string | number | boolean>,
   fetchFunction: () => Promise<T>
 ): Promise<T> {
   const key = UpstashCacheManager.generateKey('beats', params);
