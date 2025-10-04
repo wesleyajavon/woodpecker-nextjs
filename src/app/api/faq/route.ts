@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withUpstashCache } from '@/lib/cache-upstash';
 import { WOODPECKER_CACHE_CONFIG } from '@/lib/cache-upstash';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
       try {
         // Build where conditions
-        const where: any = {
+        const where: Prisma.FAQItemWhereInput = {
           isActive: true,
         };
 
