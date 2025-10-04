@@ -53,7 +53,7 @@ export default function FAQPage() {
     const fetchFAQs = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/faq-works');
+        const response = await fetch('/api/faq');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
