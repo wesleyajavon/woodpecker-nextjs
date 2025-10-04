@@ -89,7 +89,7 @@ model Order {
   paidAt        DateTime?
   
   // License information
-  licenseType   LicenseType @default(WAV_LEASE)
+  licenseType   LicenseType
   usageRights  String[]    // Array of usage rights
   
   // Timestamps
@@ -130,7 +130,7 @@ model MultiItemOrder {
   sessionId     String?  // Stripe session ID for multi-item orders
   
   // License information
-  licenseType   LicenseType @default(WAV_LEASE)
+  licenseType   LicenseType
   usageRights  String[]    // Array of usage rights
   
   // Timestamps
@@ -232,6 +232,12 @@ model User {
   orders   Order[]
   multiItemOrders MultiItemOrder[]
   beats    Beat[]
+  
+  // Content management relations
+  faqs         FAQItem[]        @relation("FAQEditor")
+  licenseInfos LicenseInfo[]     @relation("LicenseEditor")
+  privacySections PrivacySection[] @relation("PrivacyEditor")
+  termsSections TermsSection[]     @relation("TermsEditor")
 }
 
 enum UserRole {
@@ -245,4 +251,193 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// FAQ Categories (predefined categories like licenses, payment, etc.)
+model FAQCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  displayName String   // For translations: "Licenses", "Payment", etc.
+  icon        String?  // Lucide icon name
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  faqs        FAQItem[]
+  
+  @@index([slug])
+  @@index([sortOrder])
+}
+
+// FAQ Items
+model FAQItem {
+  id          String       @id @default(cuid())
+  question    String
+  answer      String
+  shortAnswer String?      // Optional shorter version
+  
+  // Content management
+  isActive    Boolean      @default(true)
+  sortOrder   Int          @default(0)
+  featured    Boolean      @default(false)
+  
+  // SEO and accessibility
+  slug       String?       @unique
+  metaKeywords String[]    @default([])
+  
+  // Timestamps
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  // Relations
+  categoryId  String
+  category    FAQCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  userId      String?      // Who created/modified last
+  user        User?        @relation("FAQEditor", fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([categoryId])
+  @@index([featured])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// License Types (WAV, Trackout, Unlimited)
+model LicenseInfo {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  slug          String   @unique
+  displayName   String   // "WAV Lease", "Trackout Lease", etc.
+  description   String
+  
+  // Pricing
+  basePrice     Decimal  @db.Decimal(10, 2)
+
+  // Features and limitations
+  features      String[] // JSON array of features
+  limitations   String[] // JSON array of limitations
+  useCases      String[] // JSON array of use cases
+  
+  // Usage limits (when applicable)
+  maxCopies     Int?     // null = unlimited
+  maxStreams    Int?     // null = unlimited
+  maxVideos     Int?     // null = unlimited
+  allowsLiveProfit Boolean @default(false)
+  allowsRadioTV  Boolean @default(false)
+  allowsSync     Boolean @default(false)
+  
+  // File types included
+  includesWav   Boolean  @default(true)
+  includesMp3   Boolean  @default(true)
+  includesStems Boolean @default(false)
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  isActive      Boolean @default(true)
+  userId        String?  // Who created/modified last
+  user          User?    @relation("LicenseEditor", fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([slug])
+  @@index([isActive])
+}
+
+// License Features (specific feature comparisons across license types)
+model LicenseFeature {
+  id            String   @id @default(cuid())
+  name          String   // "Commercial Use", "Streaming", etc.
+  slug          String   @unique
+  
+  // Feature details
+  description   String?
+  icon         String?  // Lucide icon
+  category     String?  // "usage", "limits", "files", etc.
+  
+  // License type values
+  wavValue     String   // "Yes"/"No"/"Limited: 5,000"
+  trackoutValue String
+  unlimitedValue String
+  
+  // Display settings
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([slug])
+  @@index([category])
+  @@index([sortOrder])
+}
+
+// Privacy Policy Sections
+model PrivacySection {
+  id            String       @id @default(cuid())
+  title         String
+  slug          String       @unique
+  
+  // Content
+  content       String       // Markdown or HTML content
+  icon          String?      // Lucide icon name
+  
+  // Structure
+  orderIndex    Int          @default(0)
+  isActive      Boolean      @default(true)
+  
+  // SEO
+  metaTitle    String?
+  metaDescription String?
+  
+  // Timestamps
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relations
+  userId        String?      // Who created/modified last
+  user          User?        @relation("PrivacyEditor", fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([slug])
+  @@index([orderIndex])
+}
+
+// Terms of Service Sections
+model TermsSection {
+  id            String       @id @default(cuid())
+  title         String
+  slug          String       @unique
+  
+  // Content
+  content       String       // Markdown or HTML content
+  icon          String?      // Lucide icon name
+  
+  // Structure
+  orderIndex    Int          @default(0)
+  isActive      Boolean      @default(true)
+  
+  // SEO
+  metaTitle    String?
+  metaDescription String?
+  
+  // Legal
+  version       String       @default("1.0")
+  effectiveFrom DateTime     @default(now())
+  
+  // Timestamps
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relations
+  userId        String?      // Who created/modified last
+  user          User?        @relation("TermsEditor", fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([slug])
+  @@index([orderIndex])
+  @@index([version])
 }

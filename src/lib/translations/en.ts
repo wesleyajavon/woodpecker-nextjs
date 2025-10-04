@@ -96,7 +96,7 @@ export const en = {
     items: 'Items',
     item: 'item',
     items_plural: 'items',
-    cartItems: 'Cart Items ({{count}})',
+    cartItems: 'Cart Items ({count})',
     processingFee: 'Processing Fee',
     proceedToCheckout: 'Proceed to Checkout',
     secureCheckout: 'Secure checkout powered by Stripe',
@@ -113,7 +113,7 @@ export const en = {
     searchPlaceholder: 'Search for a beat...',
     genres: 'Genres',
     allGenres: 'All',
-    itemsPerPage: '{{count}} per page',
+    itemsPerPage: '{count} per page',
     viewMode: 'View mode',
     gridView: 'Grid',
     listView: 'List',
@@ -123,7 +123,7 @@ export const en = {
     noBeatsAvailable: 'No beats available at the moment',
     resetFilters: 'Reset filters',
     customBeatCTA: 'Order a custom beat',
-    showingResults: 'Showing {{start}} to {{end}} of {{total}} beats',
+    showingResults: 'Showing {start} to {end} of {total} beats',
     stats: {
       beats: 'Beats',
       genres: 'Genres',
@@ -138,11 +138,11 @@ export const en = {
     selectLicense: 'Select a license',
     licenseDetails: 'License details',
     buy: 'Buy',
-    buyWithPrice: 'Buy - {{price}}',
-    bpm: '{{bpm}} BPM',
-    key: 'Key {{key}}',
-    duration: '{{duration}}',
-    genre: 'Genre: {{genre}}',
+    buyWithPrice: 'Buy - {price}',
+    bpm: '{bpm} BPM',
+    key: 'Key {key}',
+    duration: '{duration}',
+    genre: 'Genre: {genre}',
     tags: 'Tags',
     noTags: 'No tags',
     exclusive: 'Exclusive',
@@ -230,7 +230,7 @@ export const en = {
     errorUpdate: 'Error updating profile',
     name: 'Full name',
     avatar: 'Avatar',
-    memberSince: 'Member since {{date}}',
+    memberSince: 'Member since',
     emailVerified: 'Email verified',
     emailNotVerified: 'Email not verified',
     fetchError: 'Error fetching profile',
@@ -298,9 +298,9 @@ export const en = {
     },
     noResults: 'No questions found',
     noResultsDescription: 'Try modifying your search or selecting another category.',
-    questionsFound: '{{count}} question found',
-    questionsFound_plural: '{{count}} questions found',
-    pageInfo: 'Page {{current}} of {{total}}',
+    questionsFound: '{count} question found',
+    questionsFound_plural: '{count} questions found',
+    pageInfo: 'Page {current} of {total}',
     contactCTA: {
       title: 'Can\'t find your answer?',
       description: 'Our team is here to help. Don\'t hesitate to contact us for any specific question.',
@@ -390,11 +390,12 @@ export const en = {
     customerSatisfaction: 'Customer satisfaction',
     retentionRate: 'Retention rate',
     monthlyGrowth: 'Monthly growth',
+    uniqueCustomers: 'Unique customers',
   },
 
   // Footer
   footer: {
-    copyright: '© {{year}} l.outsider. All rights reserved.',
+    copyright: '© {year} l.outsider. All rights reserved.',
     sections: {
       products: 'Products',
       company: 'Company',
@@ -426,7 +427,7 @@ export const en = {
     title: 'Payment successful!',
     subtitle: 'Thank you for your purchase',
     description: 'Thank you for your purchase! Your beat is now available for download.',
-    descriptionMulti: 'Thank you for your purchase! Your {{count}} beats are now available for download.',
+    descriptionMulti: 'Thank you for your purchase! Your {count} beats are now available for download.',
     orderDetails: 'Order details',
     downloadLinks: 'Download links',
     backToBeats: 'Back to beats',
@@ -448,9 +449,9 @@ export const en = {
   pagination: {
     previous: 'Previous',
     next: 'Next',
-    page: 'Page {{page}}',
+    page: 'Page {page}',  
     of: 'of',
-    showing: 'Showing {{start}} to {{end}} of {{total}}',
+    showing: 'Showing {start} to {end} of {total}',
   },
 
   // Errors
@@ -578,4 +579,21 @@ export const en = {
     importantNoticeDescription: 'These terms of use constitute a legally binding agreement between you and l.outsider. By using our website or services, you acknowledge that you have read, understood and agreed to be bound by these terms.',
     questionsContact: 'If you have any questions regarding these terms, please feel free to contact us at',
   },
+
+  // Admin Stats Graphics - Additional Keys
+  admin_revenueOverview: 'Revenue Overview',
+  admin_orderAnalysis: 'Order Analysis',
+  admin_contentPerformance: 'Content Performance',
+  admin_beatsCreated: 'Beats Created',
+  admin_totalSales: 'Total Sales',
+  admin_salesSuccessRate: 'Sales Success Rate',
+  admin_customerLoyalty: 'Customer Loyalty',
+  admin_high: 'High',
+  admin_medium: 'Medium',
+  admin_low: 'Low',
+  
+  // Daily Revenue Chart
+  admin_dailyRevenue: 'Daily Revenue (Last 14 Days)',
+  admin_totalRevenue30Days: 'Total Revenue (30 Days)',
+  admin_noRevenueData: 'No revenue data available for selected period',
 };

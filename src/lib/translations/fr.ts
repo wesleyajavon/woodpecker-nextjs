@@ -113,7 +113,7 @@ export const fr = {
     searchPlaceholder: 'Rechercher un beat...',
     genres: 'Genres',
     allGenres: 'Tous',
-    itemsPerPage: '{{count}} par page',
+    itemsPerPage: '{count} par page',
     viewMode: 'Mode d\'affichage',
     gridView: 'Grille',
     listView: 'Liste',
@@ -123,7 +123,7 @@ export const fr = {
     noBeatsAvailable: 'Aucun beat disponible pour le moment',
     resetFilters: 'Réinitialiser les filtres',
     customBeatCTA: 'Commander un beat personnalisé',
-    showingResults: 'Affichage de {{start}} à {{end}} sur {{total}} beats',
+    showingResults: 'Affichage de {start} à {end} sur {total} beats',
     stats: {
       beats: 'Beats',
       genres: 'Genres',
@@ -138,11 +138,11 @@ export const fr = {
     selectLicense: 'Sélectionner une licence',
     licenseDetails: 'Détails de la licence',
     buy: 'Acheter',
-    buyWithPrice: 'Acheter - {{price}}',
-    bpm: '{{bpm}} BPM',
-    key: 'Clé {{key}}',
-    duration: '{{duration}}',
-    genre: 'Genre: {{genre}}',
+    buyWithPrice: 'Acheter - {price}',
+    bpm: '{bpm} BPM',
+    key: 'Gamme {key}',
+    duration: '{duration}',
+    genre: 'Genre: {genre}',
     tags: 'Tags',
     noTags: 'Aucun tag',
     exclusive: 'Exclusif',
@@ -273,9 +273,9 @@ export const fr = {
     titleHighlight: 'Fréquentes',
     subtitle: 'Trouvez rapidement les réponses à vos questions sur nos beats, licences et services.',
     searchPlaceholder: 'Rechercher une question...',
-    resultsCount: '{{count}} questions trouvées',
+    resultsCount: '{count} questions trouvées',
     resultsCountSingle: '1 question trouvée',
-    pageInfo: 'Page {{current}} sur {{total}}',
+    pageInfo: 'Page {current} sur {total}',
     noQuestionsFound: 'Aucune question trouvée',
     noQuestionsFoundDescription: 'Essayez de modifier votre recherche ou sélectionner une autre catégorie.',
     needHelp: 'Vous ne trouvez pas votre réponse ?',
@@ -290,8 +290,8 @@ export const fr = {
     },
     noResults: 'Aucune question trouvée',
     noResultsDescription: 'Essayez de modifier votre recherche ou sélectionner une autre catégorie.',
-    questionsFound: '{{count}} question trouvée',
-    questionsFound_plural: '{{count}} questions trouvées',
+    questionsFound: '{count} question trouvée',
+    questionsFound_plural: '{count} questions trouvées',
     contactCTA: {
       title: 'Vous ne trouvez pas votre réponse ?',
       description: 'Notre équipe est là pour vous aider. N\'hésitez pas à nous contacter pour toute question spécifique.',
@@ -405,11 +405,12 @@ export const fr = {
     customerSatisfaction: 'Satisfaction clients',
     retentionRate: 'Taux de rétention',
     monthlyGrowth: 'Croissance mensuelle',
+    uniqueCustomers: 'Clients uniques',
   },
 
   // Footer
   footer: {
-    copyright: '© {{year}} l.outsider. Tous droits réservés.',
+    copyright: '© {year} l.outsider. Tous droits réservés.',
     sections: {
       products: 'Produits',
       company: 'Entreprise',
@@ -441,7 +442,7 @@ export const fr = {
     title: 'Paiement réussi !',
     subtitle: 'Merci pour votre achat',
     description: 'Merci pour votre achat ! Votre beat est maintenant disponible au téléchargement.',
-    descriptionMulti: 'Merci pour votre achat ! Vos {{count}} beats sont maintenant disponibles au téléchargement.',
+    descriptionMulti: 'Merci pour votre achat ! Vos {count} beats sont maintenant disponibles au téléchargement.',
     orderDetails: 'Détails de la commande',
     downloadLinks: 'Liens de téléchargement',
     backToBeats: 'Retour aux beats',
@@ -463,9 +464,9 @@ export const fr = {
   pagination: {
     previous: 'Précédent',
     next: 'Suivant',
-    page: 'Page {{page}}',
+    page: 'Page {page}',
     of: 'sur',
-    showing: 'Affichage de {{start}} à {{end}} sur {{total}}',
+    showing: 'Affichage de {start} à {end} sur {total}',
   },
 
   // Errors
@@ -579,4 +580,20 @@ export const fr = {
     questionsContact: 'Si vous avez des questions concernant ces conditions, n\'hésitez pas à nous contacter à',
   },
 
+  // Admin Stats Graphics - Additional Keys
+  admin_revenueOverview: 'Aperçu des Revenus',
+  admin_orderAnalysis: 'Analyse des Commandes',
+  admin_contentPerformance: 'Performance du Contenu',
+  admin_beatsCreated: 'Beats Créés',
+  admin_totalSales: 'Ventes Totales',
+  admin_salesSuccessRate: 'Taux de Succès des Ventes',
+  admin_customerLoyalty: 'Fidélité Client',
+  admin_high: 'Élevé',
+  admin_medium: 'Moyen',
+  admin_low: 'Faible',
+  
+  // Graphique des revenus quotidiens
+  admin_dailyRevenue: 'Revenus Quotidiens (14 Derniers Jours)',
+  admin_totalRevenue30Days: 'Revenus Totaux (30 Jours)',
+  admin_noRevenueData: 'Aucune donnée de revenus disponible pour la période sélectionnée',
 };
