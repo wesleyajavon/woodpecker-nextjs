@@ -89,7 +89,7 @@ export class CacheService {
     try {
       console.log(`[CACHE SERVICE] Invalidating beat cache for ID: ${beatId || 'all'}`);
       
-      if<｜tool▁sep｜>beatId) {
+      if (beatId) {
         // Invalider les données spécifiques à un beat
         await UpstashCacheManager.invalidateBeatCache(beatId);
       } else {
