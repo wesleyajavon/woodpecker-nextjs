@@ -90,7 +90,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 pb-12">
+    <div className="min-h-screen bg-background relative overflow-hidden">
       <DottedSurface className="size-full z-0" />
       
       {/* Gradient overlay */}
@@ -105,23 +105,28 @@ export default function CartPage() {
         />
       </div>
 
-      {/* Header */}
+      {/* Mobile Header */}
       <div className="bg-card/10 backdrop-blur-lg border-b border-border/20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Link href="/beats">
-                <Button variant="outline" size="sm" className="flex items-center space-x-2 bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>{t('cart.backToBeats')}</span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center space-x-1 sm:space-x-2 bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30 touch-manipulation"
+                  style={{ minHeight: '40px' }}
+                >
+                  <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="text-xs sm:text-sm">{t('cart.backToBeats')}</span>
                 </Button>
               </Link>
               
-              <div className="flex items-center space-x-3">
-                <ShoppingCart className="h-6 w-6 text-purple-400" />
-                <h1 className="text-2xl font-bold text-foreground">{t('cart.title')}</h1>
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
+                <h1 className="text-lg sm:text-2xl font-bold text-foreground">{t('cart.title')}</h1>
                 {cart.totalItems > 0 && (
-                  <span className="bg-purple-600 text-purple-100 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                  <span className="bg-purple-600 text-purple-100 text-xs sm:text-sm font-medium px-2 py-0.5 rounded-full">
                     {cart.totalItems} {cart.totalItems === 1 ? t('cart.item') : t('cart.items_plural')}
                   </span>
                 )}
@@ -132,33 +137,33 @@ export default function CartPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4 lg:py-8 relative z-10">
         {cart.items.length === 0 ? (
           // Empty Cart State
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
+            className="text-center py-6 sm:py-8 lg:py-16"
           >
-            <div className="max-w-md mx-auto">
-              <div className="bg-card/20 backdrop-blur-lg rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg border border-border/20">
-                <ShoppingCart className="h-12 w-12 text-muted-foreground" />
+            <div className="max-w-md mx-auto px-3 sm:px-4">
+              <div className="bg-card/20 backdrop-blur-lg rounded-full w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg border border-border/20">
+                <ShoppingCart className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-muted-foreground" />
               </div>
               
-              <h2 className="text-3xl font-bold text-foreground mb-4">{t('cart.empty')}</h2>
-              <p className="text-lg text-muted-foreground mb-8">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-3 sm:mb-4">{t('cart.empty')}</h2>
+              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-4 sm:mb-6 lg:mb-8">
                 {t('cart.emptyDescription')}
               </p>
               
-              <div className="space-y-4">
-                <Link href="/beats">
-                  <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-8 rounded-xl">
-                    <Music className="h-5 w-5 mr-2" />
+              <div className="space-y-3 sm:space-y-4">
+                <Link href="/beats" className="block">
+                  <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-6 sm:px-8 rounded-xl touch-manipulation">
+                    <Music className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     {t('cart.browseBeat')}
                   </Button>
                 </Link>
                 
-                <div className="text-sm text-muted-foreground mt-2">
+                <div className="text-xs sm:text-sm text-muted-foreground mt-2">
                   {t('cart.allBeatsDescription')}
                 </div>
               </div>
@@ -166,22 +171,22 @@ export default function CartPage() {
           </motion.div>
         ) : (
           // Cart with Items
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-8">
             {/* Cart Items */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 order-2 lg:order-1">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
+                className="space-y-3 sm:space-y-4 lg:space-y-6"
               >
-                <div className="bg-card/10 backdrop-blur-lg rounded-xl p-6 border border-border/20">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-foreground">
+                <div className="bg-card/10 backdrop-blur-lg rounded-xl p-3 sm:p-4 lg:p-6 border border-border/20">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4 lg:mb-6">
+                    <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-foreground">
                       {t('cart.cartItems', { count: cart.totalItems })}
                     </h2>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {cart.items.map((item) => (
                       <CartItem key={item.beat.id} item={item} />
                     ))}
@@ -190,9 +195,9 @@ export default function CartPage() {
               </motion.div>
             </div>
 
-            {/* Cart Summary */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-8">
+            {/* Cart Summary - Mobile First */}
+            <div className="lg:col-span-1 order-1 lg:order-2">
+              <div className="lg:sticky lg:top-8">
                 <CartSummary onCheckout={handleCheckout} />
               </div>
             </div>
@@ -205,12 +210,12 @@ export default function CartPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-3 sm:p-4"
         >
-          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-8 text-center border border-border/20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">{t('cart.processingCheckout')}</h3>
-            <p className="text-muted-foreground">{t('cart.processingDescription')}</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 sm:p-6 lg:p-8 text-center border border-border/20 w-full max-w-xs sm:max-w-sm">
+            <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 lg:h-12 lg:w-12 border-b-2 border-purple-400 mx-auto mb-3 sm:mb-4"></div>
+            <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-foreground mb-2">{t('cart.processingCheckout')}</h3>
+            <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">{t('cart.processingDescription')}</p>
           </div>
         </motion.div>
       )}

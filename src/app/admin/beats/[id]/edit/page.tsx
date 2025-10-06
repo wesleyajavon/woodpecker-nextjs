@@ -274,7 +274,7 @@ export default function BeatEditPage() {
 
     return (
         <AdminRoute>
-            <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-background pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8">
                 <DottedSurface className="size-full z-0" />
                 
                 {/* Gradient overlay */}
@@ -289,25 +289,25 @@ export default function BeatEditPage() {
                     />
                 </div>
 
-                <div className="max-w-4xl mx-auto py-8 relative z-10">
+                <div className="max-w-4xl mx-auto py-4 sm:py-8 relative z-10">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-8"
+                        className="mb-6 sm:mb-8"
                     >
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center justify-between mb-4 sm:mb-6">
                             <Link
                                 href={`/admin/beats/${beatId}`}
-                                className="inline-flex mt-20 items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-4 py-2 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
+                                className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30 text-sm sm:text-base touch-manipulation"
                             >
-                                <ArrowLeft className="w-5 h-5" />
+                                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                                 Retour
                             </Link>
                         </div>
 
-                        <h1 className="text-4xl font-bold text-foreground mb-2">Modifier les fichiers</h1>
-                        <p className="text-muted-foreground text-lg">{beat.title}</p>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 leading-tight">Modifier les fichiers</h1>
+                        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">{beat.title}</p>
                     </motion.div>
 
                     {/* Affichage des erreurs */}
@@ -324,22 +324,22 @@ export default function BeatEditPage() {
                         </motion.div>
                     )}
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                         {/* Section des fichiers */}
-                        <div className="space-y-6">
-                            <h3 className="text-xl font-semibold text-foreground mb-4">Fichiers actuels</h3>
+                        <div className="space-y-4 sm:space-y-6">
+                            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Fichiers actuels</h3>
 
                             {/* Preview Audio */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                                    <Music className="w-5 h-5" />
+                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                                    <Music className="w-4 h-4 sm:w-5 sm:h-5" />
                                     Preview Audio
                                 </h4>
 
                                 {beat.previewUrl ? (
-                                    <div className="space-y-4">
+                                    <div className="space-y-3 sm:space-y-4">
                                         <div className="p-3 bg-card/5 rounded-lg">
-                                            <p className="text-foreground text-sm">Fichier actuel disponible</p>
+                                            <p className="text-foreground text-xs sm:text-sm">Fichier actuel disponible</p>
                                         </div>
                                         <audio
                                             src={beat.previewUrl}
@@ -349,10 +349,10 @@ export default function BeatEditPage() {
                                         />
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground">Aucun fichier preview</p>
+                                    <p className="text-muted-foreground text-sm">Aucun fichier preview</p>
                                 )}
 
-                                <div className="mt-4">
+                                <div className="mt-3 sm:mt-4">
                                     <input
                                         type="file"
                                         accept=".mp3,.wav,.aiff,.flac"
@@ -362,26 +362,26 @@ export default function BeatEditPage() {
                                     />
                                     <label
                                         htmlFor="preview-upload"
-                                        className="block w-full p-4 border-2 border-dashed border-purple-400/50 rounded-lg hover:border-purple-400 transition-colors text-center cursor-pointer"
+                                        className="block w-full p-3 sm:p-4 border-2 border-dashed border-purple-400/50 rounded-lg hover:border-purple-400 transition-colors text-center cursor-pointer touch-manipulation"
                                     >
                                         {uploadedFiles.preview ? (
                                             <div className="flex items-center gap-2 text-purple-300">
-                                                <Music className="w-5 h-5" />
-                                                <span>{uploadedFiles.preview.name}</span>
+                                                <Music className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm truncate">{uploadedFiles.preview.name}</span>
                                                 <button
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         setUploadedFiles(prev => ({ ...prev, preview: undefined }));
                                                     }}
-                                                    className="ml-auto text-red-400 hover:text-red-300"
+                                                    className="ml-auto text-red-400 hover:text-red-300 touch-manipulation"
                                                 >
-                                                    <X className="w-4 h-4" />
+                                                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 </button>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2 text-gray-400">
-                                                <Upload className="w-5 h-5" />
-                                                <span>Remplacer le fichier preview</span>
+                                                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm">Remplacer le fichier preview</span>
                                             </div>
                                         )}
                                     </label>
@@ -389,16 +389,16 @@ export default function BeatEditPage() {
                             </div>
 
                             {/* Master Audio */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                                    <FileAudio className="w-5 h-5" />
+                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                                    <FileAudio className="w-4 h-4 sm:w-5 sm:h-5" />
                                     Master Audio
                                 </h4>
 
                                 {beat.fullUrl ? (
-                                    <div className="space-y-4">
+                                    <div className="space-y-3 sm:space-y-4">
                                         <div className="p-3 bg-card/5 rounded-lg">
-                                            <p className="text-foreground text-sm">Fichier actuel disponible</p>
+                                            <p className="text-foreground text-xs sm:text-sm">Fichier actuel disponible</p>
                                         </div>
                                         <audio
                                             src={beat.fullUrl}
@@ -407,7 +407,7 @@ export default function BeatEditPage() {
                                         />
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground mb-4">Aucun fichier master</p>
+                                    <p className="text-muted-foreground text-sm mb-3 sm:mb-4">Aucun fichier master</p>
                                 )}
 
                                 <div>
@@ -420,26 +420,26 @@ export default function BeatEditPage() {
                                     />
                                     <label
                                         htmlFor="master-upload"
-                                        className="block w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
+                                        className="block w-full p-3 sm:p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer touch-manipulation"
                                     >
                                         {uploadedFiles.master ? (
                                             <div className="flex items-center gap-2 text-purple-300">
-                                                <FileAudio className="w-5 h-5" />
-                                                <span>{uploadedFiles.master.name}</span>
+                                                <FileAudio className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm truncate">{uploadedFiles.master.name}</span>
                                                 <button
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         setUploadedFiles(prev => ({ ...prev, master: undefined }));
                                                     }}
-                                                    className="ml-auto text-red-400 hover:text-red-300"
+                                                    className="ml-auto text-red-400 hover:text-red-300 touch-manipulation"
                                                 >
-                                                    <X className="w-4 h-4" />
+                                                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 </button>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2 text-gray-400">
-                                                <Upload className="w-5 h-5" />
-                                                <span>Remplacer le fichier master</span>
+                                                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm">Remplacer le fichier master</span>
                                             </div>
                                         )}
                                     </label>
@@ -447,34 +447,34 @@ export default function BeatEditPage() {
                             </div>
 
                             {/* Artwork */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                                    <Image className="w-5 h-5" />
+                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                                    <Image className="w-4 h-4 sm:w-5 sm:h-5" />
                                     Artwork/Cover Image
                                 </h4>
 
                                 {beat.artworkUrl ? (
-                                    <div className="space-y-4">
+                                    <div className="space-y-3 sm:space-y-4">
                                         <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                            <p className="text-foreground text-sm">Image actuelle disponible</p>
+                                            <p className="text-foreground text-xs sm:text-sm">Image actuelle disponible</p>
                                             <button
                                                 onClick={() => handleRemoveArtwork()}
-                                                className="text-red-400 hover:text-red-300 transition-colors"
+                                                className="text-red-400 hover:text-red-300 transition-colors touch-manipulation"
                                                 title="Supprimer l'image"
                                             >
-                                                <X className="w-4 h-4" />
+                                                <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </button>
                                         </div>
                                         <div className="relative">
                                             <img
                                                 src={beat.artworkUrl}
                                                 alt="Artwork actuel"
-                                                className="w-full h-48 object-cover rounded-lg"
+                                                className="w-full h-32 sm:h-48 object-cover rounded-lg"
                                             />
                                         </div>
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground mb-4">Aucune image de couverture</p>
+                                    <p className="text-muted-foreground text-sm mb-3 sm:mb-4">Aucune image de couverture</p>
                                 )}
 
                                 <div>
@@ -487,26 +487,26 @@ export default function BeatEditPage() {
                                     />
                                     <label
                                         htmlFor="artwork-upload"
-                                        className="block w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
+                                        className="block w-full p-3 sm:p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer touch-manipulation"
                                     >
                                         {uploadedFiles.artwork ? (
                                             <div className="flex items-center gap-2 text-purple-300">
-                                                <Image className="w-5 h-5" />
-                                                <span>{uploadedFiles.artwork.name}</span>
+                                                <Image className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm truncate">{uploadedFiles.artwork.name}</span>
                                                 <button
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         setUploadedFiles(prev => ({ ...prev, artwork: undefined }));
                                                     }}
-                                                    className="ml-auto text-red-400 hover:text-red-300"
+                                                    className="ml-auto text-red-400 hover:text-red-300 touch-manipulation"
                                                 >
-                                                    <X className="w-4 h-4" />
+                                                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 </button>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2 text-gray-400">
-                                                <Upload className="w-5 h-5" />
-                                                <span>Remplacer l&apos;image de couverture</span>
+                                                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm">Remplacer l&apos;image de couverture</span>
                                             </div>
                                         )}
                                     </label>
@@ -514,30 +514,30 @@ export default function BeatEditPage() {
                             </div>
 
                             {/* Stems */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                                <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                                    <Archive className="w-5 h-5" />
+                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                                    <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
                                     Stems (ZIP)
                                 </h4>
 
                                 {beat.stemsUrl ? (
-                                    <div className="space-y-4">
+                                    <div className="space-y-3 sm:space-y-4">
                                         <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                            <p className="text-foreground text-sm">Fichier stems disponible</p>
+                                            <p className="text-foreground text-xs sm:text-sm">Fichier stems disponible</p>
                                             <button
                                                 onClick={() => handleRemoveStems()}
-                                                className="text-red-400 hover:text-red-300 transition-colors"
+                                                className="text-red-400 hover:text-red-300 transition-colors touch-manipulation"
                                                 title="Supprimer les stems"
                                             >
-                                                <X className="w-4 h-4" />
+                                                <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </button>
                                         </div>
                                         <div className="p-3 bg-white/5 rounded-lg">
-                                            <p className="text-foreground text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
+                                            <p className="text-foreground text-xs sm:text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
                                         </div>
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground mb-4">Aucun fichier stems</p>
+                                    <p className="text-muted-foreground text-sm mb-3 sm:mb-4">Aucun fichier stems</p>
                                 )}
 
                                 <div>
@@ -550,26 +550,26 @@ export default function BeatEditPage() {
                                     />
                                     <label
                                         htmlFor="stems-upload"
-                                        className="block w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
+                                        className="block w-full p-3 sm:p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer touch-manipulation"
                                     >
                                         {uploadedFiles.stems ? (
                                             <div className="flex items-center gap-2 text-purple-300">
-                                                <Archive className="w-5 h-5" />
-                                                <span>{uploadedFiles.stems.name}</span>
+                                                <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm truncate">{uploadedFiles.stems.name}</span>
                                                 <button
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         setUploadedFiles(prev => ({ ...prev, stems: undefined }));
                                                     }}
-                                                    className="ml-auto text-red-400 hover:text-red-300"
+                                                    className="ml-auto text-red-400 hover:text-red-300 touch-manipulation"
                                                 >
-                                                    <X className="w-4 h-4" />
+                                                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 </button>
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2 text-gray-400">
-                                                <Upload className="w-5 h-5" />
-                                                <span>Remplacer le fichier stems</span>
+                                                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm">Remplacer le fichier stems</span>
                                             </div>
                                         )}
                                     </label>
@@ -579,14 +579,14 @@ export default function BeatEditPage() {
                         </div>
 
                         {/* Section des progrès et actions */}
-                        <div className="space-y-6">
-                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                                <h3 className="text-xl font-semibold text-foreground mb-4">Progrès d&apos;upload</h3>
+                        <div className="space-y-4 sm:space-y-6">
+                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Progrès d&apos;upload</h3>
 
-                                <div className="space-y-4">
+                                <div className="space-y-3 sm:space-y-4">
                                     {uploadedFiles.preview && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                                            <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mb-1">
                                                 <span>Preview</span>
                                                 <span>{uploadProgress.preview}%</span>
                                             </div>
@@ -601,7 +601,7 @@ export default function BeatEditPage() {
 
                                     {uploadedFiles.master && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                                            <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mb-1">
                                                 <span>Master</span>
                                                 <span>{uploadProgress.master}%</span>
                                             </div>
@@ -616,7 +616,7 @@ export default function BeatEditPage() {
 
                                     {uploadedFiles.artwork && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                                            <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mb-1">
                                                 <span>Artwork</span>
                                                 <span>{uploadProgress.artwork}%</span>
                                             </div>
@@ -631,7 +631,7 @@ export default function BeatEditPage() {
 
                                     {uploadedFiles.stems && (
                                         <div>
-                                            <div className="flex justify-between text-sm text-muted-foreground mb-1">
+                                            <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mb-1">
                                                 <span>Stems</span>
                                                 <span>{uploadProgress.stems}%</span>
                                             </div>
@@ -647,31 +647,31 @@ export default function BeatEditPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                                <h3 className="text-xl font-semibold text-foreground mb-4">Actions</h3>
+                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Actions</h3>
 
-                                <div className="space-y-4">
+                                <div className="space-y-3 sm:space-y-4">
                                     <button
                                         onClick={handleUpload}
                                         disabled={isUploading || Object.keys(uploadedFiles).length === 0}
-                                        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-muted disabled:to-muted disabled:cursor-not-allowed text-primary-foreground font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:transform-none"
+                                        className="w-full px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-muted disabled:to-muted disabled:cursor-not-allowed text-primary-foreground font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:transform-none text-sm sm:text-base touch-manipulation"
                                     >
                                         {isUploading ? (
                                             <div className="flex items-center justify-center gap-2">
-                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div>
-                                                Upload en cours...
+                                                <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-primary-foreground"></div>
+                                                <span className="text-xs sm:text-sm">Upload en cours...</span>
                                             </div>
                                         ) : (
                                             <div className="flex items-center justify-center gap-2">
-                                                <Save className="w-5 h-5" />
-                                                Sauvegarder les fichiers
+                                                <Save className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                <span className="text-xs sm:text-sm">Sauvegarder les fichiers</span>
                                             </div>
                                         )}
                                     </button>
 
                                     <Link
                                         href={`/admin/beats/${beatId}`}
-                                        className="block w-full px-6 py-3 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground text-center rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
+                                        className="block w-full px-4 sm:px-6 py-3 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground text-center rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30 text-sm sm:text-base touch-manipulation"
                                     >
                                         Annuler
                                     </Link>

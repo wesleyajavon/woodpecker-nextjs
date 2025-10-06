@@ -8,7 +8,13 @@ import { User, Settings, LogOut, ShoppingBag } from 'lucide-react'
 import Avatar from './Avatar'
 import { useTranslation } from '@/contexts/LanguageContext'
 
-export default function UserMenu() {
+export default function UserMenu({ 
+  variant = 'default', 
+  onMobileMenuClose 
+}: { 
+  variant?: 'default' | 'mobile'
+  onMobileMenuClose?: () => void
+} = {}) {
   const { t } = useTranslation()
   const { data: session } = useSession()
   const router = useRouter()
@@ -39,6 +45,9 @@ export default function UserMenu() {
       onClick: () => {
         router.push('/profile')
         setIsOpen(false)
+        if (variant === 'mobile' && onMobileMenuClose) {
+          onMobileMenuClose()
+        }
       }
     },
     // {
@@ -47,6 +56,9 @@ export default function UserMenu() {
     //   onClick: () => {
     //     router.push('/orders')
     //     setIsOpen(false)
+    //     if (variant === 'mobile' && onMobileMenuClose) {
+    //       onMobileMenuClose()
+    //     }
     //   }
     // },
     // {
@@ -55,6 +67,9 @@ export default function UserMenu() {
     //   onClick: () => {
     //     router.push('/settings')
     //     setIsOpen(false)
+    //     if (variant === 'mobile' && onMobileMenuClose) {
+    //       onMobileMenuClose()
+    //     }
     //   }
     // },
     {
@@ -63,6 +78,9 @@ export default function UserMenu() {
       onClick: () => {
         signOut({ callbackUrl: '/' })
         setIsOpen(false)
+        if (variant === 'mobile' && onMobileMenuClose) {
+          onMobileMenuClose()
+        }
       },
       className: 'text-red-600 hover:text-red-700'
     }
@@ -72,7 +90,7 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 hover:bg-gray-100"
+        className="flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 touch-manipulation"
       >
         <Avatar
           src={session.user.image}
@@ -81,7 +99,7 @@ export default function UserMenu() {
           size="sm"
           showName={false}
         />
-        <span className="text-sm font-medium hidden sm:block transition-colors duration-300 text-gray-700">
+        <span className="text-sm font-medium hidden sm:block transition-colors duration-300 text-gray-700 dark:text-gray-300">
           {session.user.name || session.user.email}
         </span>
       </button>
@@ -89,20 +107,26 @@ export default function UserMenu() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            initial={{ opacity: 0, y: variant === 'mobile' ? 10 : -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            exit={{ opacity: 0, y: variant === 'mobile' ? 10 : -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+            className={`absolute right-0 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 max-h-[calc(100vh-120px)] overflow-y-auto ${
+              variant === 'mobile' ? 'bottom-full mb-2' : 'top-full mt-2'
+            }`}
+            style={{
+              // Ensure menu doesn't overflow viewport
+              maxHeight: 'calc(100vh - 120px)',
+            }}
           >
             {menuItems.map((item, index) => (
               <button
                 key={index}
                 onClick={item.onClick}
-                className={`w-full flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors ${item.className || ''}`}
+                className={`w-full flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-manipulation ${item.className || ''}`}
               >
-                <item.icon className="w-4 h-4" />
-                <span>{item.label}</span>
+                <item.icon className="w-4 h-4 flex-shrink-0" />
+                <span className="text-left">{item.label}</span>
               </button>
             ))}
           </motion.div>

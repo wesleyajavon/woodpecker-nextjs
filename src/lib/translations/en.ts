@@ -192,6 +192,8 @@ export const en = {
     words: ['on fire', 'masterclass', 'bangers', 'gems', 'hot', 'fire'],
     description: 'Only bangers in this selection of instrumentals that are turning everything upside down right now.',
     viewAllBeats: 'View all my beats',
+    loading: 'Loading beats...',
+    noBeats: 'No featured beats at the moment',
   },
 
   // Auth

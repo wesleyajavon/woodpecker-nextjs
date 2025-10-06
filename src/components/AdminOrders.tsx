@@ -190,74 +190,77 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Filters and Search */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 sm:p-6 border border-white/20">
+        <div className="flex flex-col gap-3 sm:gap-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
             <input
               type="text"
               placeholder={t('admin.searchOrders')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base touch-manipulation"
             />
           </div>
 
-          {/* Filter by type */}
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value as 'all' | 'single' | 'multi')}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="all">{t('admin.allOrders')}</option>
-            <option value="single">{t('admin.singleOrders')}</option>
-            <option value="multi">{t('admin.multiOrders')}</option>
-          </select>
+          {/* Filters Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {/* Filter by type */}
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value as 'all' | 'single' | 'multi')}
+              className="px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base touch-manipulation"
+            >
+              <option value="all">{t('admin.allOrders')}</option>
+              <option value="single">{t('admin.singleOrders')}</option>
+              <option value="multi">{t('admin.multiOrders')}</option>
+            </select>
 
-          {/* Sort by */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'date' | 'amount' | 'status')}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="date">{t('admin.sortByDate')}</option>
-            <option value="amount">{t('admin.sortByAmount')}</option>
-            <option value="status">{t('admin.sortByStatus')}</option>
-          </select>
+            {/* Sort by */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'date' | 'amount' | 'status')}
+              className="px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base touch-manipulation"
+            >
+              <option value="date">{t('admin.sortByDate')}</option>
+              <option value="amount">{t('admin.sortByAmount')}</option>
+              <option value="status">{t('admin.sortByStatus')}</option>
+            </select>
 
-          {/* Sort order */}
-          <button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors"
-          >
-            {sortOrder === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-{sortOrder === 'asc' ? t('admin.ascending') : t('admin.descending')}
-          </button>
+            {/* Sort order */}
+            <button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors text-sm sm:text-base touch-manipulation"
+            >
+              {sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" /> : <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />}
+              <span className="hidden sm:inline">{sortOrder === 'asc' ? t('admin.ascending') : t('admin.descending')}</span>
+            </button>
 
-          {/* Items per page */}
-          <select
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value={5}>{t('admin.itemsPerPage', { count: 5 })}</option>
-            <option value={10}>{t('admin.itemsPerPage', { count: 10 })}</option>
-            <option value={25}>{t('admin.itemsPerPage', { count: 25 })}</option>
-            <option value={50}>{t('admin.itemsPerPage', { count: 50 })}</option>
-          </select>
+            {/* Items per page */}
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base touch-manipulation"
+            >
+              <option value={5}>{t('admin.itemsPerPage', { count: 5 })}</option>
+              <option value={10}>{t('admin.itemsPerPage', { count: 10 })}</option>
+              <option value={25}>{t('admin.itemsPerPage', { count: 25 })}</option>
+              <option value={50}>{t('admin.itemsPerPage', { count: 50 })}</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Orders List */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {filteredOrders.length === 0 ? (
-          <div className="text-center py-12">
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-300 text-lg">{t('admin.noOrdersFound')}</p>
+          <div className="text-center py-8 sm:py-12">
+            <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-300 text-base sm:text-lg">{t('admin.noOrdersFound')}</p>
           </div>
         ) : (
           paginatedOrders.map((order, index) => (
@@ -270,49 +273,49 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             >
               {/* Order Header */}
               <div 
-                className="p-6 cursor-pointer hover:bg-white/5 transition-colors"
+                className="p-4 sm:p-6 cursor-pointer hover:bg-white/5 transition-colors"
                 onClick={() => toggleOrderExpansion(order.id)}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                     <div className="flex-shrink-0">
                       {order.type === 'single' ? (
-                        <CreditCard className="w-6 h-6 text-purple-400" />
+                        <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
                       ) : (
-                        <Package className="w-6 h-6 text-blue-400" />
+                        <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                       )}
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-white truncate">
                         {order.type === 'single' ? order.beat.title : t('admin.multiOrderTitle', { count: (order as MultiItemOrder).items.length })}
                       </h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-300 mt-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-300 mt-1">
                         <span className="flex items-center gap-1">
-                          <User className="w-4 h-4" />
-                          {order.customerEmail}
+                          <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className="truncate">{order.customerEmail}</span>
                         </span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                           {formatDate(order.createdAt)}
                         </span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
                     <div className="text-right">
-                      <div className="text-xl font-bold text-white">
+                      <div className="text-lg sm:text-xl font-bold text-white">
                         {formatAmount(order.totalAmount)}
                       </div>
                       <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                         {order.status}
                       </div>
                     </div>
-                    <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                    <button className="p-2 hover:bg-white/10 rounded-lg transition-colors touch-manipulation">
                       {expandedOrder === order.id ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                        <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                       )}
                     </button>
                   </div>
@@ -325,31 +328,31 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="border-t border-white/20 p-6 bg-white/5"
+                  className="border-t border-white/20 p-4 sm:p-6 bg-white/5"
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Order Information */}
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-4">{t('admin.orderInformation')}</h4>
-                      <div className="space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">{t('success.orderId')}:</span>
-                          <span className="text-white font-mono text-sm">{order.id}</span>
+                      <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">{t('admin.orderInformation')}</h4>
+                      <div className="space-y-2 sm:space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                          <span className="text-gray-300 text-sm sm:text-base">{t('success.orderId')}:</span>
+                          <span className="text-white font-mono text-xs sm:text-sm break-all">{order.id}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">{t('admin.customerEmail')}:</span>
-                          <span className="text-white">{order.customerEmail}</span>
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                          <span className="text-gray-300 text-sm sm:text-base">{t('admin.customerEmail')}:</span>
+                          <span className="text-white text-sm sm:text-base break-all">{order.customerEmail}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">{t('admin.orderDate')}:</span>
-                          <span className="text-white">{formatDate(order.createdAt)}</span>
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                          <span className="text-gray-300 text-sm sm:text-base">{t('admin.orderDate')}:</span>
+                          <span className="text-white text-sm sm:text-base">{formatDate(order.createdAt)}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">{t('common.totalAmount')}:</span>
-                          <span className="text-white font-semibold">{formatAmount(order.totalAmount)}</span>
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                          <span className="text-gray-300 text-sm sm:text-base">{t('common.totalAmount')}:</span>
+                          <span className="text-white font-semibold text-sm sm:text-base">{formatAmount(order.totalAmount)}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">{t('common.status')}:</span>
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                          <span className="text-gray-300 text-sm sm:text-base">{t('common.status')}:</span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                             {order.status}
                           </span>
@@ -359,33 +362,33 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
 
                     {/* Order Items */}
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-4">{t('admin.orderedItems')}</h4>
+                      <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">{t('admin.orderedItems')}</h4>
                       {order.type === 'single' ? (
-                        <div className="bg-white/10 rounded-lg p-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h5 className="font-semibold text-white">{order.beat.title}</h5>
-                              <p className="text-sm text-gray-300">{order.beat.genre} • {order.beat.bpm} BPM</p>
+                        <div className="bg-white/10 rounded-lg p-3 sm:p-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                            <div className="min-w-0 flex-1">
+                              <h5 className="font-semibold text-white text-sm sm:text-base truncate">{order.beat.title}</h5>
+                              <p className="text-xs sm:text-sm text-gray-300">{order.beat.genre} • {order.beat.bpm} BPM</p>
                             </div>
                             <div className="text-right">
-                              <div className="text-white font-semibold">{formatAmount(order.beat.wavLeasePrice)}</div>
-                              <div className="text-sm text-gray-300">{t('admin.quantity')}: 1</div>
+                              <div className="text-white font-semibold text-sm sm:text-base">{formatAmount(order.beat.wavLeasePrice)}</div>
+                              <div className="text-xs sm:text-sm text-gray-300">{t('admin.quantity')}: 1</div>
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {(order as MultiItemOrder).items.map((item, itemIndex) => (
-                            <div key={itemIndex} className="bg-white/10 rounded-lg p-4">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <h5 className="font-semibold text-white">{item.beat.title}</h5>
-                                  <p className="text-sm text-gray-300">{item.beat.genre} • {item.beat.bpm} BPM</p>
+                            <div key={itemIndex} className="bg-white/10 rounded-lg p-3 sm:p-4">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                                <div className="min-w-0 flex-1">
+                                  <h5 className="font-semibold text-white text-sm sm:text-base truncate">{item.beat.title}</h5>
+                                  <p className="text-xs sm:text-sm text-gray-300">{item.beat.genre} • {item.beat.bpm} BPM</p>
                                 </div>
                                 <div className="text-right">
-                                  <div className="text-white font-semibold">{formatAmount(item.unitPrice)}</div>
-                                  <div className="text-sm text-gray-300">{t('admin.quantity')}: {item.quantity}</div>
-                                  <div className="text-sm text-purple-300 font-medium">
+                                  <div className="text-white font-semibold text-sm sm:text-base">{formatAmount(item.unitPrice)}</div>
+                                  <div className="text-xs sm:text-sm text-gray-300">{t('admin.quantity')}: {item.quantity}</div>
+                                  <div className="text-xs sm:text-sm text-purple-300 font-medium">
                                     {t('common.total')}: {formatAmount(item.totalPrice)}
                                   </div>
                                 </div>
@@ -398,14 +401,14 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-3 mt-6 pt-4 border-t border-white/20">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                      <Eye className="w-4 h-4" />
-{t('admin.viewDetails')}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/20">
+                    <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm sm:text-base touch-manipulation">
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                      {t('admin.viewDetails')}
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
-                      <Download className="w-4 h-4" />
-{t('common.download')}
+                    <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm sm:text-base touch-manipulation">
+                      <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                      {t('common.download')}
                     </button>
                   </div>
                 </motion.div>
@@ -417,43 +420,43 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
 
       {/* Pagination Controls */}
       {filteredOrders.length > 0 && (
-        <div className="flex items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+        <div className="flex flex-col sm:flex-row items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-3 sm:p-4 border border-white/20 gap-3 sm:gap-0">
           <div className="flex items-center gap-4">
-            <span className="text-gray-300 text-sm">
-{t('admin.showingOrders', { start: startIndex + 1, end: Math.min(endIndex, filteredOrders.length), total: filteredOrders.length })}
+            <span className="text-gray-300 text-xs sm:text-sm text-center sm:text-left">
+              {t('admin.showingOrders', { start: startIndex + 1, end: Math.min(endIndex, filteredOrders.length), total: filteredOrders.length })}
             </span>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Previous button */}
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm touch-manipulation"
             >
-              <ChevronLeft className="w-4 h-4" />
-{t('pagination.previous')}
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t('pagination.previous')}</span>
             </button>
 
             {/* Page numbers */}
             <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
                 let pageNum;
-                if (totalPages <= 5) {
+                if (totalPages <= 3) {
                   pageNum = i + 1;
-                } else if (currentPage <= 3) {
+                } else if (currentPage <= 2) {
                   pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
+                } else if (currentPage >= totalPages - 1) {
+                  pageNum = totalPages - 2 + i;
                 } else {
-                  pageNum = currentPage - 2 + i;
+                  pageNum = currentPage - 1 + i;
                 }
 
                 return (
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                       currentPage === pageNum
                         ? 'bg-purple-600 text-white'
                         : 'bg-white/10 text-gray-300 hover:bg-white/20'
@@ -469,10 +472,10 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm touch-manipulation"
             >
-{t('pagination.next')}
-              <ChevronRight className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('pagination.next')}</span>
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>

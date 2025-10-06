@@ -30,20 +30,20 @@ export default function FeaturedProducts() {
 
   if (loading) {
     return (
-      <section className="pt-12 pb-20">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Beats en vedette
+      <section className="pt-8 pb-12 md:pt-12 md:pb-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-8 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 md:mb-4">
+              {t('featured.title')}
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Mes meilleurs beats
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+              {t('featured.description')}
             </p>
           </div>
-          <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex items-center justify-center min-h-[300px] md:min-h-[400px]">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-              <p className="text-foreground text-lg">Chargement des beats...</p>
+              <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-purple-500 mx-auto mb-3 md:mb-4"></div>
+              <p className="text-foreground text-sm md:text-lg">{t('featured.loading')}</p>
             </div>
           </div>
         </div>
@@ -53,19 +53,19 @@ export default function FeaturedProducts() {
 
   if (featuredBeats.length === 0) {
     return (
-      <section className="pt-12 pb-20">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Beats en vedette
+      <section className="pt-8 pb-12 md:pt-12 md:pb-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-8 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 md:mb-4">
+              {t('featured.title')}
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Mes meilleurs beats
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+              {t('featured.description')}
             </p>
           </div>
-          <div className="text-center py-16">
-            <div className="text-muted-foreground text-lg mb-4">
-              Aucun beat en vedette pour le moment
+          <div className="text-center py-8 md:py-16">
+            <div className="text-muted-foreground text-sm md:text-lg mb-4 px-4">
+              {t('featured.noBeats')}
             </div>
           </div>
         </div>
@@ -74,67 +74,75 @@ export default function FeaturedProducts() {
   }
 
   return (
-    <section className="pt-12 pb-20">
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="pt-8 pb-12 md:pt-12 md:pb-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
         >
-          <motion.div className="relative mx-4 my-4 flex flex-col items-center justify-center gap-4 text-center sm:mx-0 sm:mb-0 sm:flex-row">
+          <motion.div className="relative mx-2 my-2 md:mx-4 md:my-4 flex flex-col items-center justify-center gap-2 md:gap-4 text-center sm:mx-0 sm:mb-0 sm:flex-row">
             <LayoutTextFlip
               text={`${t('featured.title')} `}
               words={translations[language].featured.words}
               duration={2500}
             />
           </motion.div>
-          <p className="mt-4 text-center text-xl text-foreground max-w-2xl mx-auto">
+          <p className="mt-3 md:mt-4 text-center text-base sm:text-lg md:text-xl text-foreground max-w-2xl mx-auto px-4">
             {t('featured.description')}
           </p>
         </motion.div>
 
-        {/* Grille des beats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        {/* Grid des beats - Mobile optimized */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-8 md:mb-12">
           {featuredBeats.map((beat, index) => (
             <motion.div
               key={beat.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -10 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: index * 0.1,
+                ease: "easeOut"
+              }}
+              whileHover={{ 
+                y: -5,
+                scale: 1.01
+              }}
+              className="w-full"
             >
               <BeatCard
                 beat={beat}
                 isPlaying={playingBeat === beat.id}
                 onPlay={togglePlay}
                 onPause={togglePlay}
-                className="group relative bg-card/10 backdrop-blur-lg rounded-2xl overflow-hidden hover:bg-card/20 transition-all duration-500"
+                className="group relative bg-card/10 backdrop-blur-lg rounded-xl md:rounded-2xl overflow-hidden hover:bg-card/20 transition-all duration-500 w-full h-full"
               />
             </motion.div>
           ))}
         </div>
 
-        {/* CTA */}
+        {/* CTA - Mobile optimized */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center flex justify-center"
+          className="text-center flex justify-center px-4"
         >
-          <Link href="/beats">
+          <Link href="/beats" className="w-full sm:w-auto">
             <HoverBorderGradient
-              containerClassName="rounded-2xl"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300"
+              containerClassName="rounded-xl md:rounded-2xl w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-sm sm:text-base md:text-lg font-semibold transition-all duration-300 w-full sm:w-auto"
               duration={1.5}
               clockwise={true}
             >
               {t('featured.viewAllBeats')}
-              <Music className="w-5 h-5" />
+              <Music className="w-4 h-4 md:w-5 md:h-5" />
             </HoverBorderGradient>
           </Link>
         </motion.div>

@@ -220,7 +220,7 @@ export default function BeatManagementPage() {
 
   return (
     <AdminRoute>
-      <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8">
         <DottedSurface className="size-full z-0" />
         
         {/* Gradient overlay */}
@@ -235,42 +235,43 @@ export default function BeatManagementPage() {
           />
         </div>
 
-        <div className="max-w-6xl mx-auto py-8 relative z-10">
+        <div className="max-w-6xl mx-auto py-4 sm:py-8 relative z-10">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-6 sm:mb-8"
           >
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
               <Link
                 href="/admin/upload"
-                className="inline-flex items-center mt-20 gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-4 py-2 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"
+                className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30 text-sm sm:text-base touch-manipulation"
               >
-                <ArrowLeft className="w-5 h-5" />
-{t('common.back')}
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                {t('common.back')}
               </Link>
               
-              <div className="flex items-center gap-3 mt-20">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 {isEditing ? (
                   <>
                     <Button
                       onClick={handleSave}
                       disabled={isSaving}
                       variant="primary"
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-2 touch-manipulation"
                     >
-                      <Edit className="w-4 h-4" />
-                      {isSaving ? t('common.saving') : t('common.save')}
+                      <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">{isSaving ? t('common.saving') : t('common.save')}</span>
                     </Button>
                     
                     <Button
                       onClick={handleCancel}
                       disabled={isSaving}
                       variant="card"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 touch-manipulation"
                     >
-                      <X className="w-4 h-4" />
-{t('common.cancel')}
+                      <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">{t('common.cancel')}</span>
                     </Button>
                   </>
                 ) : (
@@ -278,18 +279,20 @@ export default function BeatManagementPage() {
                     <Button
                       onClick={() => setIsEditing(true)}
                       variant="card"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 touch-manipulation"
                     >
-                      <Edit className="w-4 h-4" />
-                      {t('common.edit')}
+                      <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">{t('common.edit')}</span>
                     </Button>
                     
                     <Button
                       asChild
                       variant="primary"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 touch-manipulation"
                     >
                       <Link href={`/admin/beats/${beatId}/edit`}>
-                        <Upload className="w-4 h-4" />
-{t('admin.editFiles')}
+                        <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">{t('admin.editFiles')}</span>
                       </Link>
                     </Button>
                     
@@ -297,9 +300,10 @@ export default function BeatManagementPage() {
                       onClick={handleDelete}
                       disabled={isDeleting}
                       variant="destructive"
+                      className="text-xs sm:text-sm px-3 sm:px-4 py-2 touch-manipulation"
                     >
-                      <Trash2 className="w-4 h-4" />
-                      {isDeleting ? t('common.deleting') : t('common.delete')}
+                      <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">{isDeleting ? t('common.deleting') : t('common.delete')}</span>
                     </Button>
                   </>
                 )}
@@ -307,46 +311,45 @@ export default function BeatManagementPage() {
             </div>
 
             {isEditing ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <input
                   type="text"
                   value={editData.title || ''}
                   onChange={(e) => handleEditChange('title', e.target.value)}
-                  className="text-4xl font-bold bg-background border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary w-full"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold bg-background border border-border rounded-lg px-3 sm:px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary w-full touch-manipulation"
                   placeholder="Titre du beat"
                 />
                 <textarea
                   value={editData.description || ''}
                   onChange={(e) => handleEditChange('description', e.target.value)}
-                  className="text-lg bg-background border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary w-full resize-none"
+                  className="text-base sm:text-lg bg-background border border-border rounded-lg px-3 sm:px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary w-full resize-none touch-manipulation"
                   placeholder="Description du beat"
                   rows={3}
                 />
               </div>
             ) : (
               <>
-                <h1 className="text-4xl font-bold text-foreground mb-2">{beat.title}</h1>
-                <p className="text-muted-foreground text-lg">{beat.description}</p>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 leading-tight">{beat.title}</h1>
+                <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">{beat.description}</p>
               </>
             )}
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Informations principales */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="lg:col-span-2 space-y-6"
+              className="lg:col-span-2 space-y-4 sm:space-y-6"
             >
               {/* Player audio */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Music className="w-5 h-5" />
+              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                  <Music className="w-4 h-4 sm:w-5 sm:h-5" />
                   Aperçu
                 </h3>
                 
-
 
                 {beat.previewUrl && (
                   <audio
@@ -362,17 +365,17 @@ export default function BeatManagementPage() {
               </div>
 
               {/* Détails du beat */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                <h3 className="text-xl font-semibold text-foreground mb-4">Détails</h3>
+              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Détails</h3>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">Genre</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">Genre</label>
                     {isEditing ? (
                       <select
                         value={editData.genre || ''}
                         onChange={(e) => handleEditChange('genre', e.target.value)}
-                        className="w-full p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full p-2 sm:p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base touch-manipulation"
                       >
                         <option value="Trap">Trap</option>
                         <option value="Hip-Hop">Hip-Hop</option>
@@ -386,33 +389,33 @@ export default function BeatManagementPage() {
                         <option value="Rock">Rock</option>
                       </select>
                     ) : (
-                      <p className="text-foreground font-medium">{beat.genre}</p>
+                      <p className="text-foreground font-medium text-sm sm:text-base">{beat.genre}</p>
                     )}
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">BPM</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">BPM</label>
                     {isEditing ? (
                       <input
                         type="number"
                         value={editData.bpm || ''}
                         onChange={(e) => handleEditChange('bpm', parseInt(e.target.value))}
-                        className="w-full p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full p-2 sm:p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base touch-manipulation"
                         min="60"
                         max="200"
                       />
                     ) : (
-                      <p className="text-foreground font-medium">{beat.bpm}</p>
+                      <p className="text-foreground font-medium text-sm sm:text-base">{beat.bpm}</p>
                     )}
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">Tonalité</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">Tonalité</label>
                     {isEditing ? (
                       <select
                         value={editData.key || ''}
                         onChange={(e) => handleEditChange('key', e.target.value)}
-                        className="w-full p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full p-2 sm:p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base touch-manipulation"
                       >
                         <option value="C">C</option>
                         <option value="C#">C#</option>
@@ -428,23 +431,23 @@ export default function BeatManagementPage() {
                         <option value="B">B</option>
                       </select>
                     ) : (
-                      <p className="text-foreground font-medium">{beat.key}</p>
+                      <p className="text-foreground font-medium text-sm sm:text-base">{beat.key}</p>
                     )}
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">Durée</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">Durée</label>
                     {isEditing ? (
                       <input
                         type="text"
                         value={editData.duration || ''}
                         onChange={(e) => handleEditChange('duration', e.target.value)}
-                        className="w-full p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full p-2 sm:p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base touch-manipulation"
                         placeholder="3:24"
                       />
                     ) : (
-                      <p className="text-foreground font-medium flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
+                      <p className="text-foreground font-medium flex items-center gap-1 text-sm sm:text-base">
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                         {beat.duration}
                       </p>
                     )}
@@ -452,15 +455,15 @@ export default function BeatManagementPage() {
                 </div>
 
                 {/* Tags */}
-                <div className="mt-6">
-                  <label className="text-sm text-muted-foreground mb-2 block">Tags</label>
+                <div className="mt-4 sm:mt-6">
+                  <label className="text-xs sm:text-sm text-muted-foreground mb-2 block">Tags</label>
                   {isEditing ? (
                     <div className="space-y-3">
                       <div className="flex flex-wrap gap-2">
                         {(editData.tags || []).map((tag, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm"
+                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-primary/20 text-primary rounded-full text-xs sm:text-sm"
                           >
                             <Tag className="w-3 h-3" />
                             {tag}
@@ -470,18 +473,18 @@ export default function BeatManagementPage() {
                                 newTags.splice(index, 1);
                                 handleEditChange('tags', newTags);
                               }}
-                              className="ml-1 text-primary/70 hover:text-red-400 transition-colors"
+                              className="ml-1 text-primary/70 hover:text-red-400 transition-colors touch-manipulation"
                             >
                               <X className="w-3 h-3" />
                             </button>
                           </span>
                         ))}
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <input
                           type="text"
                           placeholder="Ajouter un tag..."
-                          className="flex-1 p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="flex-1 p-2 sm:p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base touch-manipulation"
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
                               e.preventDefault();
@@ -505,7 +508,7 @@ export default function BeatManagementPage() {
                               input.value = '';
                             }
                           }}
-                          className="px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors"
+                          className="px-3 sm:px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors text-sm touch-manipulation"
                         >
                           Ajouter
                         </button>
@@ -520,7 +523,7 @@ export default function BeatManagementPage() {
                         {beat.tags.map((tag, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm"
+                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-primary/20 text-primary rounded-full text-xs sm:text-sm"
                           >
                             <Tag className="w-3 h-3" />
                             {tag}
@@ -528,29 +531,29 @@ export default function BeatManagementPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground text-sm">Aucun tag</p>
+                      <p className="text-muted-foreground text-xs sm:text-sm">Aucun tag</p>
                     )
                   )}
                 </div>
               </div>
 
               {/* Fichiers disponibles */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                <h3 className="text-xl font-semibold text-foreground mb-4">Fichiers</h3>
+              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Fichiers</h3>
                 
                 <div className="space-y-3">
                   {beat.previewUrl && (
                     <div className="flex items-center justify-between p-3 bg-card/5 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <Music className="w-5 h-5 text-primary" />
-                        <span className="text-foreground">Preview (30s)</span>
+                        <Music className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                        <span className="text-foreground text-sm sm:text-base">Preview (30s)</span>
                       </div>
                       <button
                         onClick={() => {
                           const url = `/api/download/beat/${beat.id}?type=preview&admin=true`
                           window.location.href = url
                         }}
-                        className="text-primary hover:text-primary/80"
+                        className="text-primary hover:text-primary/80 touch-manipulation"
                         title="Télécharger la preview"
                       >
                         <Download className="w-4 h-4" />
@@ -561,15 +564,15 @@ export default function BeatManagementPage() {
                   {beat.fullUrl && (
                     <div className="flex items-center justify-between p-3 bg-card/5 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <Music className="w-5 h-5 text-green-400" />
-                        <span className="text-foreground">Master (WAV)</span>
+                        <Music className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                        <span className="text-foreground text-sm sm:text-base">Master (WAV)</span>
                       </div>
                       <button
                         onClick={() => {
                           const url = `/api/download/beat/${beat.id}?type=master&admin=true`
                           window.location.href = url
                         }}
-                        className="text-green-400 hover:text-green-300"
+                        className="text-green-400 hover:text-green-300 touch-manipulation"
                         title="Télécharger le master"
                       >
                         <Download className="w-4 h-4" />
@@ -586,46 +589,46 @@ export default function BeatManagementPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="space-y-6"
+              className="space-y-4 sm:space-y-6"
             >
               {/* Prix et statut */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" />
+              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
                   Prix
                 </h3>
                 
                 <div className="text-center">
-                  <div className="text-lg font-bold text-foreground mb-2">
+                  <div className="text-base sm:text-lg font-bold text-foreground mb-2">
                     WAV: {beat.wavLeasePrice}€
                   </div>
-                  <div className="text-lg font-bold text-foreground mb-2">
+                  <div className="text-base sm:text-lg font-bold text-foreground mb-2">
                     Trackout: {beat.trackoutLeasePrice}€
                   </div>
-                  <div className="text-lg font-bold text-foreground mb-2">
+                  <div className="text-base sm:text-lg font-bold text-foreground mb-2">
                     Unlimited: {beat.unlimitedLeasePrice}€
                   </div>
-                  <div className="text-sm text-muted-foreground mb-4">
+                  <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                     {beat.isExclusive ? 'Exclusif' : 'Non-exclusif'}
                   </div>
                   
                   {isEditing && (
-                    <div className="flex items-center justify-center gap-4">
-                      <label className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+                      <label className="flex items-center gap-2 text-muted-foreground text-sm">
                         <input
                           type="checkbox"
                           checked={editData.isExclusive || false}
                           onChange={(e) => handleEditChange('isExclusive', e.target.checked)}
-                          className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary"
+                          className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary touch-manipulation"
                         />
                         Exclusif
                       </label>
-                      <label className="flex items-center gap-2 text-muted-foreground">
+                      <label className="flex items-center gap-2 text-muted-foreground text-sm">
                         <input
                           type="checkbox"
                           checked={editData.featured || false}
                           onChange={(e) => handleEditChange('featured', e.target.checked)}
-                          className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary"
+                          className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary touch-manipulation"
                         />
                         En vedette
                       </label>
@@ -633,7 +636,7 @@ export default function BeatManagementPage() {
                   )}
                   
                   {isEditing && <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <p className="text-yellow-300 text-sm">
+                    <p className="text-yellow-300 text-xs sm:text-sm">
                       💡 Le prix ne peut pas être modifié ici. Contactez l&apos;administrateur pour changer le prix.
                     </p>
                   </div>}
@@ -641,46 +644,46 @@ export default function BeatManagementPage() {
               </div>
 
               {/* Statistiques */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
+              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                   Statistiques
                 </h3>
                 
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Vues</span>
-                    <span className="text-foreground font-medium">0</span>
+                    <span className="text-muted-foreground text-sm">Vues</span>
+                    <span className="text-foreground font-medium text-sm">0</span>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Téléchargements</span>
-                    <span className="text-foreground font-medium">0</span>
+                    <span className="text-muted-foreground text-sm">Téléchargements</span>
+                    <span className="text-foreground font-medium text-sm">0</span>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Achats</span>
-                    <span className="text-foreground font-medium">0</span>
+                    <span className="text-muted-foreground text-sm">Achats</span>
+                    <span className="text-foreground font-medium text-sm">0</span>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Revenus</span>
-                    <span className="text-green-400 font-medium">0€</span>
+                    <span className="text-muted-foreground text-sm">Revenus</span>
+                    <span className="text-green-400 font-medium text-sm">0€</span>
                   </div>
                 </div>
               </div>
 
               {/* Informations système */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 border border-border/20">
-                <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
+              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                   Informations
                 </h3>
                 
-                <div className="space-y-3 text-sm">
+                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">ID</span>
-                    <span className="text-foreground font-mono">{beat.id}</span>
+                    <span className="text-foreground font-mono text-xs break-all">{beat.id}</span>
                   </div>
                   
                   <div className="flex justify-between">

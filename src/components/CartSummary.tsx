@@ -81,36 +81,36 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 p-6 shadow-sm"
+      className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 p-4 sm:p-6 shadow-sm"
     >
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-foreground">{t('cart.orderSummary')}</h3>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
+        <h3 className="text-lg sm:text-xl font-semibold text-foreground">{t('cart.orderSummary')}</h3>
         <Button
           variant="outline"
           size="sm"
           onClick={handleClearCart}
           disabled={isClearing}
-          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-500/50"
+          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-500/50 w-full sm:w-auto touch-manipulation"
         >
-          <Trash2 className="h-4 w-4 mr-1" />
-          {t('cart.clearCart')}
+          <Trash2 className="h-4 w-4 mr-1 sm:mr-2" />
+          <span className="text-sm sm:text-base">{t('cart.clearCart')}</span>
         </Button>
       </div>
 
       {/* Cart Items Summary */}
-      <div className="space-y-3 mb-6">
+      <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
         {cart.items.map((item) => (
-          <div key={`${item.beat.id}-${item.licenseType}`} className="flex items-center justify-between text-sm">
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-foreground">{item.beat.title}</span>
-                <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
+          <div key={`${item.beat.id}-${item.licenseType}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <span className="font-medium text-foreground text-sm sm:text-base truncate">{item.beat.title}</span>
+                <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full w-fit">
                   {getLicenseDisplayName(item.licenseType)}
                 </span>
               </div>
-              <span className="text-muted-foreground text-xs">× {item.quantity}</span>
+              <span className="text-muted-foreground text-xs sm:text-sm">× {item.quantity}</span>
             </div>
-            <span className="font-medium text-foreground">
+            <span className="font-medium text-foreground text-sm sm:text-base">
               €{(getPriceByLicense(item.beat, item.licenseType) * item.quantity).toFixed(2)}
             </span>
           </div>
@@ -118,18 +118,18 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
       </div>
 
       {/* Divider */}
-      <div className="border-t border-border/20 mb-6"></div>
+      <div className="border-t border-border/20 mb-4 sm:mb-6"></div>
 
       {/* Totals */}
-      <div className="space-y-3 mb-6">
-        <div className="flex items-center justify-between text-sm">
+      <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+        <div className="flex items-center justify-between text-sm sm:text-base">
           <span className="text-muted-foreground">{t('cart.items')} ({cart.totalItems})</span>
-          <span className="text-foreground">€{cart.totalPrice.toFixed(2)}</span>
+          <span className="text-foreground font-medium">€{cart.totalPrice.toFixed(2)}</span>
         </div>
         
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-sm sm:text-base">
           <span className="text-muted-foreground">{t('cart.processingFee')}</span>
-          <span className="text-foreground">€0.00</span>
+          <span className="text-foreground font-medium">€0.00</span>
         </div>
         
         {/* <div className="flex items-center justify-between text-sm">
@@ -137,8 +137,8 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
           <span className="text-foreground">€{(cart.totalPrice * 0.21).toFixed(2)}</span>
         </div> */}
         
-        <div className="border-t border-border/20 pt-3">
-          <div className="flex items-center justify-between text-lg font-semibold">
+        <div className="border-t border-border/20 pt-2 sm:pt-3">
+          <div className="flex items-center justify-between text-base sm:text-lg font-semibold">
             <span className="text-foreground">{t('common.total')}</span>
             <span className="text-foreground">
               {/* €{(cart.totalPrice * 1.21).toFixed(2)} */}
@@ -149,17 +149,17 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
       </div>
 
       {/* Checkout Button */}
-        <Button
+      <Button
         onClick={onCheckout}
-        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
+        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 touch-manipulation"
       >
-        <CreditCard className="h-5 w-5 mr-2" />
-        {t('cart.proceedToCheckout')}
-        <ArrowRight className="h-5 w-5 ml-2" />
+        <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+        <span className="text-sm sm:text-base">{t('cart.proceedToCheckout')}</span>
+        <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
       </Button>
 
       {/* Security Notice */}
-      <p className="text-xs text-muted-foreground text-center mt-4">
+      <p className="text-xs sm:text-sm text-muted-foreground text-center mt-3 sm:mt-4">
         🔒 {t('cart.secureCheckout')}
       </p>
     </motion.div>

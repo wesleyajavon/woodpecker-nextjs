@@ -83,7 +83,7 @@ const ContactPage = () => {
   ];
 
   return (
-    <main className="min-h-screen bg-background pt-20 pb-12">
+    <main className="min-h-screen bg-background pt-16 sm:pt-20 pb-8 sm:pb-12">
       <DottedSurface className="size-full z-0" />
       
       {/* Gradient overlay */}
@@ -98,15 +98,15 @@ const ContactPage = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12 relative z-10">
         <ContactCard
           title={t('contact.title')}
           description={t('contact.subtitle')}
           contactInfo={contactInfo}
           className="shadow-2xl"
         >
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                   {t('contact.form.name')} *
@@ -118,7 +118,7 @@ const ContactPage = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground text-sm sm:text-base touch-manipulation"
                   placeholder={t('contact.form.namePlaceholder')}
                 />
               </div>
@@ -134,7 +134,7 @@ const ContactPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-muted-foreground text-sm sm:text-base touch-manipulation"
                   placeholder="votre@email.com"
                 />
               </div>
@@ -150,7 +150,7 @@ const ContactPage = () => {
                 value={formData.subject}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors text-sm sm:text-base touch-manipulation"
               >
                 <option value="">{t('contact.form.selectSubject')}</option>
                 <option value="support">{t('contact.form.subjects.support')}</option>
@@ -170,21 +170,21 @@ const ContactPage = () => {
                 value={formData.message}
                 onChange={handleChange}
                 required
-                rows={6}
-                className="w-full px-4 py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none placeholder-muted-foreground"
+                rows={5}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background border border-border text-foreground rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none placeholder-muted-foreground text-sm sm:text-base touch-manipulation"
                 placeholder={t('contact.form.messagePlaceholder')}
               />
             </div>
 
             {/* Messages de statut */}
             {submitStatus === 'success' && (
-              <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm">
                 {t('contact.form.success')}
               </div>
             )}
 
             {submitStatus === 'error' && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm">
                 ❌ {errorMessage}
               </div>
             )}
@@ -193,7 +193,7 @@ const ContactPage = () => {
               type="submit"
               disabled={isSubmitting}
               className={cn(
-                "w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2",
+                "w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base touch-manipulation",
                 isSubmitting
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
                   : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transform hover:scale-105"
@@ -201,13 +201,13 @@ const ContactPage = () => {
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
-                  {t('contact.form.sending')}
+                  <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-current"></div>
+                  <span className="text-xs sm:text-sm">{t('contact.form.sending')}</span>
                 </>
               ) : (
                 <>
-                  <Send className="h-5 w-5" />
-                  {t('contact.form.send')}
+                  <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="text-xs sm:text-sm">{t('contact.form.send')}</span>
                 </>
               )}
             </button>

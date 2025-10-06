@@ -192,6 +192,8 @@ export const fr = {
     words: ['en feu', 'masterclass', 'en pétard', 'pépites', 'bouillants', 'crackito'],
     description: 'Que des bangers dans cette sélection d\'instrus qui retournent tout en ce moment.',
     viewAllBeats: 'Voir tous mes beats',
+    loading: 'Chargement des beats...',
+    noBeats: 'Aucun beat en vedette pour le moment',
   },
 
   // Auth

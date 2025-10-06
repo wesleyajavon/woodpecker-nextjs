@@ -314,21 +314,21 @@ export default function LicensesPage() {
         />
       </div>
 
-      <div className="relative z-10 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 pt-20 sm:pt-24 pb-12 sm:pb-16 px-3 sm:px-4 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
               {t('licenses.pageTitle')}{' '}
               <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent">
                 {t('licenses.pageTitleHighlight')}
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
               {t('licenses.pageSubtitle')}
             </p>
           </motion.div>
@@ -338,58 +338,58 @@ export default function LicensesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-16"
+            className="mb-12 sm:mb-16"
           >
-            <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 overflow-hidden">
-              <div className="p-6 border-b border-border/20">
-                <h2 className="text-2xl font-bold text-foreground mb-2">{t('licenses.comparisonTitle')}</h2>
-                <p className="text-muted-foreground">{t('licenses.comparisonSubtitle')}</p>
+            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-border/20 overflow-hidden">
+              <div className="p-4 sm:p-6 border-b border-border/20">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">{t('licenses.comparisonTitle')}</h2>
+                <p className="text-sm sm:text-base text-muted-foreground">{t('licenses.comparisonSubtitle')}</p>
               </div>
               
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[600px]">
                   <thead>
                     <tr className="border-b border-border/20">
-                      <th className="text-left p-4 text-foreground font-semibold">{t('licenses.features')}</th>
-                      <th className="text-center p-4">
-                        <div className="flex flex-col items-center gap-2">
-                          <Music className="w-6 h-6 text-blue-400" />
-                          <span className="font-semibold text-foreground">WAV Lease</span>
-                          <span className="text-sm text-muted-foreground">{t('licenses.basic')}</span>
+                      <th className="text-left p-3 sm:p-4 text-foreground font-semibold text-sm sm:text-base">{t('licenses.features')}</th>
+                      <th className="text-center p-3 sm:p-4 min-w-[140px]">
+                        <div className="flex flex-col items-center gap-1 sm:gap-2">
+                          <Music className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
+                          <span className="font-semibold text-foreground text-xs sm:text-sm">WAV Lease</span>
+                          <span className="text-xs text-muted-foreground">{t('licenses.basic')}</span>
                           <button
                             onClick={() => openModal('wav')}
-                            className="mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg"
+                            className="mt-1 sm:mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg touch-manipulation"
                           >
                             <Info className="w-3 h-3" />
-                            {t('licenses.readMore')}
+                            <span className="hidden sm:inline">{t('licenses.readMore')}</span>
                           </button>
                         </div>
                       </th>
-                      <th className="text-center p-4">
-                        <div className="flex flex-col items-center gap-2">
-                          <Archive className="w-6 h-6 text-purple-400" />
-                          <span className="font-semibold text-foreground">Trackout Lease</span>
-                          <span className="text-sm text-muted-foreground">{t('licenses.advanced')}</span>
+                      <th className="text-center p-3 sm:p-4 min-w-[140px]">
+                        <div className="flex flex-col items-center gap-1 sm:gap-2">
+                          <Archive className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+                          <span className="font-semibold text-foreground text-xs sm:text-sm">Trackout Lease</span>
+                          <span className="text-xs text-muted-foreground">{t('licenses.advanced')}</span>
                           <button
                             onClick={() => openModal('trackout')}
-                            className="mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg"
+                            className="mt-1 sm:mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg touch-manipulation"
                           >
                             <Info className="w-3 h-3" />
-                            {t('licenses.readMore')}
+                            <span className="hidden sm:inline">{t('licenses.readMore')}</span>
                           </button>
                         </div>
                       </th>
-                      <th className="text-center p-4">
-                        <div className="flex flex-col items-center gap-2">
-                          <Crown className="w-6 h-6 text-orange-400" />
-                          <span className="font-semibold text-foreground">Unlimited Lease</span>
-                          <span className="text-sm text-muted-foreground">{t('licenses.premium')}</span>
+                      <th className="text-center p-3 sm:p-4 min-w-[140px]">
+                        <div className="flex flex-col items-center gap-1 sm:gap-2">
+                          <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
+                          <span className="font-semibold text-foreground text-xs sm:text-sm">Unlimited Lease</span>
+                          <span className="text-xs text-muted-foreground">{t('licenses.premium')}</span>
                           <button
                             onClick={() => openModal('unlimited')}
-                            className="mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg"
+                            className="mt-1 sm:mt-2 text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-lg touch-manipulation"
                           >
                             <Info className="w-3 h-3" />
-                            {t('licenses.readMore')}
+                            <span className="hidden sm:inline">{t('licenses.readMore')}</span>
                           </button>
                         </div>
                       </th>
@@ -398,38 +398,38 @@ export default function LicensesPage() {
                   <tbody>
                     {licenseFeatures.map((feature, index) => (
                       <tr key={feature.name} className="border-b border-border/10 hover:bg-card/5">
-                        <td className="p-4 font-medium text-foreground">{feature.name}</td>
-                        <td className="p-4 text-center">
+                        <td className="p-3 sm:p-4 font-medium text-foreground text-sm sm:text-base">{feature.name}</td>
+                        <td className="p-3 sm:p-4 text-center">
                           {typeof feature.wav === 'boolean' ? (
                             feature.wav ? (
-                              <Check className="w-5 h-5 text-green-400 mx-auto" />
+                              <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mx-auto" />
                             ) : (
-                              <X className="w-5 h-5 text-red-400 mx-auto" />
+                              <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mx-auto" />
                             )
                           ) : (
-                            <span className="text-foreground font-medium">{feature.wav}</span>
+                            <span className="text-foreground font-medium text-xs sm:text-sm">{feature.wav}</span>
                           )}
                         </td>
-                        <td className="p-4 text-center">
+                        <td className="p-3 sm:p-4 text-center">
                           {typeof feature.trackout === 'boolean' ? (
                             feature.trackout ? (
-                              <Check className="w-5 h-5 text-green-400 mx-auto" />
+                              <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mx-auto" />
                             ) : (
-                              <X className="w-5 h-5 text-red-400 mx-auto" />
+                              <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mx-auto" />
                             )
                           ) : (
-                            <span className="text-foreground font-medium">{feature.trackout}</span>
+                            <span className="text-foreground font-medium text-xs sm:text-sm">{feature.trackout}</span>
                           )}
                         </td>
-                        <td className="p-4 text-center">
+                        <td className="p-3 sm:p-4 text-center">
                           {typeof feature.unlimited === 'boolean' ? (
                             feature.unlimited ? (
-                              <Check className="w-5 h-5 text-green-400 mx-auto" />
+                              <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mx-auto" />
                             ) : (
-                              <X className="w-5 h-5 text-red-400 mx-auto" />
+                              <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mx-auto" />
                             )
                           ) : (
-                            <span className="text-foreground font-medium">{feature.unlimited}</span>
+                            <span className="text-foreground font-medium text-xs sm:text-sm">{feature.unlimited}</span>
                           )}
                         </td>
                       </tr>
@@ -445,32 +445,32 @@ export default function LicensesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mb-16"
+            className="mb-12 sm:mb-16"
           >
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-foreground mb-4">{t('licenses.usageExamples')}</h2>
-              <p className="text-muted-foreground">{t('licenses.usageExamplesSubtitle')}</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">{t('licenses.usageExamples')}</h2>
+              <p className="text-sm sm:text-base text-muted-foreground px-2 sm:px-0">{t('licenses.usageExamplesSubtitle')}</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {usageExamples.map((example, index) => (
                 <motion.div
                   key={example.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + index * 0.1 }}
-                  className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 p-6 hover:border-border/40 transition-all"
+                  className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 p-4 sm:p-6 hover:border-border/40 transition-all"
                 >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                      <example.icon className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <example.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-foreground">{example.title}</h3>
+                    <h3 className="font-semibold text-foreground text-sm sm:text-base">{example.title}</h3>
                   </div>
-                  <p className="text-muted-foreground text-sm mb-4">{example.description}</p>
-                  <div className="space-y-1">
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">{example.description}</p>
+                  <div className="flex flex-wrap gap-1 sm:gap-2">
                     {example.licenses.map((license, idx) => (
-                      <div key={idx} className="text-xs text-primary bg-primary/10 px-2 py-1 rounded inline-block mr-1">
+                      <div key={idx} className="text-xs text-primary bg-primary/10 px-2 py-1 rounded">
                         {license}
                       </div>
                     ))}
@@ -485,19 +485,19 @@ export default function LicensesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mb-16"
+            className="mb-12 sm:mb-16"
           >
-            <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <AlertCircle className="w-6 h-6 text-yellow-400" />
-                <h2 className="text-2xl font-bold text-foreground">{t('licenses.importantPoints')}</h2>
+            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-border/20 p-4 sm:p-6">
+              <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">{t('licenses.importantPoints')}</h2>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {importantNotes.map((note, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-muted-foreground text-sm">{note}</p>
+                  <div key={index} className="flex items-start gap-2 sm:gap-3">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">{note}</p>
                   </div>
                 ))}
               </div>
@@ -512,14 +512,14 @@ export default function LicensesPage() {
             transition={{ delay: 0.5 }}
             className="text-center"
           >
-            <div className="bg-card/10 backdrop-blur-lg rounded-2xl border border-border/20 p-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">{t('licenses.customLicenseTitle')}</h2>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-border/20 p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">{t('licenses.customLicenseTitle')}</h2>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 max-w-2xl mx-auto px-2 sm:px-0">
                 {t('licenses.customLicenseDescription')}
               </p>
               <a
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl transition-colors font-medium"
+                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-colors font-medium text-sm sm:text-base touch-manipulation"
               >
                 {t('common.contactUs')}
               </a>
@@ -546,46 +546,46 @@ export default function LicensesPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-full max-w-4xl mx-4"
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-full max-w-4xl mx-3 sm:mx-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">
+              <div className="bg-card/95 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-border/50 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">
                 {/* Modal Header - Fixed */}
-                <div className="flex items-center justify-between p-4 md:p-6 border-b border-border/20 flex-shrink-0">
-                  <div className="flex items-center gap-3">
-                    {selectedLicense === 'wav' && <Music className="w-6 h-6 text-blue-400" />}
-                    {selectedLicense === 'trackout' && <Archive className="w-6 h-6 text-purple-400" />}
-                    {selectedLicense === 'unlimited' && <Crown className="w-6 h-6 text-orange-400" />}
-                    <div>
-                      <h3 className="text-xl md:text-2xl font-bold text-foreground">
+                <div className="flex items-center justify-between p-3 sm:p-4 md:p-6 border-b border-border/20 flex-shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    {selectedLicense === 'wav' && <Music className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400 flex-shrink-0" />}
+                    {selectedLicense === 'trackout' && <Archive className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 flex-shrink-0" />}
+                    {selectedLicense === 'unlimited' && <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400 flex-shrink-0" />}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground truncate">
                         {licenseDetails[selectedLicense].title}
                       </h3>
-                      <p className="text-sm md:text-base text-muted-foreground">
+                      <p className="text-xs sm:text-sm md:text-base text-muted-foreground leading-relaxed">
                         {licenseDetails[selectedLicense].description}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={closeModal}
-                    className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg flex-shrink-0"
+                    className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg flex-shrink-0 touch-manipulation"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
 
                 {/* Modal Body - Scrollable */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     {/* Features */}
-                    <div className="space-y-3 md:space-y-4">
-                      <h4 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
-                        <Check className="w-4 md:w-5 h-4 md:h-5 text-green-400" />
+                    <div className="space-y-2 sm:space-y-3 md:space-y-4">
+                      <h4 className="text-sm sm:text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
+                        <Check className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-green-400" />
                         {t('licenses.includedFeatures')}
                       </h4>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1 sm:space-y-2">
                         {licenseDetails[selectedLicense].features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground leading-relaxed">
-                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2 flex-shrink-0" />
+                          <li key={index} className="flex items-start gap-2 text-xs sm:text-sm md:text-sm text-muted-foreground leading-relaxed">
+                            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-400 rounded-full mt-2 flex-shrink-0" />
                             <span>{feature}</span>
                           </li>
                         ))}
@@ -593,15 +593,15 @@ export default function LicensesPage() {
                     </div>
 
                     {/* Limitations */}
-                    <div className="space-y-3 md:space-y-4">
-                      <h4 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
-                        <AlertCircle className="w-4 md:w-5 h-4 md:h-5 text-yellow-400" />
+                    <div className="space-y-2 sm:space-y-3 md:space-y-4">
+                      <h4 className="text-sm sm:text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
+                        <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-yellow-400" />
                         {t('licenses.limitations')}
                       </h4>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1 sm:space-y-2">
                         {licenseDetails[selectedLicense].limitations.map((limitation, index) => (
-                          <li key={index} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground leading-relaxed">
-                            <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full mt-2 flex-shrink-0" />
+                          <li key={index} className="flex items-start gap-2 text-xs sm:text-sm md:text-sm text-muted-foreground leading-relaxed">
+                            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-yellow-400 rounded-full mt-2 flex-shrink-0" />
                             <span>{limitation}</span>
                           </li>
                         ))}
@@ -609,15 +609,15 @@ export default function LicensesPage() {
                     </div>
 
                     {/* Use Cases */}
-                    <div className="space-y-3 md:space-y-4">
-                      <h4 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
-                        <ExternalLink className="w-4 md:w-5 h-4 md:h-5 text-blue-400" />
+                    <div className="space-y-2 sm:space-y-3 md:space-y-4">
+                      <h4 className="text-sm sm:text-base md:text-lg font-semibold text-foreground flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-2 -mt-2">
+                        <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-blue-400" />
                         {t('licenses.useCases')}
                       </h4>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1 sm:space-y-2">
                         {licenseDetails[selectedLicense].useCases.map((useCase, index) => (
-                          <li key={index} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground leading-relaxed">
-                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
+                          <li key={index} className="flex items-start gap-2 text-xs sm:text-sm md:text-sm text-muted-foreground leading-relaxed">
+                            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
                             <span>{useCase}</span>
                           </li>
                         ))}
@@ -627,21 +627,21 @@ export default function LicensesPage() {
                 </div>
 
                 {/* Modal Footer - Fixed */}
-                <div className="flex flex-col sm:flex-row items-center justify-between p-4 md:p-6 border-t border-border/20 bg-card/20 flex-shrink-0 gap-3 sm:gap-0">
-                  <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-                    <Info className="w-4 h-4" />
+                <div className="flex flex-col sm:flex-row items-center justify-between p-3 sm:p-4 md:p-6 border-t border-border/20 bg-card/20 flex-shrink-0 gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                    <Info className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>{t('licenses.completeInformation')}</span>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3">
                     <a
                       href="/contact"
-                      className="px-3 md:px-4 py-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                      className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-primary hover:text-primary/80 transition-colors touch-manipulation"
                     >
                       {t('licenses.questions')}
                     </a>
                     <button
                       onClick={closeModal}
-                      className="px-3 md:px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
+                      className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium touch-manipulation"
                     >
                       {t('common.close')}
                     </button>

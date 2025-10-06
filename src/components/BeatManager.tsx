@@ -176,99 +176,106 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
   return (
     <div className="space-y-6">
       {/* Filtres et recherche */}
-      <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-        <div className="flex flex-col lg:flex-row gap-4 items-center">
-          <div className="relative flex-1 max-w-md">
+      <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          {/* Search Input */}
+          <div className="relative w-full">
             <input
               type="text"
               placeholder={t('admin.searchBeats')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-4 pr-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-3 sm:pl-4 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base touch-manipulation"
             />
           </div>
 
-          <select
-            value={filterGenre}
-            onChange={(e) => setFilterGenre(e.target.value)}
-            className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="Tous" className="bg-gray-800 text-white">{t('beats.allGenres')}</option>
-            {Array.from(new Set(beats.map(beat => beat.genre))).map(genre => (
-              <option key={genre} value={genre} className="bg-gray-800 text-white">
-                {genre}
-              </option>
-            ))}
-          </select>
+          {/* Filters Row */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <select
+              value={filterGenre}
+              onChange={(e) => setFilterGenre(e.target.value)}
+              className="flex-1 bg-white/20 border border-white/30 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base touch-manipulation"
+            >
+              <option value="Tous" className="bg-gray-800 text-white">{t('beats.allGenres')}</option>
+              {Array.from(new Set(beats.map(beat => beat.genre))).map(genre => (
+                <option key={genre} value={genre} className="bg-gray-800 text-white">
+                  {genre}
+                </option>
+              ))}
+            </select>
 
-          <select
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            className="bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value={5} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 5 })}</option>
-            <option value={10} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 10 })}</option>
-            <option value={25} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 25 })}</option>
-            <option value={50} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 50 })}</option>
-          </select>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="flex-1 sm:flex-none sm:w-auto bg-white/20 border border-white/30 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base touch-manipulation"
+            >
+              <option value={5} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 5 })}</option>
+              <option value={10} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 10 })}</option>
+              <option value={25} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 25 })}</option>
+              <option value={50} className="bg-gray-800 text-white">{t('beats.itemsPerPage', { count: 50 })}</option>
+            </select>
+          </div>
 
-          <div className="text-sm text-gray-300">
-{t('admin.beatsFound', { count: filteredBeats.length })}
+          {/* Results Count */}
+          <div className="text-xs sm:text-sm text-gray-300 text-center sm:text-left">
+            {t('admin.beatsFound', { count: filteredBeats.length })}
           </div>
         </div>
       </div>
 
       {/* Liste des beats */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {paginatedBeats.map((beat) => (
           <motion.div
             key={beat.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white/10 backdrop-blur-lg rounded-xl p-6 hover:bg-white/20 transition-all duration-300"
+            className="bg-white/10 backdrop-blur-lg rounded-xl p-4 sm:p-6 hover:bg-white/20 transition-all duration-300"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               {/* Informations du beat */}
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-xl font-bold text-white">{beat.title}</h3>
-                  {beat.isExclusive && (
-                    <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-bold">
-{t('beatCard.exclusive').toUpperCase()}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-white truncate">{beat.title}</h3>
+                  <div className="flex flex-wrap gap-1 sm:gap-2">
+                    {beat.isExclusive && (
+                      <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-bold">
+                        {t('beatCard.exclusive').toUpperCase()}
+                      </span>
+                    )}
+                    {beat.featured && (
+                      <span className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                        {t('admin.featured').toUpperCase()}
+                      </span>
+                    )}
+                    <span className={`text-xs px-2 py-1 rounded-full ${beat.isActive
+                        ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                        : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                      }`}>
+                      {beat.isActive ? t('admin.active') : t('admin.inactive')}
                     </span>
-                  )}
-                  {beat.featured && (
-                    <span className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-{t('admin.featured').toUpperCase()}
-                    </span>
-                  )}
-                  <span className={`text-xs px-2 py-1 rounded-full ${beat.isActive
-                      ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                      : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                    }`}>
-{beat.isActive ? t('admin.active') : t('admin.inactive')}
-                  </span>
+                  </div>
                 </div>
 
-                <p className="text-gray-300 mb-3 line-clamp-2">{beat.description}</p>
+                <p className="text-gray-300 mb-3 line-clamp-2 text-sm sm:text-base">{beat.description}</p>
 
-                <div className="flex items-center gap-4 text-sm text-gray-400">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-400">
                   <span>{beat.genre}</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span>{beat.bpm} BPM</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span>{beat.key}</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span>{beat.duration}</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span className="text-purple-300 font-medium">{formatPrice(beat.wavLeasePrice)}</span>
                 </div>
 
                 {beat.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
+                  <div className="flex flex-wrap gap-1 sm:gap-2 mt-3">
                     {beat.tags.map((tag, index) => (
                       <span
                         key={index}
@@ -282,7 +289,7 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 ml-6">
+              <div className="flex items-center justify-center sm:justify-end gap-2 sm:ml-6">
                 {/* Bouton play/pause
                 <button
                   onClick={() => togglePlay(beat.id)}
@@ -299,25 +306,24 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
 
                 {/* Bouton modifier */}
-
                 <Link
                   href={`/admin/beats/${beat.id}`}
-                  className="p-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors"
+                  className="p-2.5 sm:p-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors touch-manipulation"
                   title="Voir les détails"
                 >
-                  <Edit className="w-4 h-4" />
+                  <Edit className="w-4 h-4 sm:w-4 sm:h-4" />
                 </Link>
 
                 {/* Bouton statut */}
                 <button
                   onClick={() => handleToggleStatus(beat.id, beat.isActive)}
-                  className={`p-2 rounded-lg transition-colors ${beat.isActive
+                  className={`p-2.5 sm:p-2 rounded-lg transition-colors touch-manipulation ${beat.isActive
                       ? 'bg-red-500/20 hover:bg-red-500/30 text-red-300'
                       : 'bg-green-500/20 hover:bg-green-500/30 text-green-300'
                     }`}
                   title={beat.isActive ? 'Désactiver' : 'Activer'}
                 >
-                  {beat.isActive ? <Lock className="w-4 h-4" /> : <Star className="w-4 h-4" />}
+                  {beat.isActive ? <Lock className="w-4 h-4 sm:w-4 sm:h-4" /> : <Star className="w-4 h-4 sm:w-4 sm:h-4" />}
                 </button>
 
                 {/* Bouton supprimer
@@ -336,43 +342,43 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
       {/* Pagination Controls */}
       {filteredBeats.length > 0 && (
-        <div className="flex items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+        <div className="flex flex-col sm:flex-row items-center justify-between bg-white/10 backdrop-blur-lg rounded-xl p-3 sm:p-4 border border-white/20 gap-3 sm:gap-0">
           <div className="flex items-center gap-4">
-            <span className="text-gray-300 text-sm">
-  {t('beats.showingResults', { start: startIndex + 1, end: Math.min(endIndex, filteredBeats.length), total: filteredBeats.length })}
+            <span className="text-gray-300 text-xs sm:text-sm text-center sm:text-left">
+              {t('beats.showingResults', { start: startIndex + 1, end: Math.min(endIndex, filteredBeats.length), total: filteredBeats.length })}
             </span>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Previous button */}
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm touch-manipulation"
             >
-              <ChevronLeft className="w-4 h-4" />
-{t('pagination.previous')}
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t('pagination.previous')}</span>
             </button>
 
             {/* Page numbers */}
             <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
                 let pageNum;
-                if (totalPages <= 5) {
+                if (totalPages <= 3) {
                   pageNum = i + 1;
-                } else if (currentPage <= 3) {
+                } else if (currentPage <= 2) {
                   pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
+                } else if (currentPage >= totalPages - 1) {
+                  pageNum = totalPages - 2 + i;
                 } else {
-                  pageNum = currentPage - 2 + i;
+                  pageNum = currentPage - 1 + i;
                 }
 
                 return (
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                       currentPage === pageNum
                         ? 'bg-purple-600 text-white'
                         : 'bg-white/10 text-gray-300 hover:bg-white/20'
@@ -388,10 +394,10 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm touch-manipulation"
             >
-{t('pagination.next')}
-              <ChevronRight className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('pagination.next')}</span>
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>
@@ -399,8 +405,8 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
       {/* Message si aucun beat trouvé */}
       {filteredBeats.length === 0 && (
-        <div className="text-center py-16">
-          <div className="text-gray-400 text-lg mb-4">
+        <div className="text-center py-8 sm:py-16 px-4">
+          <div className="text-gray-400 text-base sm:text-lg mb-4">
             {searchTerm || filterGenre !== 'Tous'
               ? t('admin.noBeatsWithCriteria')
               : t('beats.noBeatsAvailable')
@@ -412,9 +418,9 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
                 setSearchTerm('');
                 setFilterGenre('Tous');
               }}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-colors text-sm sm:text-base touch-manipulation"
             >
-{t('beats.resetFilters')}
+              {t('beats.resetFilters')}
             </button>
           )}
         </div>

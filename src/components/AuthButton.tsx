@@ -8,7 +8,13 @@ import UserMenu from './UserMenu'
 import { useState, useEffect } from 'react'
 import { useTranslation } from '@/contexts/LanguageContext'
 
-export default function AuthButton({ variant = 'default' }: { variant?: 'default' | 'floating' } = {}) {
+export default function AuthButton({ 
+  variant = 'default', 
+  onMobileMenuClose 
+}: { 
+  variant?: 'default' | 'floating' | 'mobile'
+  onMobileMenuClose?: () => void
+} = {}) {
   const { data: session, status } = useSession()
   const { t } = useTranslation()
   const [mounted, setMounted] = useState(false)
@@ -22,9 +28,9 @@ export default function AuthButton({ variant = 'default' }: { variant?: 'default
     return (
       <Button 
         disabled 
-        className={`transition-all duration-300 ${variant === 'floating' ? 'bg-transparent text-muted-foreground border-none' : 'bg-muted text-muted-foreground'}`}
+        className={`transition-all duration-300 ${variant === 'floating' ? 'bg-transparent text-muted-foreground border-none' : 'bg-muted text-muted-foreground'} ${variant === 'mobile' ? 'w-full' : ''}`}
       >
-{t('common.loading')}
+        {t('common.loading')}
       </Button>
     )
   }
@@ -33,9 +39,9 @@ export default function AuthButton({ variant = 'default' }: { variant?: 'default
     return (
       <Button 
         disabled 
-        className={`transition-all duration-300 ${variant === 'floating' ? 'bg-transparent text-muted-foreground border-none' : 'bg-muted text-muted-foreground'}`}
+        className={`transition-all duration-300 ${variant === 'floating' ? 'bg-transparent text-muted-foreground border-none' : 'bg-muted text-muted-foreground'} ${variant === 'mobile' ? 'w-full' : ''}`}
       >
-{t('common.loading')}
+        {t('common.loading')}
       </Button>
     )
   }
@@ -51,6 +57,23 @@ export default function AuthButton({ variant = 'default' }: { variant?: 'default
           >
             <span className="relative z-10 text-foreground">{t('auth.signOut')}</span>
             <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-purple-500 to-transparent h-px" />
+          </Button>
+        </div>
+      )
+    }
+    
+    if (variant === 'mobile') {
+      return (
+        <div className="w-full space-y-3">
+          <div className="flex items-center justify-center">
+            <UserMenu variant="mobile" onMobileMenuClose={onMobileMenuClose} />
+          </div>
+          <Button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            variant="outline"
+            className="w-full text-sm transition-all duration-300 border-border text-foreground hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 touch-manipulation"
+          >
+            {t('auth.signOut')}
           </Button>
         </div>
       )
@@ -78,6 +101,18 @@ export default function AuthButton({ variant = 'default' }: { variant?: 'default
       >
         <span className="relative z-10">{t('auth.signIn')}</span>
         <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-purple-500 to-transparent h-px" />
+      </Button>
+    )
+  }
+
+  if (variant === 'mobile') {
+    return (
+      <Button
+        onClick={() => window.location.href = '/auth/signin'}
+        variant="outline"
+        className="w-full text-sm transition-all duration-300 border-border text-foreground hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 touch-manipulation"
+      >
+        {t('auth.signIn')}
       </Button>
     )
   }
