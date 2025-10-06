@@ -207,11 +207,11 @@ export default function BeatsPage() {
 
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12 px-2">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-bold text-foreground mb-4"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-3 sm:mb-4 leading-tight"
           >
 {t('beats.title')}
           </motion.h1>
@@ -219,7 +219,7 @@ export default function BeatsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-muted-foreground max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
           >
 {t('beats.description')}
           </motion.p>
@@ -230,65 +230,68 @@ export default function BeatsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-card/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-border/20"
+          className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-border/20"
         >
-          <div className="flex flex-col lg:flex-row gap-4 items-center">
+          <div className="flex flex-col gap-4 sm:gap-6">
             {/* Barre de recherche */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                              <input
-                  type="text"
-                  placeholder={t('beats.searchPlaceholder')}
-                  onChange={(e) => searchBeats(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-card/20 border border-border/30 rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 sm:w-5 sm:h-5" />
+              <input
+                type="text"
+                placeholder={t('beats.searchPlaceholder')}
+                onChange={(e) => searchBeats(e.target.value)}
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-card/20 border border-border/30 rounded-lg text-sm sm:text-base text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent touch-manipulation"
+              />
             </div>
 
-            {/* Filtre par genre */}
-            <div className="flex items-center gap-2">
-              <Filter className="text-muted-foreground w-5 h-5" />
+            {/* Filtres et contrôles */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              {/* Filtre par genre */}
+              <div className="flex items-center gap-2 flex-1">
+                <Filter className="text-muted-foreground w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <select
+                  onChange={(e) => filterByGenre(e.target.value)}
+                  className="w-full bg-card/20 border border-border/30 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 touch-manipulation"
+                >
+                  {genres.map((genre) => (
+                    <option key={genre} value={genre} className="bg-card text-foreground">
+                      {genre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Items per page selector */}
               <select
-                onChange={(e) => filterByGenre(e.target.value)}
-                className="bg-card/20 border border-border/30 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={itemsPerPage}
+                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                className="w-full sm:w-auto bg-card/20 border border-border/30 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 touch-manipulation"
               >
-                {genres.map((genre) => (
-                  <option key={genre} value={genre} className="bg-card text-foreground">
-                    {genre}
-                  </option>
-                ))}
+                <option value={4} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '4' })}</option>
+                <option value={8} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '8' })}</option>
+                <option value={12} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '12' })}</option>
+                <option value={24} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '24' })}</option>
               </select>
-            </div>
 
-            {/* Items per page selector */}
-            <select
-              value={itemsPerPage}
-              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="bg-card/20 border border-border/30 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value={4} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '4' })}</option>
-              <option value={8} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '8' })}</option>
-              <option value={12} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '12' })}</option>
-              <option value={24} className="bg-card text-foreground">{t('beats.itemsPerPage', { count: '24' })}</option>
-            </select>
-
-            {/* Toggle de vue */}
-            <div className="flex items-center gap-2 bg-card/20 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'grid' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Grid3X3 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <List className="w-5 h-5" />
-              </button>
+              {/* Toggle de vue */}
+              <div className="flex items-center gap-1 sm:gap-2 bg-card/20 rounded-lg p-1 w-full sm:w-auto justify-center">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 sm:p-2 rounded-md transition-colors touch-manipulation ${
+                    viewMode === 'grid' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 sm:p-2 rounded-md transition-colors touch-manipulation ${
+                    viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <List className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -298,23 +301,23 @@ export default function BeatsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
         >
-          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
-            <p className="text-2xl font-bold text-foreground">{totalBeats}</p>
-            <p className="text-muted-foreground">{t('beats.stats.beats')}</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">{totalBeats}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.beats')}</p>
           </div>
-          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
-            <p className="text-2xl font-bold text-foreground">{genres.length - 1}</p>
-            <p className="text-muted-foreground">{t('beats.stats.genres')}</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">{genres.length - 1}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.genres')}</p>
           </div>
-          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
-            <p className="text-2xl font-bold text-foreground">∞</p>
-            <p className="text-muted-foreground">{t('beats.stats.possibilities')}</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">∞</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.possibilities')}</p>
           </div>
-          <div className="bg-card/10 backdrop-blur-lg rounded-xl p-4 text-center border border-border/20">
-            <p className="text-2xl font-bold text-foreground">24/7</p>
-            <p className="text-muted-foreground">{t('beats.stats.available')}</p>
+          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">24/7</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.available')}</p>
           </div>
         </motion.div>
 
@@ -355,44 +358,47 @@ export default function BeatsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="flex items-center justify-between bg-card/10 backdrop-blur-lg rounded-xl p-4 border border-border/20 mt-12"
+                className="bg-card/10 backdrop-blur-lg rounded-xl p-4 sm:p-6 border border-border/20 mt-8 sm:mt-12"
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-muted-foreground text-sm">
+                {/* Results info - full width on mobile */}
+                <div className="flex items-center justify-center sm:justify-start mb-4 sm:mb-0">
+                  <span className="text-muted-foreground text-xs sm:text-sm text-center sm:text-left">
                     {t('beats.showingResults', { start: startIndex.toString(), end: endIndex.toString(), total: totalBeats.toString() })}
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2">
+                {/* Pagination controls */}
+                <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-3 sm:gap-2">
                   {/* Previous button */}
                   <button
                     onClick={goToPreviousPage}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-1 px-3 py-2 bg-card/10 border border-border/20 rounded-lg text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 sm:px-4 py-2.5 sm:py-2 bg-card/10 border border-border/20 rounded-lg text-xs sm:text-sm text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation w-full sm:w-auto justify-center"
                   >
-                    <ChevronLeft className="w-4 h-4" />
-{t('pagination.previous')}
+                    <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">{t('pagination.previous')}</span>
+                    <span className="sm:hidden">Prev</span>
                   </button>
 
                   {/* Page numbers */}
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  <div className="flex items-center gap-1 sm:gap-1">
+                    {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
                       let pageNum;
-                      if (totalPages <= 5) {
+                      if (totalPages <= 3) {
                         pageNum = i + 1;
-                      } else if (currentPage <= 3) {
+                      } else if (currentPage <= 2) {
                         pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
+                      } else if (currentPage >= totalPages - 1) {
+                        pageNum = totalPages - 2 + i;
                       } else {
-                        pageNum = currentPage - 2 + i;
+                        pageNum = currentPage - 1 + i;
                       }
 
                       return (
                         <button
                           key={pageNum}
                           onClick={() => goToPage(pageNum)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          className={`px-3 sm:px-3 py-2 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                             currentPage === pageNum
                               ? 'bg-purple-600 text-white'
                               : 'bg-card/10 text-muted-foreground hover:bg-card/20'
@@ -408,10 +414,11 @@ export default function BeatsPage() {
                   <button
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 px-3 py-2 bg-card/10 border border-border/20 rounded-lg text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 sm:px-4 py-2.5 sm:py-2 bg-card/10 border border-border/20 rounded-lg text-xs sm:text-sm text-foreground hover:bg-card/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation w-full sm:w-auto justify-center"
                   >
-{t('pagination.next')}
-                    <ChevronRight className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('pagination.next')}</span>
+                    <span className="sm:hidden">Next</span>
+                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               </motion.div>
@@ -421,14 +428,14 @@ export default function BeatsPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
+            className="text-center py-12 sm:py-16 px-4"
           >
-            <div className="text-muted-foreground text-lg mb-4">
+            <div className="text-muted-foreground text-base sm:text-lg mb-4 sm:mb-6">
               {t('beats.noBeatsAvailable')}
             </div>
             <button
               onClick={resetFilters}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-colors text-sm sm:text-base touch-manipulation"
             >
               {t('beats.resetFilters')}
             </button>
@@ -440,17 +447,17 @@ export default function BeatsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-center flex justify-center mt-16"
+          className="text-center flex justify-center mt-12 sm:mt-16 px-4"
         >
           <Link href="/contact">
             <HoverBorderGradient
-              containerClassName="rounded-2xl"
-              className="inline-flex items-center gap-2 text-foreground px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300"
+              containerClassName="rounded-xl sm:rounded-2xl"
+              className="inline-flex items-center gap-2 text-foreground px-4 sm:px-6 md:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg font-semibold transition-all duration-300 touch-manipulation"
               duration={1.5}
               clockwise={true}
             >
 {t('beats.customBeatCTA')}
-              <Music className="w-5 h-5" />
+              <Music className="w-4 h-4 sm:w-5 sm:h-5" />
             </HoverBorderGradient>
           </Link>
         </motion.div>
