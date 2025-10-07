@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { Play, Pause, ShoppingCart, Star, Music, Archive, Crown, X, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { Beat } from '@/types/beat';
 import { LicenseType } from '@/types/cart';
@@ -39,7 +40,12 @@ export default function BeatCard({
   const [selectedLicense, setSelectedLicense] = useState<LicenseType>('WAV_LEASE');
   const [showLicenseModal, setShowLicenseModal] = useState(false);
   const [expandedLicense, setExpandedLicense] = useState<LicenseType | null>(null);
+  const [mounted, setMounted] = useState(false);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getPrice = (licenseType: LicenseType): number => {
     switch (licenseType) {
@@ -243,27 +249,28 @@ export default function BeatCard({
       </div>
     </motion.div>
 
-      {/* License Selection Modal - Outside of BeatCard container */}
-      <AnimatePresence>
-        {showLicenseModal && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={closeLicenseModal}
-            />
-            
-            {/* Modal Content */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-[calc(100vw-2rem)] max-w-md max-h-[90vh] flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
+      {/* License Selection Modal - Rendered via Portal */}
+      {mounted && showLicenseModal && createPortal(
+        <AnimatePresence>
+          {showLicenseModal && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+                onClick={closeLicenseModal}
+              />
+              
+              {/* Modal Content */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[calc(100vw-2rem)] max-w-md max-h-[90vh] flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
               <div className="bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl flex flex-col h-full overflow-hidden">
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border/20 flex-shrink-0">
@@ -295,7 +302,6 @@ export default function BeatCard({
                             whileTap={{ scale: 0.99 }}
                             onClick={() => {
                               setSelectedLicense('WAV_LEASE');
-                              closeLicenseModal();
                             }}
                             className="text-left flex-1 cursor-pointer min-w-0"
                           >
@@ -357,7 +363,6 @@ export default function BeatCard({
                             whileTap={{ scale: 0.99 }}
                             onClick={() => {
                               setSelectedLicense('TRACKOUT_LEASE');
-                              closeLicenseModal();
                             }}
                             className="text-left flex-1 cursor-pointer min-w-0"
                           >
@@ -419,7 +424,6 @@ export default function BeatCard({
                             whileTap={{ scale: 0.99 }}
                             onClick={() => {
                               setSelectedLicense('UNLIMITED_LEASE');
-                              closeLicenseModal();
                             }}
                             className="text-left flex-1 cursor-pointer min-w-0"
                           >
@@ -480,7 +484,10 @@ export default function BeatCard({
                     {t('common.cancel')}
                   </button>
                   <button
-                    onClick={closeLicenseModal}
+                    onClick={() => {
+                      // License is already selected, just close the modal
+                      closeLicenseModal();
+                    }}
                     className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
                   >
                     {t('common.confirm')}
@@ -490,7 +497,9 @@ export default function BeatCard({
             </motion.div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
     </>
   );
 }
