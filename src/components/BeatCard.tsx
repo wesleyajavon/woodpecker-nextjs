@@ -140,11 +140,11 @@ export default function BeatCard({
       </div>
 
       {/* Content */}
-      <div className={`${isListMode ? 'p-3 flex-1 min-w-0' : 'p-4'}`}>
+      <div className={`${isListMode ? 'p-3 flex-1 min-w-0' : 'p-3 sm:p-4'}`}>
         {/* Title and Genre */}
         <div className={`${isListMode ? 'mb-2' : 'mb-3'}`}>
-          <h3 className={`${isListMode ? 'text-sm' : 'text-lg'} font-semibold text-foreground truncate`}>{beat.title}</h3>
-          <p className={`text-sm text-muted-foreground ${isListMode ? 'text-xs' : ''}`}>{beat.genre}</p>
+          <h3 className={`${isListMode ? 'text-sm' : 'text-base sm:text-lg'} font-semibold text-foreground truncate`}>{beat.title}</h3>
+          <p className={`text-xs sm:text-sm text-muted-foreground ${isListMode ? 'text-xs' : ''} truncate`}>{beat.genre}</p>
         </div>
 
         {isListMode ? (
@@ -172,24 +172,24 @@ export default function BeatCard({
         ) : (
           <>
             {/* BPM and Key */}
-            <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
-              <span>{t('beatCard.bpm', { bpm: beat.bpm.toString() })}</span>
-              <span>{t('beatCard.key', { key: beat.key })}</span>
-              <span>{t('beatCard.duration', { duration: beat.duration })}</span>
+            <div className="flex items-center gap-2 sm:gap-4 mb-3 text-xs sm:text-sm text-muted-foreground flex-wrap">
+              <span className="whitespace-nowrap">{t('beatCard.bpm', { bpm: beat.bpm.toString() })}</span>
+              <span className="whitespace-nowrap">{t('beatCard.key', { key: beat.key })}</span>
+              <span className="whitespace-nowrap">{t('beatCard.duration', { duration: beat.duration })}</span>
             </div>
 
             {/* Price Display */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-foreground">
+            <div className="mb-3 sm:mb-4">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground truncate">
                   {formatPrice(getPrice(selectedLicense))}
                 </span>
                 <button
                   onClick={openLicenseModal}
-                  className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
+                  className="text-xs sm:text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1 flex-shrink-0 whitespace-nowrap"
                 >
-                  <Crown className="w-4 h-4" />
-                  {t('beatCard.changeLicense')}
+                  <Crown className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">{t('beatCard.changeLicense')}</span>
                 </button>
               </div>
             </div>
@@ -197,21 +197,20 @@ export default function BeatCard({
         )}
 
         {/* Add to Cart Button */}
-        <div className={`mt-3 ${isListMode ? 'flex gap-1' : ''}`}>
+        <div className={`mt-2 sm:mt-3 ${isListMode ? 'flex gap-1' : ''}`}>
           {isListMode ? (
             <>
               <button
                 onClick={openLicenseModal}
-                className="flex-shrink-0 p-2 text-purple-400 hover:text-purple-300 transition-colors touch-manipulation"
+                className="flex-shrink-0 p-2 text-purple-400 hover:text-purple-300 transition-colors"
                 title={t('beatCard.changeLicense')}
-                style={{ minHeight: '44px', minWidth: '44px' }}
               >
                 <Crown className="w-3 h-3" />
               </button>
               <AddToCartButton
                 beat={beat}
                 licenseType={selectedLicense}
-                className="flex-1"
+                className="flex-1 min-w-0"
               />
             </>
           ) : (
@@ -225,11 +224,11 @@ export default function BeatCard({
 
         {/* Tags - Only show in grid mode */}
         {!isListMode && beat.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1">
+          <div className="mt-2 sm:mt-3 flex flex-wrap gap-1">
             {beat.tags.slice(0, 3).map((tag, index) => (
               <span
                 key={index}
-                className="px-2 py-1 bg-muted/50 text-muted-foreground text-xs rounded-full"
+                className="px-2 py-1 bg-muted/50 text-muted-foreground text-xs rounded-full truncate max-w-[100px]"
               >
                 {tag}
               </span>
@@ -262,27 +261,26 @@ export default function BeatCard({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-4 sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 z-[101] w-auto max-w-md mx-auto flex flex-col"
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-[calc(100vw-2rem)] max-w-md max-h-[90vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl flex flex-col max-h-full overflow-hidden">
+              <div className="bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl flex flex-col h-full overflow-hidden">
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border/20 flex-shrink-0">
-                  <h3 className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
-                    <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
-                    {t('beatCard.selectLicense')}
+                  <h3 className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2 truncate">
+                    <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 flex-shrink-0" />
+                    <span className="truncate">{t('beatCard.selectLicense')}</span>
                   </h3>
                   <button
                     onClick={closeLicenseModal}
-                    className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg touch-manipulation"
-                    style={{ minHeight: '44px', minWidth: '44px' }}
+                    className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg flex-shrink-0"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 min-h-0">
                   {/* License Options */}
                   <div className="space-y-2 sm:space-y-3">
                     {/* WAV Lease */}
@@ -299,30 +297,28 @@ export default function BeatCard({
                               setSelectedLicense('WAV_LEASE');
                               closeLicenseModal();
                             }}
-                            className="text-left flex-1 cursor-pointer touch-manipulation"
-                            style={{ minHeight: '44px' }}
+                            className="text-left flex-1 cursor-pointer min-w-0"
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold text-foreground text-sm sm:text-base">WAV Lease</h4>
+                              <h4 className="font-semibold text-foreground text-sm sm:text-base truncate">WAV Lease</h4>
                               {selectedLicense === 'WAV_LEASE' && (
-                                <Check className="w-4 h-4 text-purple-400" />
+                                <Check className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400 flex-shrink-0" />
                               )}
                             </div>
-                            <p className="font-medium text-xs sm:text-sm text-foreground">WAV & MP3</p>
+                            <p className="font-medium text-xs sm:text-sm text-foreground truncate">WAV & MP3</p>
                           </motion.div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-base sm:text-lg font-bold text-foreground">
+                          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                            <span className="text-sm sm:text-lg font-bold text-foreground whitespace-nowrap">
                               {formatPrice(beat.wavLeasePrice)}
                             </span>
                             <button
                               onClick={() => toggleLicenseDetails('WAV_LEASE')}
-                              className="text-muted-foreground hover:text-foreground transition-colors p-2 touch-manipulation"
-                              style={{ minHeight: '44px', minWidth: '44px' }}
+                              className="text-muted-foreground hover:text-foreground transition-colors p-1 sm:p-2 flex-shrink-0"
                             >
                               {expandedLicense === 'WAV_LEASE' ? (
-                                <ChevronUp className="w-4 h-4" />
+                                <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" />
                               ) : (
-                                <ChevronDown className="w-4 h-4" />
+                                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
                               )}
                             </button>
                           </div>
@@ -337,12 +333,12 @@ export default function BeatCard({
                               transition={{ duration: 0.2 }}
                               className="overflow-hidden"
                             >
-                              <div className="px-4 pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3 mt-1">
-                                <p>• Used for Music Recording</p>
-                                <p>• Distribute up to 5 000 copies</p>
-                                <p>• 100 000 Online Audio Streams</p>
-                                <p>• 1 Music Video</p>
-                                <p>• UNLIMITED Non-profit Live Performances only</p>
+                              <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-2 sm:pt-3 mt-1">
+                                <p className="break-words">• Used for Music Recording</p>
+                                <p className="break-words">• Distribute up to 5 000 copies</p>
+                                <p className="break-words">• 100 000 Online Audio Streams</p>
+                                <p className="break-words">• 1 Music Video</p>
+                                <p className="break-words">• UNLIMITED Non-profit Live Performances only</p>
                               </div>
                             </motion.div>
                           )}
@@ -363,30 +359,28 @@ export default function BeatCard({
                               setSelectedLicense('TRACKOUT_LEASE');
                               closeLicenseModal();
                             }}
-                            className="text-left flex-1 cursor-pointer touch-manipulation"
-                            style={{ minHeight: '44px' }}
+                            className="text-left flex-1 cursor-pointer min-w-0"
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold text-foreground text-sm sm:text-base">Trackout Lease</h4>
+                              <h4 className="font-semibold text-foreground text-sm sm:text-base truncate">Trackout Lease</h4>
                               {selectedLicense === 'TRACKOUT_LEASE' && (
-                                <Check className="w-4 h-4 text-purple-400" />
+                                <Check className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400 flex-shrink-0" />
                               )}
                             </div>
-                            <p className="font-medium text-xs sm:text-sm text-foreground">WAV, STEMS & MP3</p>
+                            <p className="font-medium text-xs sm:text-sm text-foreground truncate">WAV, STEMS & MP3</p>
                           </motion.div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-base sm:text-lg font-bold text-foreground">
+                          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                            <span className="text-sm sm:text-lg font-bold text-foreground whitespace-nowrap">
                               {formatPrice(beat.trackoutLeasePrice)}
                             </span>
                             <button
                               onClick={() => toggleLicenseDetails('TRACKOUT_LEASE')}
-                              className="text-muted-foreground hover:text-foreground transition-colors p-2 touch-manipulation"
-                              style={{ minHeight: '44px', minWidth: '44px' }}
+                              className="text-muted-foreground hover:text-foreground transition-colors p-1 sm:p-2 flex-shrink-0"
                             >
                               {expandedLicense === 'TRACKOUT_LEASE' ? (
-                                <ChevronUp className="w-4 h-4" />
+                                <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" />
                               ) : (
-                                <ChevronDown className="w-4 h-4" />
+                                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
                               )}
                             </button>
                           </div>
@@ -401,12 +395,12 @@ export default function BeatCard({
                               transition={{ duration: 0.2 }}
                               className="overflow-hidden"
                             >
-                              <div className="px-4 pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3 mt-1">
-                                <p>• Used for Music Recording</p>
-                                <p>• Distribute up to 10 000 copies</p>
-                                <p>• 250 000 Online Audio Streams</p>
-                                <p>• 3 Music Video</p>
-                                <p>• UNLIMITED Non-profit Live Performances only</p>
+                              <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-2 sm:pt-3 mt-1">
+                                <p className="break-words">• Used for Music Recording</p>
+                                <p className="break-words">• Distribute up to 10 000 copies</p>
+                                <p className="break-words">• 250 000 Online Audio Streams</p>
+                                <p className="break-words">• 3 Music Video</p>
+                                <p className="break-words">• UNLIMITED Non-profit Live Performances only</p>
                               </div>
                             </motion.div>
                           )}
@@ -427,30 +421,28 @@ export default function BeatCard({
                               setSelectedLicense('UNLIMITED_LEASE');
                               closeLicenseModal();
                             }}
-                            className="text-left flex-1 cursor-pointer touch-manipulation"
-                            style={{ minHeight: '44px' }}
+                            className="text-left flex-1 cursor-pointer min-w-0"
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold text-foreground text-sm sm:text-base">Unlimited Lease</h4>
+                              <h4 className="font-semibold text-foreground text-sm sm:text-base truncate">Unlimited Lease</h4>
                               {selectedLicense === 'UNLIMITED_LEASE' && (
-                                <Check className="w-4 h-4 text-purple-400" />
+                                <Check className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400 flex-shrink-0" />
                               )}
                             </div>
-                            <p className="font-medium text-xs sm:text-sm text-foreground">WAV, STEMS & MP3</p>
+                            <p className="font-medium text-xs sm:text-sm text-foreground truncate">WAV, STEMS & MP3</p>
                           </motion.div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-base sm:text-lg font-bold text-foreground">
+                          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                            <span className="text-sm sm:text-lg font-bold text-foreground whitespace-nowrap">
                               {formatPrice(beat.unlimitedLeasePrice)}
                             </span>
                             <button
                               onClick={() => toggleLicenseDetails('UNLIMITED_LEASE')}
-                              className="text-muted-foreground hover:text-foreground transition-colors p-2 touch-manipulation"
-                              style={{ minHeight: '44px', minWidth: '44px' }}
+                              className="text-muted-foreground hover:text-foreground transition-colors p-1 sm:p-2 flex-shrink-0"
                             >
                               {expandedLicense === 'UNLIMITED_LEASE' ? (
-                                <ChevronUp className="w-4 h-4" />
+                                <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" />
                               ) : (
-                                <ChevronDown className="w-4 h-4" />
+                                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
                               )}
                             </button>
                           </div>
@@ -465,12 +457,12 @@ export default function BeatCard({
                               transition={{ duration: 0.2 }}
                               className="overflow-hidden"
                             >
-                              <div className="px-4 pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3 mt-1">
-                                <p>• Used for Music Recording</p>
-                                <p>• Distribute up to UNLIMITED copies</p>
-                                <p>• UNLIMITED Online Audio Streams</p>
-                                <p>• UNLIMITED Music Video</p>
-                                <p>• UNLIMITED Non-profit Live Performances only</p>
+                              <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-1 text-xs text-muted-foreground border-t border-border/50 pt-2 sm:pt-3 mt-1">
+                                <p className="break-words">• Used for Music Recording</p>
+                                <p className="break-words">• Distribute up to UNLIMITED copies</p>
+                                <p className="break-words">• UNLIMITED Online Audio Streams</p>
+                                <p className="break-words">• UNLIMITED Music Video</p>
+                                <p className="break-words">• UNLIMITED Non-profit Live Performances only</p>
                               </div>
                             </motion.div>
                           )}
@@ -483,15 +475,13 @@ export default function BeatCard({
                 <div className="flex gap-2 sm:gap-3 p-4 sm:p-6 border-t border-border/20 flex-shrink-0">
                   <button
                     onClick={closeLicenseModal}
-                    className="flex-1 px-4 py-3 text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50 rounded-lg touch-manipulation font-medium"
-                    style={{ minHeight: '44px' }}
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors hover:bg-muted/50 rounded-lg font-medium"
                   >
                     {t('common.cancel')}
                   </button>
                   <button
                     onClick={closeLicenseModal}
-                    className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium touch-manipulation"
-                    style={{ minHeight: '44px' }}
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
                   >
                     {t('common.confirm')}
                   </button>
