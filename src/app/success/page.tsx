@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Download, Music, Clock, Tag, Star } from 'lucide-react'
+import { Download, Music, Clock, Tag, Star, ArrowRight } from 'lucide-react'
 import { Order, MultiItemOrder } from '@/types/order'
 import { Beat } from '@/types/beat'
 import { useSession } from 'next-auth/react'
@@ -12,6 +12,7 @@ import DownloadStemsButton from '@/components/DownloadStemsButton'
 import ResendEmailButton from '@/components/ResendEmailButton'
 import { DottedSurface } from '@/components/ui/dotted-surface'
 import { Button } from '@/components/ui/Button'
+import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/contexts/LanguageContext'
 
@@ -54,7 +55,7 @@ function SuccessContent() {
         try {
           // First try multi-item order
           const multiResponse = await fetch(`/api/orders/multi-payment/${sessionId}`)
-          
+
           if (multiResponse.ok) {
             const multiResult = await multiResponse.json()
             if (multiResult.success) {
@@ -67,7 +68,7 @@ function SuccessContent() {
 
           // Fallback to single order
           const response = await fetch(`/api/orders/payment/${sessionId}`)
-          
+
           if (response.ok) {
             const result = await response.json()
             if (result.success) {
@@ -161,7 +162,7 @@ function SuccessContent() {
     return (
       <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
         <DottedSurface className="size-full z-0" />
-        
+
         {/* Gradient overlay */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           <div
@@ -186,7 +187,7 @@ function SuccessContent() {
     return (
       <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
         <DottedSurface className="size-full z-0" />
-        
+
         {/* Gradient overlay */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           <div
@@ -215,7 +216,7 @@ function SuccessContent() {
           </p>
           <Button asChild variant="primary" className="w-full">
             <Link href="/beats">
-              Browse Beats
+              {t('success.browseBeats')}
             </Link>
           </Button>
         </div>
@@ -227,7 +228,7 @@ function SuccessContent() {
     return (
       <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
         <DottedSurface className="size-full z-0" />
-        
+
         {/* Gradient overlay */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           <div
@@ -255,18 +256,27 @@ function SuccessContent() {
             We couldn&apos;t find your order details. This might be because the payment is still processing.
           </p>
           <div className="space-y-3">
-            <Button asChild variant="primary" className="w-full">
-              <Link href="/beats">
-                Browse Beats
-              </Link>
-            </Button>
-            <Button 
+            <Link href="/beats" className="w-full">
+              <HoverBorderGradient
+                containerClassName="rounded-xl md:rounded-2xl w-full"
+                className="group inline-flex items-center justify-center gap-2 backdrop-blur-lg px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all duration-300 border border-border/20 w-full"
+                duration={1.5}
+                clockwise={true}
+              >
+                <span>{t('success.browseBeats')}</span>
+                <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+              </HoverBorderGradient>
+            </Link>
+            <HoverBorderGradient
+              containerClassName="rounded-xl md:rounded-2xl w-full max-w-xs"
+              className="group inline-flex items-center justify-center gap-2 backdrop-blur-lg px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all duration-300 border border-border/20 w-full"
+              duration={1.5}
+              clockwise={true}
               onClick={() => window.location.reload()}
-              variant="card"
-              className="w-full"
             >
-              Try Again
-            </Button>
+              <span>{t('success.tryAgain')}</span>
+              <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+            </HoverBorderGradient>
           </div>
         </div>
       </div>
@@ -276,7 +286,7 @@ function SuccessContent() {
   return (
     <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8">
       <DottedSurface className="size-full z-0" />
-      
+
       {/* Gradient overlay */}
       <div className="absolute inset-0 z-0 flex items-center justify-center">
         <div
@@ -304,16 +314,16 @@ function SuccessContent() {
               className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-white mb-6"
             >
               <svg className="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
             </motion.div>
-        
+
             <h1 className="text-3xl font-bold text-white mb-4">
-          {t('success.title')}
-        </h1>
-        
+              {t('success.title')}
+            </h1>
+
             <p className="text-green-100 text-lg">
-              {isMultiItemOrder 
+              {isMultiItemOrder
                 ? t('success.descriptionMulti', { count: (multiOrderDetails?.items.length || 0).toString() })
                 : t('success.description')
               }
@@ -324,24 +334,24 @@ function SuccessContent() {
           <div className="p-8">
             {isMultiItemOrder && multiOrderDetails ? (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-foreground mb-6">Détails de la commande</h2>
-                
+                <h2 className="text-2xl font-bold text-foreground mb-6">{t('success.orderDetails')}</h2>
+
                 <div className="bg-card/20 backdrop-blur-lg rounded-xl p-6 mb-6 border border-border/20">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium text-muted-foreground">ID de commande:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.orderId')}:</span>
                       <p className="text-foreground font-mono">{multiOrderDetails.id}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-muted-foreground">Email:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.email')}:</span>
                       <p className="text-foreground">{multiOrderDetails.customerEmail}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-muted-foreground">Montant total:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.totalAmount')}:</span>
                       <p className="text-foreground text-lg font-semibold">€{multiOrderDetails.totalAmount}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-muted-foreground">Statut:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.status')}:</span>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                         {multiOrderDetails.status}
                       </span>
@@ -351,7 +361,7 @@ function SuccessContent() {
 
                 {/* Beats List */}
                 <div className="space-y-4 mb-8">
-                  <h3 className="text-xl font-semibold text-foreground">Beats achetés</h3>
+                  <h3 className="text-xl font-semibold text-foreground">{t('success.purchasedBeats')}</h3>
                   {multiOrderDetails.items.map((item, index) => (
                     <motion.div
                       key={item.id}
@@ -393,46 +403,46 @@ function SuccessContent() {
               </div>
             ) : orderDetails && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-foreground mb-6">Détails de la commande</h2>
-                
+                <h2 className="text-2xl font-bold text-foreground mb-6">{t('success.orderDetails')}</h2>
+
                 <div className="bg-card/20 backdrop-blur-lg rounded-xl p-6 border border-border/20">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium text-muted-foreground">ID de commande:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.orderId')}:</span>
                       <p className="text-foreground font-mono">{orderDetails.id}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-muted-foreground">Beat:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.beat')}:</span>
                       <p className="text-foreground">{orderDetails.beat.title}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-muted-foreground">Montant:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.amount')}:</span>
                       <p className="text-foreground text-lg font-semibold">€{orderDetails.totalAmount.toFixed(2)}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-muted-foreground">Statut:</span>
+                      <span className="font-medium text-muted-foreground">{t('success.status')}:</span>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                         {orderDetails.status}
                       </span>
                     </div>
                   </div>
                 </div>
-          </div>
-        )}
+              </div>
+            )}
 
             {/* Download Section */}
             <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mb-8">
               <h3 className="text-xl font-semibold text-primary mb-4 flex items-center">
                 <Download className="w-6 h-6 mr-2" />
-                Télécharger vos beats
-            </h3>
-            
+                {t('success.downloadBeats')}
+              </h3>
+
               {isMultiItemOrder ? (
                 // Multi-item downloads
                 !multiOrderDownloads ? (
                   <div className="text-center">
                     <p className="text-primary mb-4">
-                      Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
+                      {t('success.generateDownloadLinks')}
                     </p>
                     <Button
                       onClick={generateMultiOrderDownloadUrls}
@@ -440,15 +450,18 @@ function SuccessContent() {
                       variant="primary"
                       className="w-full"
                     >
-                      {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
+                      {isGeneratingDownload ? t('success.generating') : t('success.generateDownloadLinksButton')}
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     <p className="text-primary">
-                      Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
+                      {t('success.downloadLinksReady')}
                     </p>
-                    
+                    <p className="text-primary">
+                      {t('success.checkYourEmail')}
+                    </p>
+
                     <div className="space-y-4">
                       {multiOrderDownloads.beats.map((beatDownload, index) => (
                         <motion.div
@@ -459,7 +472,7 @@ function SuccessContent() {
                           className="bg-card/20 backdrop-blur-lg rounded-lg p-4 border border-primary/30"
                         >
                           <h4 className="font-semibold text-foreground mb-3">{beatDownload.beatTitle}</h4>
-                          
+
                           <div className="space-y-2">
                             <Button asChild variant="primary" className="w-full">
                               <a
@@ -467,10 +480,10 @@ function SuccessContent() {
                                 download
                               >
                                 <Download className="w-4 h-4 mr-2" />
-                                Télécharger le master (WAV)
+                                {t('success.downloadMaster')}
                               </a>
                             </Button>
-                            
+
                             {beatDownload.hasStems && (
                               <DownloadStemsButton
                                 beatId={beatDownload.beatId}
@@ -478,16 +491,16 @@ function SuccessContent() {
                                 className="mt-2"
                               />
                             )}
-                            
+
                           </div>
                         </motion.div>
                       ))}
                     </div>
-                    
+
                     <p className="text-xs text-primary/70 text-center">
-                      ⏰ Expire le {new Date(multiOrderDownloads.expiresAt).toLocaleString('fr-FR')}
+                      ⏰ {t('success.expiresAt')} {new Date(multiOrderDownloads.expiresAt).toLocaleString('fr-FR')}
                     </p>
-                    
+
                     {multiOrderDetails && (
                       <ResendEmailButton
                         orderId={multiOrderDetails.id}
@@ -501,42 +514,45 @@ function SuccessContent() {
               ) : (
                 // Single item downloads
                 !downloadUrls ? (
-              <div className="text-center">
+                  <div className="text-center">
                     <p className="text-primary mb-4">
-                  Cliquez sur le bouton ci-dessous pour générer vos liens de téléchargement sécurisés.
-                </p>
-                <Button
-                  onClick={generateDownloadUrls}
-                  disabled={isGeneratingDownload}
-                  variant="primary"
-                  className="w-full"
-                >
-                  {isGeneratingDownload ? 'Génération...' : 'Générer les liens de téléchargement'}
-                </Button>
-              </div>
-            ) : (
+                      {t('success.generateDownloadLinks')}
+                    </p>
+                    <Button
+                      onClick={generateDownloadUrls}
+                      disabled={isGeneratingDownload}
+                      variant="primary"
+                      className="w-full"
+                    >
+                      {isGeneratingDownload ? t('success.generating') : t('success.generateDownloadLinksButton')}
+                    </Button>
+                  </div>
+                ) : (
                   <div className="space-y-4">
                     <p className="text-primary">
-                  Vos liens de téléchargement sont prêts ! Ils expirent dans 30 minutes.
-                </p>
-                
-                <div className="space-y-2">
-                  <Button asChild variant="primary" className="w-full">
-                    <a
-                      href={downloadUrls.master}
-                      download
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Télécharger le master (WAV)
-                    </a>
-                  </Button>
-                  
-                </div>
-                
-                    <p className="text-xs text-primary/70 text-center">
-                      ⏰ Expire le {new Date(downloadUrls.expiresAt).toLocaleString('fr-FR')}
+                      {t('success.downloadLinksReady')}
                     </p>
-                    
+                    <p className="text-primary">
+                      {t('success.checkYourEmail')}
+                    </p>
+
+                    <div className="space-y-2">
+                      <Button asChild variant="primary" className="w-full">
+                        <a
+                          href={downloadUrls.master}
+                          download
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          {t('success.downloadMaster')}
+                        </a>
+                      </Button>
+
+                    </div>
+
+                    <p className="text-xs text-primary/70 text-center">
+                      ⏰ {t('success.expiresAt')} {new Date(downloadUrls.expiresAt).toLocaleString('fr-FR')}
+                    </p>
+
                     {orderDetails && (
                       <ResendEmailButton
                         orderId={orderDetails.id}
@@ -545,25 +561,37 @@ function SuccessContent() {
                         className="mt-4"
                       />
                     )}
-              </div>
+                  </div>
                 )
-            )}
-          </div>
-        
+              )}
+            </div>
+
             {/* Action Buttons */}
             <div className={`flex gap-4 ${session ? 'flex-col sm:flex-row' : 'justify-center'}`}>
-              <Button asChild variant="primary" className={`${session ? 'flex-1' : 'w-full max-w-xs'}`}>
-                <Link href="/beats">
-                  Découvrir d&apos;autres beats
-                </Link>
-              </Button>
-              
+              <Link href="/beats" className={`${session ? 'flex-1' : 'w-full max-w-xs'}`}>
+                <HoverBorderGradient
+                  containerClassName="rounded-xl md:rounded-2xl w-full"
+                  className="group inline-flex items-center justify-center gap-2 backdrop-blur-lg px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all duration-300 border border-border/20 w-full"
+                  duration={1.5}
+                  clockwise={true}
+                >
+                  <span>{t('success.discoverMoreBeats')}</span>
+                  <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                </HoverBorderGradient>
+              </Link>
+
               {session && (
-                <Button asChild variant="card" className="flex-1">
-                  <Link href="/profile">
-                    Aller au profil
-                  </Link>
-                </Button>
+                <Link href="/profile" className="flex-1">
+                  <HoverBorderGradient
+                    containerClassName="rounded-xl md:rounded-2xl w-full"
+                    className="group inline-flex items-center justify-center gap-2 backdrop-blur-lg px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl font-semibold text-sm sm:text-base md:text-lg transition-all duration-300 border border-border/20 w-full"
+                    duration={1.5}
+                    clockwise={true}
+                  >
+                    <span>{t('success.goToProfile')}</span>
+                    <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                  </HoverBorderGradient>
+                </Link>
               )}
             </div>
           </div>
@@ -578,7 +606,7 @@ export default function SuccessPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
         <DottedSurface className="size-full z-0" />
-        
+
         {/* Gradient overlay */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           <div
