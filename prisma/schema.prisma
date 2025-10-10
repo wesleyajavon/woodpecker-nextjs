@@ -178,7 +178,9 @@ enum OrderStatus {
   PAID
   COMPLETED
   CANCELLED
+  FAILED
   REFUNDED
+  DISPUTED
 }
 
 enum LicenseType {

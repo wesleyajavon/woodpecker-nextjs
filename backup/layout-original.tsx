@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Navigation from "@/components/Navigation";
+import SessionProvider from "@/components/SessionProvider";
+import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { Footer } from "@/components/blocks/footer-section";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "l.outsider - Bientôt Disponible",
-  description: "Plateforme de beats de qualité professionnelle - Bientôt en ligne",
+  title: "l.outsider",
+  description: "Plateforme de beats de qualité professionnelle",
 };
 
 export default function RootLayout({
@@ -34,9 +39,19 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="min-h-screen">
-            {children}
-          </main>
+          <LanguageProvider>
+            <SessionProvider>
+              <CartProvider>
+                <div className="flex flex-col min-h-screen">
+                  <Navigation />
+                  <main className="flex-1">
+                    {children}
+                  </main>
+                  <Footer />
+                </div>
+              </CartProvider>
+            </SessionProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -52,40 +52,31 @@ function SuccessContent() {
     if (sessionId) {
       // Try to fetch multi-item order first, then fallback to single order
       const fetchOrderDetails = async () => {
-        try {
-          // First try multi-item order
-          const multiResponse = await fetch(`/api/orders/multi-payment/${sessionId}`)
-
-          if (multiResponse.ok) {
-            const multiResult = await multiResponse.json()
-            if (multiResult.success) {
-              setMultiOrderDetails(multiResult.data)
+      try {
+        const response = await fetch(`/api/orders/lookup/${sessionId}`)
+        
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success) {
+            if (result.type === 'multi-item') {
+              setMultiOrderDetails(result.data)
               setIsMultiItemOrder(true)
-              setIsLoading(false)
-              return
-            }
-          }
-
-          // Fallback to single order
-          const response = await fetch(`/api/orders/payment/${sessionId}`)
-
-          if (response.ok) {
-            const result = await response.json()
-            if (result.success) {
+            } else {
               setOrderDetails(result.data)
               setIsMultiItemOrder(false)
-            } else {
-              console.error('Failed to fetch order:', result.error)
             }
           } else {
-            console.error('Failed to fetch order details')
+            console.error('Failed to fetch order:', result.error)
           }
-        } catch (error) {
-          console.error('Error fetching order details:', error)
-        } finally {
-          setIsLoading(false)
+        } else {
+          console.error('Failed to fetch order details')
         }
+      } catch (error) {
+        console.error('Error fetching order details:', error)
+      } finally {
+        setIsLoading(false)
       }
+    }
 
       fetchOrderDetails()
     } else {
@@ -417,7 +408,7 @@ function SuccessContent() {
                     </div>
                     <div>
                       <span className="font-medium text-muted-foreground">{t('success.amount')}:</span>
-                      <p className="text-foreground text-lg font-semibold">€{orderDetails.totalAmount.toFixed(2)}</p>
+                      <p className="text-foreground text-lg font-semibold">€{orderDetails.totalAmount}</p>
                     </div>
                     <div>
                       <span className="font-medium text-muted-foreground">{t('success.status')}:</span>

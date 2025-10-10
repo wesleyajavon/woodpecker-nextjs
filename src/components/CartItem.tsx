@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Trash2, Plus, Minus, Music, Clock, Tag, Archive } from 'lucide-react'
+import { Trash2, Music, Clock, Tag, Archive } from 'lucide-react'
 import { CartItem as CartItemType } from '@/types/cart'
 import { Beat } from '@/types/beat'
 import { useCartActions } from '@/hooks/useCart'
@@ -14,7 +14,7 @@ interface CartItemProps {
 }
 
 export default function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeFromCart } = useCartActions()
+  const { removeFromCart } = useCartActions()
   const [isRemoving, setIsRemoving] = useState(false)
   const { t } = useTranslation()
 
@@ -24,14 +24,6 @@ export default function CartItem({ item }: CartItemProps) {
       case 'TRACKOUT_LEASE': return beat.trackoutLeasePrice
       case 'UNLIMITED_LEASE': return beat.unlimitedLeasePrice
       default: return beat.wavLeasePrice
-    }
-  }
-
-  const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity <= 0) {
-      handleRemove()
-    } else {
-      updateQuantity(item.beat.id, item.licenseType, newQuantity)
     }
   }
 
@@ -128,52 +120,26 @@ export default function CartItem({ item }: CartItemProps) {
             {/* Price */}
             <div className="text-right sm:text-right">
               <div className="text-lg sm:text-xl font-bold text-foreground">
-                €{(getPrice(item.beat, item.licenseType) * item.quantity).toFixed(2)}
+                €{getPrice(item.beat, item.licenseType).toFixed(2)}
               </div>
               <div className="text-xs sm:text-sm text-muted-foreground">
-                €{getPrice(item.beat, item.licenseType).toFixed(2)} {t('cart.each')}
+                {t('cart.singleItem')}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quantity Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border/20 gap-3 sm:gap-0">
-        <div className="flex items-center justify-center sm:justify-start space-x-3 sm:space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleQuantityChange(item.quantity - 1)}
-            disabled={isRemoving}
-            className="h-9 w-9 sm:h-8 sm:w-8 p-0 rounded-full bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30 touch-manipulation"
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          
-          <span className="text-base sm:text-lg font-medium text-foreground min-w-[2rem] text-center">
-            {item.quantity}
-          </span>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleQuantityChange(item.quantity + 1)}
-            disabled={isRemoving}
-            className="h-9 w-9 sm:h-8 sm:w-8 p-0 rounded-full bg-card/20 backdrop-blur-lg border border-border/20 text-foreground hover:bg-card/30 touch-manipulation"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-
+      {/* Remove Button */}
+      <div className="flex justify-end mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border/20">
         <Button
           variant="outline"
           size="sm"
           onClick={handleRemove}
           disabled={isRemoving}
-          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-500/50 w-full sm:w-auto touch-manipulation"
+          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-500/50 touch-manipulation"
         >
-          <Trash2 className="h-4 w-4 mr-1 sm:mr-2" />
+          <Trash2 className="h-4 w-4 mr-2" />
           <span className="text-sm sm:text-base">{t('common.remove')}</span>
         </Button>
       </div>

@@ -59,184 +59,11 @@ export async function POST(request: NextRequest) {
     
     switch (event.type) {
       case 'checkout.session.completed':
-        const session = event.data.object
+        await handleSuccessfulPayment(event.data.object)
+        break
         
-        console.log('Payment successful for session:', session.id)
-        console.log('Session details:', {
-          id: session.id,
-          customer_email: session.customer_email,
-          amount_total: session.amount_total,
-          currency: session.currency
-        })
-        
-        try {
-          // Retrieve the full session details from Stripe
-          const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-            expand: ['line_items', 'line_items.data.price.product']
-          })
-
-          if (!fullSession.line_items?.data || fullSession.line_items.data.length === 0) {
-            console.error('No line items found in session:', session.id)
-            break
-          }
-
-          const lineItems = fullSession.line_items.data
-          const isMultiItem = lineItems.length > 1
-
-          if (isMultiItem) {
-            // Handle multi-item order
-            console.log('Processing multi-item order with', lineItems.length, 'items')
-            
-            const orderItems = []
-            let totalAmount = 0
-
-            for (const lineItem of lineItems) {
-              const price = lineItem.price
-              const product = price?.product
-
-              if (!product || typeof product === 'string' || product.deleted) {
-                console.error('Invalid or deleted product data in line item:', lineItem.id)
-                continue
-              }
-
-              const beatId = product.metadata?.beat_id
-              if (!beatId) {
-                console.error('No beat_id found in product metadata:', product.id)
-                continue
-              }
-
-              const beat = await BeatService.getBeatById(beatId)
-              if (!beat) {
-                console.error('Beat not found:', beatId)
-                continue
-              }
-
-              const quantity = lineItem.quantity || 1
-              const unitPrice = (price.unit_amount || 0) / 100
-              const itemTotal = unitPrice * quantity
-              totalAmount += itemTotal
-
-              orderItems.push({
-                beatId,
-                quantity,
-                unitPrice,
-                totalPrice: itemTotal
-              })
-            }
-
-            if (orderItems.length === 0) {
-              console.error('No valid items found for multi-item order')
-              break
-            }
-
-            // Create multi-item order
-            const multiOrder = await prisma.multiItemOrder.create({
-              data: {
-                customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
-                customerName: fullSession.customer_details?.name || undefined,
-                customerPhone: fullSession.customer_details?.phone || undefined,
-                totalAmount,
-                currency: fullSession.currency?.toUpperCase() || 'EUR',
-                status: 'PAID',
-                paymentMethod: 'card',
-                paymentId: session.id,
-                sessionId: session.id,
-                paidAt: new Date(),
-                licenseType: 'WAV_LEASE',
-                usageRights: ['Non-exclusive rights', 'Commercial use', 'Streaming'],
-                items: {
-                  create: orderItems.map(item => ({
-                    beatId: item.beatId,
-                    quantity: item.quantity,
-                    unitPrice: item.unitPrice,
-                    totalPrice: item.totalPrice
-                  }))
-                }
-              }
-            })
-
-            console.log('Multi-item order created successfully:', multiOrder.id)
-
-            // Send confirmation email with download links
-            try {
-              await sendOrderConfirmationEmail(
-                multiOrder.id,
-                multiOrder.customerEmail,
-                true // isMultiItem
-              )
-            } catch (emailError) {
-              console.error('Failed to send confirmation email for multi-item order:', emailError)
-              // Don't fail the webhook if email fails
-            }
-
-          } else {
-            // Handle single-item order (existing logic)
-            const lineItem = lineItems[0]
-            const price = lineItem.price
-            const product = price?.product
-
-            if (!product || typeof product === 'string' || product.deleted) {
-              console.error('Invalid or deleted product data in session:', session.id)
-              break
-            }
-
-            // Get the beat ID from the product metadata
-            console.log('Product metadata:', product.metadata)
-            const beatId = product.metadata?.beat_id
-            if (!beatId) {
-              console.error('No beat_id found in product metadata:', product.id)
-              console.error('Available metadata keys:', Object.keys(product.metadata || {}))
-              break
-            }
-            
-            console.log('Found beat_id:', beatId)
-
-            // Get the beat details
-            const beat = await BeatService.getBeatById(beatId)
-            if (!beat) {
-              console.error('Beat not found:', beatId)
-              break
-            }
-
-            // Get license type from session metadata
-            const licenseType = fullSession.metadata?.license_type || 'WAV_LEASE'
-            
-            // Create the order in the database
-            const orderData = {
-              customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
-              customerName: fullSession.customer_details?.name || undefined,
-              customerPhone: fullSession.customer_details?.phone || undefined,
-              totalAmount: (fullSession.amount_total || 0) / 100, // Convert from cents
-              currency: fullSession.currency?.toUpperCase() || 'EUR',
-              paymentMethod: 'card',
-              paymentId: session.id,
-              licenseType: licenseType as LicenseType,
-              usageRights: getUsageRights(licenseType),
-              beatId: beatId
-            }
-
-            const order = await OrderService.createOrder(orderData)
-            console.log('Order created successfully:', order.id)
-
-            // Send confirmation email with download links
-            try {
-              await sendOrderConfirmationEmail(
-                order.id,
-                order.customerEmail,
-                false // isMultiItem
-              )
-            } catch (emailError) {
-              console.error('Failed to send confirmation email for single order:', emailError)
-              // Don't fail the webhook if email fails
-            }
-          }
-
-        } catch (error) {
-          console.error('Error processing checkout session:', error)
-        } finally {
-          await prisma.$disconnect()
-        }
-        
+      case 'checkout.session.expired':
+        await handleExpiredSession(event.data.object)
         break
         
       case 'payment_intent.succeeded':
@@ -245,8 +72,15 @@ export async function POST(request: NextRequest) {
         break
         
       case 'payment_intent.payment_failed':
-        const failedPayment = event.data.object
-        console.log('Payment failed:', failedPayment.id)
+        await handleFailedPayment(event.data.object)
+        break
+        
+      case 'charge.dispute.created':
+        await handleDisputeCreated(event.data.object)
+        break
+        
+      case 'charge.refunded':
+        await handleRefunded(event.data.object)
         break
         
       default:
@@ -262,4 +96,401 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+// Handle successful payment
+async function handleSuccessfulPayment(session: any) {
+  console.log('Payment successful for session:', session.id)
+  console.log('Session details:', {
+    id: session.id,
+    customer_email: session.customer_email,
+    amount_total: session.amount_total,
+    currency: session.currency
+  })
+  
+  try {
+    // Retrieve the full session details from Stripe
+    const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+      expand: ['line_items', 'line_items.data.price.product']
+    })
+
+    if (!fullSession.line_items?.data || fullSession.line_items.data.length === 0) {
+      console.error('No line items found in session:', session.id)
+      return
+    }
+
+    const lineItems = fullSession.line_items.data
+    const isMultiItem = lineItems.length > 1
+
+    if (isMultiItem) {
+      await handleMultiItemOrder(fullSession, lineItems)
+    } else {
+      await handleSingleItemOrder(fullSession, lineItems[0])
+    }
+
+  } catch (error) {
+    console.error('Error processing checkout session:', error)
+  } finally {
+    await prisma.$disconnect()
+  }
+}
+
+// Handle expired/cancelled session
+async function handleExpiredSession(session: any) {
+  console.log('Session expired:', session.id)
+  
+  try {
+    // Update order status to CANCELLED
+    await updateOrderStatus(session.id, 'CANCELLED', {
+      reason: 'Session expired',
+      cancelledAt: new Date()
+    })
+    
+    console.log('Order cancelled due to expired session:', session.id)
+  } catch (error) {
+    console.error('Error handling expired session:', error)
+  }
+}
+
+// Handle failed payment
+async function handleFailedPayment(paymentIntent: any) {
+  console.log('Payment failed:', paymentIntent.id)
+  
+  try {
+    // Find the order by payment ID
+    const order = await findOrderByPaymentId(paymentIntent.id)
+    
+    if (order) {
+      await updateOrderStatus(paymentIntent.id, 'FAILED', {
+        reason: paymentIntent.last_payment_error?.message || 'Payment failed',
+        failedAt: new Date(),
+        failureCode: paymentIntent.last_payment_error?.code
+      })
+      
+      console.log('Order marked as failed:', order.id)
+      
+      // Send failure notification email
+      try {
+        await sendPaymentFailureEmail(order.customerEmail, order.id, paymentIntent.last_payment_error?.message)
+      } catch (emailError) {
+        console.error('Failed to send failure email:', emailError)
+      }
+    }
+  } catch (error) {
+    console.error('Error handling failed payment:', error)
+  }
+}
+
+// Handle dispute/chargeback
+async function handleDisputeCreated(dispute: any) {
+  console.log('Dispute created:', dispute.id)
+  
+  try {
+    const order = await findOrderByPaymentId(dispute.payment_intent)
+    
+    if (order) {
+      await updateOrderStatus(dispute.payment_intent, 'DISPUTED', {
+        reason: 'Payment disputed',
+        disputedAt: new Date(),
+        disputeId: dispute.id,
+        disputeReason: dispute.reason
+      })
+      
+      console.log('Order marked as disputed:', order.id)
+      
+      // Send dispute notification email
+      try {
+        await sendDisputeNotificationEmail(order.customerEmail, order.id, dispute.reason)
+      } catch (emailError) {
+        console.error('Failed to send dispute email:', emailError)
+      }
+    }
+  } catch (error) {
+    console.error('Error handling dispute:', error)
+  }
+}
+
+// Handle refund
+async function handleRefunded(charge: any) {
+  console.log('Charge refunded:', charge.id)
+  
+  try {
+    const order = await findOrderByPaymentId(charge.payment_intent)
+    
+    if (order) {
+      await updateOrderStatus(charge.payment_intent, 'REFUNDED', {
+        reason: 'Payment refunded',
+        refundedAt: new Date(),
+        refundId: charge.refunds?.data?.[0]?.id,
+        refundAmount: charge.refunds?.data?.[0]?.amount
+      })
+      
+      console.log('Order marked as refunded:', order.id)
+      
+      // Send refund notification email
+      try {
+        await sendRefundNotificationEmail(order.customerEmail, order.id, charge.refunds?.data?.[0]?.amount)
+      } catch (emailError) {
+        console.error('Failed to send refund email:', emailError)
+      }
+    }
+  } catch (error) {
+    console.error('Error handling refund:', error)
+  }
+}
+
+// Helper function to find order by payment ID
+async function findOrderByPaymentId(paymentId: string) {
+  // Try multi-item order first
+  const multiOrder = await prisma.multiItemOrder.findFirst({
+    where: { paymentId }
+  })
+  
+  if (multiOrder) {
+    return { ...multiOrder, type: 'multi-item' }
+  }
+  
+  // Fallback to single order
+  const singleOrder = await prisma.order.findFirst({
+    where: { paymentId }
+  })
+  
+  if (singleOrder) {
+    return { ...singleOrder, type: 'single' }
+  }
+  
+  return null
+}
+
+// Helper function to update order status
+async function updateOrderStatus(paymentId: string, status: string, additionalData: any = {}) {
+  // Try multi-item order first
+  const multiOrder = await prisma.multiItemOrder.findFirst({
+    where: { paymentId }
+  })
+  
+  if (multiOrder) {
+    await prisma.multiItemOrder.update({
+      where: { id: multiOrder.id },
+      data: {
+        status: status as any,
+        ...additionalData
+      }
+    })
+    return
+  }
+  
+  // Fallback to single order
+  const singleOrder = await prisma.order.findFirst({
+    where: { paymentId }
+  })
+  
+  if (singleOrder) {
+    await prisma.order.update({
+      where: { id: singleOrder.id },
+      data: {
+        status: status as any,
+        ...additionalData
+      }
+    })
+  }
+}
+
+// Handle multi-item order creation
+async function handleMultiItemOrder(fullSession: any, lineItems: any[]) {
+  console.log('Processing multi-item order with', lineItems.length, 'items')
+  
+  const orderItems = []
+  let totalAmount = 0
+
+  for (const lineItem of lineItems) {
+    const price = lineItem.price
+    const product = price?.product
+
+    if (!product || typeof product === 'string' || product.deleted) {
+      console.error('Invalid or deleted product data in line item:', lineItem.id)
+      continue
+    }
+
+    const beatId = product.metadata?.beat_id
+    if (!beatId) {
+      console.error('No beat_id found in product metadata:', product.id)
+      continue
+    }
+
+    const beat = await BeatService.getBeatById(beatId)
+    if (!beat) {
+      console.error('Beat not found:', beatId)
+      continue
+    }
+
+    const quantity = lineItem.quantity || 1
+    const unitPrice = (price.unit_amount || 0) / 100
+    const itemTotal = unitPrice * quantity
+    totalAmount += itemTotal
+
+    orderItems.push({
+      beatId,
+      quantity,
+      unitPrice,
+      totalPrice: itemTotal
+    })
+  }
+
+  if (orderItems.length === 0) {
+    console.error('No valid items found for multi-item order')
+    return
+  }
+
+  // Create multi-item order with PENDING status, then update to PAID
+  const multiOrder = await prisma.multiItemOrder.create({
+    data: {
+      customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
+      customerName: fullSession.customer_details?.name || undefined,
+      customerPhone: fullSession.customer_details?.phone || undefined,
+      totalAmount,
+      currency: fullSession.currency?.toUpperCase() || 'EUR',
+      status: 'PENDING', // Start with PENDING status (same as single orders)
+      paymentMethod: 'card',
+      paymentId: fullSession.id,
+      sessionId: fullSession.id,
+      licenseType: 'WAV_LEASE',
+      usageRights: ['Non-exclusive rights', 'Commercial use', 'Streaming'],
+      items: {
+        create: orderItems.map(item => ({
+          beatId: item.beatId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice
+        }))
+      }
+    }
+  })
+
+  // Update to PAID status since payment was successful (same as single orders)
+  await prisma.multiItemOrder.update({
+    where: { id: multiOrder.id },
+    data: {
+      status: 'PAID',
+      paidAt: new Date()
+    }
+  })
+
+  console.log('Multi-item order created successfully:', multiOrder.id)
+
+  // Send confirmation email with download links
+  try {
+    await sendOrderConfirmationEmail(
+      multiOrder.id,
+      multiOrder.customerEmail,
+      true // isMultiItem
+    )
+  } catch (emailError) {
+    console.error('Failed to send confirmation email for multi-item order:', emailError)
+  }
+}
+
+// Handle single-item order creation
+async function handleSingleItemOrder(fullSession: any, lineItem: any) {
+  const price = lineItem.price
+  const product = price?.product
+
+  if (!product || typeof product === 'string' || product.deleted) {
+    console.error('Invalid or deleted product data in session:', fullSession.id)
+    return
+  }
+
+  // Get the beat ID from the product metadata
+  console.log('Product metadata:', product.metadata)
+  const beatId = product.metadata?.beat_id
+  if (!beatId) {
+    console.error('No beat_id found in product metadata:', product.id)
+    console.error('Available metadata keys:', Object.keys(product.metadata || {}))
+    return
+  }
+  
+  console.log('Found beat_id:', beatId)
+
+  // Get the beat details
+  const beat = await BeatService.getBeatById(beatId)
+  if (!beat) {
+    console.error('Beat not found:', beatId)
+    return
+  }
+
+  // Get license type from session metadata
+  const licenseType = fullSession.metadata?.license_type || 'WAV_LEASE'
+  
+  // Find existing order by paymentId and update it to PAID status
+  const existingOrder = await prisma.order.findFirst({
+    where: { paymentId: fullSession.id }
+  })
+
+  let order
+
+  if (existingOrder) {
+    // Update existing order to PAID status
+    order = await prisma.order.update({
+      where: { id: existingOrder.id },
+      data: {
+        status: 'PAID',
+        paidAt: new Date(),
+        customerEmail: fullSession.customer_email || fullSession.customer_details?.email || existingOrder.customerEmail,
+        customerName: fullSession.customer_details?.name || existingOrder.customerName,
+        customerPhone: fullSession.customer_details?.phone || existingOrder.customerPhone,
+        totalAmount: (fullSession.amount_total || 0) / 100,
+        currency: fullSession.currency?.toUpperCase() || 'EUR',
+        paymentMethod: 'card',
+        licenseType: licenseType as LicenseType,
+        usageRights: getUsageRights(licenseType)
+      }
+    })
+    console.log('Order updated to PAID status:', order.id)
+  } else {
+    // Fallback: create new order if none exists (shouldn't happen in normal flow)
+    console.warn('No existing order found for payment ID:', fullSession.id)
+    const orderData = {
+      customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
+      customerName: fullSession.customer_details?.name || undefined,
+      customerPhone: fullSession.customer_details?.phone || undefined,
+      totalAmount: (fullSession.amount_total || 0) / 100,
+      currency: fullSession.currency?.toUpperCase() || 'EUR',
+      paymentMethod: 'card',
+      paymentId: fullSession.id,
+      licenseType: licenseType as LicenseType,
+      usageRights: getUsageRights(licenseType),
+      beatId: beatId,
+      status: 'PAID' // Create as PAID since payment succeeded
+    }
+
+    order = await OrderService.createOrder(orderData)
+    console.log('Fallback order created successfully:', order.id)
+  }
+
+  // Send confirmation email with download links
+  try {
+    await sendOrderConfirmationEmail(
+      order.id,
+      order.customerEmail,
+      false // isMultiItem
+    )
+  } catch (emailError) {
+    console.error('Failed to send confirmation email for single order:', emailError)
+  }
+}
+
+// Email notification functions
+async function sendPaymentFailureEmail(email: string, orderId: string, errorMessage?: string) {
+  // TODO: Implement payment failure email
+  console.log(`Payment failure email would be sent to ${email} for order ${orderId}: ${errorMessage}`)
+}
+
+async function sendDisputeNotificationEmail(email: string, orderId: string, reason: string) {
+  // TODO: Implement dispute notification email
+  console.log(`Dispute notification email would be sent to ${email} for order ${orderId}: ${reason}`)
+}
+
+async function sendRefundNotificationEmail(email: string, orderId: string, refundAmount?: number) {
+  // TODO: Implement refund notification email
+  console.log(`Refund notification email would be sent to ${email} for order ${orderId}: ${refundAmount}`)
 }

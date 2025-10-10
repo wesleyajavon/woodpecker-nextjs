@@ -98,6 +98,7 @@ export const en = {
     items: 'Items',
     item: 'item',
     items_plural: 'items',
+    singleItem: 'Single item',
     cartItems: 'Cart Items ({count})',
     processingFee: 'Processing Fee',
     proceedToCheckout: 'Proceed to Checkout',
@@ -461,6 +462,7 @@ export const en = {
     tryAgain: 'Try again',
     checkYourEmail: 'Check your email, we sent you the download links there too.',
     expiresAt: 'Expires at',
+    email: 'Email',
   },
 
   // Pagination

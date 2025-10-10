@@ -7,16 +7,83 @@ MODE=${1:-"coming-soon"}
 
 if [ "$MODE" = "coming-soon" ]; then
     echo "🚧 Switching to Coming Soon mode..."
+    
+    # Backup current full app files
     cp src/app/page.tsx backup/page-full-app.tsx 2>/dev/null || true
     cp src/app/layout.tsx backup/layout-full-app.tsx 2>/dev/null || true
     
-    # Use the coming soon versions (already in place)
+    # Switch to coming soon files
+    cp backup/page-coming-soon.tsx src/app/page.tsx
+    cp backup/layout-coming-soon.tsx src/app/layout.tsx 2>/dev/null || {
+        # Create coming soon layout if it doesn't exist
+        cat > src/app/layout.tsx << 'EOF'
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import SessionProvider from "@/components/SessionProvider";
+import { CartProvider } from "@/contexts/CartContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "l.outsider - Bientôt Disponible",
+  description: "Plateforme de beats de qualité professionnelle - Bientôt en ligne",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="fr" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <LanguageProvider>
+            <SessionProvider>
+              <CartProvider>
+                <main className="min-h-screen">
+                  {children}
+                </main>
+              </CartProvider>
+            </SessionProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+EOF
+    }
+    
     echo "✅ Coming Soon page is now active"
-    echo "📝 Original files backed up to backup/"
+    echo "📝 Full app files backed up to backup/"
     
 elif [ "$MODE" = "full-app" ]; then
     echo "🚀 Switching to Full App mode..."
     
+    # Backup current coming soon files
+    cp src/app/page.tsx backup/page-coming-soon.tsx 2>/dev/null || true
+    cp src/app/layout.tsx backup/layout-coming-soon.tsx 2>/dev/null || true
+    
+    # Restore full app files
     if [ -f "backup/page-original.tsx" ]; then
         cp backup/page-original.tsx src/app/page.tsx
         echo "✅ Restored original page.tsx"

@@ -98,6 +98,7 @@ export const fr = {
     items: 'Articles',
     item: 'article',
     items_plural: 'articles',
+    singleItem: 'Article unique',
     cartItems: 'Articles du panier',
     processingFee: 'Frais de traitement',
     proceedToCheckout: 'Procéder au paiement',
