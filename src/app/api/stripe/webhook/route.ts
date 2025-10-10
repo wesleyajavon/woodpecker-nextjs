@@ -6,8 +6,52 @@ import { BeatService } from '@/services/beatService'
 import { sendOrderConfirmationEmail } from '@/services/orderEmailService'
 import { PrismaClient } from '@prisma/client'
 import { LicenseType } from '@/types/cart'
+import Stripe from 'stripe'
 
 const prisma = new PrismaClient()
+
+// Type definitions for Stripe webhook events
+type StripeCheckoutSession = Stripe.Checkout.Session
+type StripePaymentIntent = Stripe.PaymentIntent
+type StripeDispute = Stripe.Dispute
+type StripeCharge = Stripe.Charge
+type StripeLineItem = Stripe.LineItem
+type StripePrice = Stripe.Price
+type StripeProduct = Stripe.Product
+
+interface OrderStatusUpdateData {
+  reason?: string
+  cancelledAt?: Date
+  failedAt?: Date
+  failureCode?: string
+  disputedAt?: Date
+  disputeId?: string
+  disputeReason?: string
+  refundedAt?: Date
+  refundId?: string
+  refundAmount?: number
+}
+
+interface OrderItem {
+  beatId: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
+
+interface OrderData {
+  customerEmail: string
+  customerName?: string
+  customerPhone?: string
+  totalAmount: number
+  currency: string
+  paymentMethod: string
+  paymentId: string
+  licenseType: LicenseType
+  usageRights: string[]
+  beatId: string
+  status: string
+}
 
 // Helper function to get usage rights based on license type
 function getUsageRights(licenseType: string): string[] {
@@ -37,7 +81,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let event
+    let event: Stripe.Event
 
     try {
       // Verify the webhook signature
@@ -59,28 +103,28 @@ export async function POST(request: NextRequest) {
     
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleSuccessfulPayment(event.data.object)
+        await handleSuccessfulPayment(event.data.object as StripeCheckoutSession)
         break
         
       case 'checkout.session.expired':
-        await handleExpiredSession(event.data.object)
+        await handleExpiredSession(event.data.object as StripeCheckoutSession)
         break
         
       case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object
+        const paymentIntent = event.data.object as StripePaymentIntent
         console.log('Payment succeeded:', paymentIntent.id)
         break
         
       case 'payment_intent.payment_failed':
-        await handleFailedPayment(event.data.object)
+        await handleFailedPayment(event.data.object as StripePaymentIntent)
         break
         
       case 'charge.dispute.created':
-        await handleDisputeCreated(event.data.object)
+        await handleDisputeCreated(event.data.object as StripeDispute)
         break
         
       case 'charge.refunded':
-        await handleRefunded(event.data.object)
+        await handleRefunded(event.data.object as StripeCharge)
         break
         
       default:
@@ -99,7 +143,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Handle successful payment
-async function handleSuccessfulPayment(session: any) {
+async function handleSuccessfulPayment(session: StripeCheckoutSession) {
   console.log('Payment successful for session:', session.id)
   console.log('Session details:', {
     id: session.id,
@@ -136,7 +180,7 @@ async function handleSuccessfulPayment(session: any) {
 }
 
 // Handle expired/cancelled session
-async function handleExpiredSession(session: any) {
+async function handleExpiredSession(session: StripeCheckoutSession) {
   console.log('Session expired:', session.id)
   
   try {
@@ -153,7 +197,7 @@ async function handleExpiredSession(session: any) {
 }
 
 // Handle failed payment
-async function handleFailedPayment(paymentIntent: any) {
+async function handleFailedPayment(paymentIntent: StripePaymentIntent) {
   console.log('Payment failed:', paymentIntent.id)
   
   try {
@@ -182,14 +226,20 @@ async function handleFailedPayment(paymentIntent: any) {
 }
 
 // Handle dispute/chargeback
-async function handleDisputeCreated(dispute: any) {
+async function handleDisputeCreated(dispute: StripeDispute) {
   console.log('Dispute created:', dispute.id)
   
   try {
-    const order = await findOrderByPaymentId(dispute.payment_intent)
+    const paymentIntentId = typeof dispute.payment_intent === 'string' ? dispute.payment_intent : dispute.payment_intent?.id
+    if (!paymentIntentId) {
+      console.error('No payment intent ID found in dispute:', dispute.id)
+      return
+    }
+    
+    const order = await findOrderByPaymentId(paymentIntentId)
     
     if (order) {
-      await updateOrderStatus(dispute.payment_intent, 'DISPUTED', {
+      await updateOrderStatus(paymentIntentId, 'DISPUTED', {
         reason: 'Payment disputed',
         disputedAt: new Date(),
         disputeId: dispute.id,
@@ -211,14 +261,20 @@ async function handleDisputeCreated(dispute: any) {
 }
 
 // Handle refund
-async function handleRefunded(charge: any) {
+async function handleRefunded(charge: StripeCharge) {
   console.log('Charge refunded:', charge.id)
   
   try {
-    const order = await findOrderByPaymentId(charge.payment_intent)
+    const paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id
+    if (!paymentIntentId) {
+      console.error('No payment intent ID found in charge:', charge.id)
+      return
+    }
+    
+    const order = await findOrderByPaymentId(paymentIntentId)
     
     if (order) {
-      await updateOrderStatus(charge.payment_intent, 'REFUNDED', {
+      await updateOrderStatus(paymentIntentId, 'REFUNDED', {
         reason: 'Payment refunded',
         refundedAt: new Date(),
         refundId: charge.refunds?.data?.[0]?.id,
@@ -263,7 +319,7 @@ async function findOrderByPaymentId(paymentId: string) {
 }
 
 // Helper function to update order status
-async function updateOrderStatus(paymentId: string, status: string, additionalData: any = {}) {
+async function updateOrderStatus(paymentId: string, status: string, additionalData: OrderStatusUpdateData = {}) {
   // Try multi-item order first
   const multiOrder = await prisma.multiItemOrder.findFirst({
     where: { paymentId }
@@ -297,15 +353,15 @@ async function updateOrderStatus(paymentId: string, status: string, additionalDa
 }
 
 // Handle multi-item order creation
-async function handleMultiItemOrder(fullSession: any, lineItems: any[]) {
+async function handleMultiItemOrder(fullSession: StripeCheckoutSession, lineItems: StripeLineItem[]) {
   console.log('Processing multi-item order with', lineItems.length, 'items')
   
-  const orderItems = []
+  const orderItems: OrderItem[] = []
   let totalAmount = 0
 
   for (const lineItem of lineItems) {
-    const price = lineItem.price
-    const product = price?.product
+    const price = lineItem.price as StripePrice
+    const product = price?.product as StripeProduct
 
     if (!product || typeof product === 'string' || product.deleted) {
       console.error('Invalid or deleted product data in line item:', lineItem.id)
@@ -391,9 +447,9 @@ async function handleMultiItemOrder(fullSession: any, lineItems: any[]) {
 }
 
 // Handle single-item order creation
-async function handleSingleItemOrder(fullSession: any, lineItem: any) {
-  const price = lineItem.price
-  const product = price?.product
+async function handleSingleItemOrder(fullSession: StripeCheckoutSession, lineItem: StripeLineItem) {
+  const price = lineItem.price as StripePrice
+  const product = price?.product as StripeProduct
 
   if (!product || typeof product === 'string' || product.deleted) {
     console.error('Invalid or deleted product data in session:', fullSession.id)
@@ -449,7 +505,7 @@ async function handleSingleItemOrder(fullSession: any, lineItem: any) {
   } else {
     // Fallback: create new order if none exists (shouldn't happen in normal flow)
     console.warn('No existing order found for payment ID:', fullSession.id)
-    const orderData = {
+    const orderData: OrderData = {
       customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
       customerName: fullSession.customer_details?.name || undefined,
       customerPhone: fullSession.customer_details?.phone || undefined,
