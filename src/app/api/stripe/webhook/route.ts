@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 import { OrderService } from '@/services/orderService'
 import { BeatService } from '@/services/beatService'
 import { sendOrderConfirmationEmail } from '@/services/orderEmailService'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, OrderStatus } from '@prisma/client'
 import { LicenseType } from '@/types/cart'
 import Stripe from 'stripe'
 
@@ -185,7 +185,7 @@ async function handleExpiredSession(session: StripeCheckoutSession) {
   
   try {
     // Update order status to CANCELLED
-    await updateOrderStatus(session.id, 'CANCELLED', {
+    await updateOrderStatus(session.id, OrderStatus.CANCELLED, {
       reason: 'Session expired',
       cancelledAt: new Date()
     })
@@ -205,7 +205,7 @@ async function handleFailedPayment(paymentIntent: StripePaymentIntent) {
     const order = await findOrderByPaymentId(paymentIntent.id)
     
     if (order) {
-      await updateOrderStatus(paymentIntent.id, 'FAILED', {
+      await updateOrderStatus(paymentIntent.id, 'FAILED' as OrderStatus, {
         reason: paymentIntent.last_payment_error?.message || 'Payment failed',
         failedAt: new Date(),
         failureCode: paymentIntent.last_payment_error?.code
@@ -239,7 +239,7 @@ async function handleDisputeCreated(dispute: StripeDispute) {
     const order = await findOrderByPaymentId(paymentIntentId)
     
     if (order) {
-      await updateOrderStatus(paymentIntentId, 'DISPUTED', {
+      await updateOrderStatus(paymentIntentId, 'DISPUTED' as OrderStatus, {
         reason: 'Payment disputed',
         disputedAt: new Date(),
         disputeId: dispute.id,
@@ -274,7 +274,7 @@ async function handleRefunded(charge: StripeCharge) {
     const order = await findOrderByPaymentId(paymentIntentId)
     
     if (order) {
-      await updateOrderStatus(paymentIntentId, 'REFUNDED', {
+      await updateOrderStatus(paymentIntentId, OrderStatus.REFUNDED, {
         reason: 'Payment refunded',
         refundedAt: new Date(),
         refundId: charge.refunds?.data?.[0]?.id,
@@ -319,7 +319,7 @@ async function findOrderByPaymentId(paymentId: string) {
 }
 
 // Helper function to update order status
-async function updateOrderStatus(paymentId: string, status: string, additionalData: OrderStatusUpdateData = {}) {
+async function updateOrderStatus(paymentId: string, status: OrderStatus, additionalData: OrderStatusUpdateData = {}) {
   // Try multi-item order first
   const multiOrder = await prisma.multiItemOrder.findFirst({
     where: { paymentId }
@@ -329,7 +329,7 @@ async function updateOrderStatus(paymentId: string, status: string, additionalDa
     await prisma.multiItemOrder.update({
       where: { id: multiOrder.id },
       data: {
-        status: status as any,
+        status,
         ...additionalData
       }
     })
@@ -345,7 +345,7 @@ async function updateOrderStatus(paymentId: string, status: string, additionalDa
     await prisma.order.update({
       where: { id: singleOrder.id },
       data: {
-        status: status as any,
+        status,
         ...additionalData
       }
     })
@@ -406,7 +406,7 @@ async function handleMultiItemOrder(fullSession: StripeCheckoutSession, lineItem
       customerPhone: fullSession.customer_details?.phone || undefined,
       totalAmount,
       currency: fullSession.currency?.toUpperCase() || 'EUR',
-      status: 'PENDING', // Start with PENDING status (same as single orders)
+      status: OrderStatus.PENDING, // Start with PENDING status (same as single orders)
       paymentMethod: 'card',
       paymentId: fullSession.id,
       sessionId: fullSession.id,
@@ -427,7 +427,7 @@ async function handleMultiItemOrder(fullSession: StripeCheckoutSession, lineItem
   await prisma.multiItemOrder.update({
     where: { id: multiOrder.id },
     data: {
-      status: 'PAID',
+      status: OrderStatus.PAID,
       paidAt: new Date()
     }
   })
@@ -489,7 +489,7 @@ async function handleSingleItemOrder(fullSession: StripeCheckoutSession, lineIte
     order = await prisma.order.update({
       where: { id: existingOrder.id },
       data: {
-        status: 'PAID',
+        status: OrderStatus.PAID,
         paidAt: new Date(),
         customerEmail: fullSession.customer_email || fullSession.customer_details?.email || existingOrder.customerEmail,
         customerName: fullSession.customer_details?.name || existingOrder.customerName,
@@ -516,7 +516,7 @@ async function handleSingleItemOrder(fullSession: StripeCheckoutSession, lineIte
       licenseType: licenseType as LicenseType,
       usageRights: getUsageRights(licenseType),
       beatId: beatId,
-      status: 'PAID' // Create as PAID since payment succeeded
+      status: OrderStatus.PAID // Create as PAID since payment succeeded
     }
 
     order = await OrderService.createOrder(orderData)
