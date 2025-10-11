@@ -61,26 +61,47 @@ export function S3Upload({
     setErrorMessage('')
 
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('folder', `beats/${folder}`)
-      formData.append('beatId', beatId)
-
-      const response = await fetch('/api/s3/upload', {
-        method: 'POST',
-        body: formData
+      // Étape 1: Obtenir l'URL signée
+      const params = new URLSearchParams({
+        fileName: file.name,
+        contentType: file.type,
+        folder: `beats/${folder}`,
+        beatId: beatId,
+        fileSize: file.size.toString()
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Erreur lors de l\'upload')
+      const presignedResponse = await fetch(`/api/s3/upload?${params}`)
+      
+      if (!presignedResponse.ok) {
+        const errorData = await presignedResponse.json()
+        throw new Error(errorData.message || 'Erreur lors de la génération de l\'URL signée')
       }
 
-      const result = await response.json()
+      const presignedData = await presignedResponse.json()
       
+      // Étape 2: Upload direct vers S3 avec progression
+      setProgress(50) // Progression après obtention de l'URL signée
+      
+      const uploadResponse = await fetch(presignedData.data.uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type
+        }
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Erreur lors de l'upload vers S3: ${uploadResponse.status}`)
+      }
+
       setProgress(100)
       setUploadStatus('success')
-      onUploadComplete(result.data)
+      
+      // Retourner les données avec la clé S3 et l'URL publique
+      onUploadComplete({
+        url: presignedData.data.publicUrl,
+        key: presignedData.data.key
+      })
       
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erreur inconnue'
@@ -155,7 +176,7 @@ export function S3Upload({
             ></div>
           </div>
           <p className="text-xs text-center text-gray-500">
-            {progress}% - Upload vers AWS S3...
+            {progress}% - {progress < 50 ? 'Génération URL signée...' : 'Upload direct vers AWS S3...'}
           </p>
         </div>
       )}
