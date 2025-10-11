@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Génération de l'URL d'upload directe Cloudinary
+    // Génération de l'URL d'upload signée Cloudinary
     const timestamp = Date.now()
     const randomId = Math.random().toString(36).substring(2, 15)
     const publicId = `${folder}/${timestamp}-${randomId}-${fileName.replace(/\.[^/.]+$/, '')}`
@@ -86,26 +86,49 @@ export async function GET(request: NextRequest) {
     if (isAudio) resourceType = 'video'
     if (isZip) resourceType = 'raw'
 
-    // URL d'upload directe Cloudinary (sans signature)
-    const uploadUrl = `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`
+    // Génération de la signature pour l'upload signé
+    const crypto = require('crypto')
+    const timestamp_sign = Math.floor(Date.now() / 1000)
     
-    // Paramètres d'upload
-    const uploadParams = new URLSearchParams({
+    // Paramètres de base pour la signature
+    const params: Record<string, string> = {
       public_id: publicId,
       folder: folder,
       resource_type: resourceType,
-      ...(isAudio && {
-        format: 'mp3',
-        quality: 'auto:low',
-        ...(folder.includes('previews') && { duration: '30' })
-      }),
-      ...(isImage && {
-        format: 'webp',
-        quality: 'auto:best',
-        width: '1200',
-        height: '1200',
-        crop: 'fill'
-      })
+      timestamp: timestamp_sign.toString()
+    }
+
+    // Ajouter les transformations selon le type
+    if (isAudio) {
+      params.format = 'mp3'
+      params.quality = 'auto:low'
+      if (folder.includes('previews')) {
+        params.duration = '30'
+      }
+    } else if (isImage) {
+      params.format = 'webp'
+      params.quality = 'auto:best'
+      params.width = '1200'
+      params.height = '1200'
+      params.crop = 'fill'
+    }
+
+    // Génération de la signature
+    const signatureString = Object.keys(params)
+      .sort()
+      .map(key => `${key}=${params[key]}`)
+      .join('&') + process.env.CLOUDINARY_API_SECRET
+    
+    const signature = crypto.createHash('sha1').update(signatureString).digest('hex')
+
+    // URL d'upload signée Cloudinary
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`
+    
+    // Paramètres d'upload avec signature
+    const uploadParams = new URLSearchParams({
+      ...params,
+      signature,
+      api_key: process.env.CLOUDINARY_API_KEY!
     })
 
     return NextResponse.json({
@@ -116,13 +139,17 @@ export async function GET(request: NextRequest) {
         publicUrl: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/${resourceType}/upload/${publicId}`,
         resourceType,
         maxFileSize: isZip ? 500 * 1024 * 1024 : isAudio ? 100 * 1024 * 1024 : 20 * 1024 * 1024,
+        signature: signature,
+        timestamp: timestamp_sign,
+        apiKey: process.env.CLOUDINARY_API_KEY!,
         instructions: {
           method: 'POST',
           url: `${uploadUrl}?${uploadParams.toString()}`,
           headers: {
             'Content-Type': 'multipart/form-data'
           },
-          body: 'FormData with file field'
+          body: 'FormData with file field',
+          note: 'Upload signé Cloudinary - pas besoin d\'upload_preset'
         }
       }
     })
