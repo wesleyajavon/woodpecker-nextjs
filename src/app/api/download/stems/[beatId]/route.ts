@@ -76,10 +76,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       where: {
         customerEmail: session.user.email,
         status: { in: ['PAID', 'COMPLETED'] },
-        licenseType: { in: ['TRACKOUT_LEASE', 'UNLIMITED_LEASE'] },
         items: {
           some: {
-            beatId: beatId
+            beatId: beatId,
+            licenseType: { in: ['TRACKOUT_LEASE', 'UNLIMITED_LEASE'] }
           }
         }
       }
