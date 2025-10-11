@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { CloudinaryService, CLOUDINARY_FOLDERS } from '@/lib/cloudinary'
+import { createHash } from 'crypto'
 
 // GET - Génération d'URL d'upload directe Cloudinary
 export async function GET(request: NextRequest) {
@@ -87,7 +88,6 @@ export async function GET(request: NextRequest) {
     if (isZip) resourceType = 'raw'
 
     // Génération de la signature pour l'upload signé
-    const crypto = require('crypto')
     const timestamp_sign = Math.floor(Date.now() / 1000)
     
     // Paramètres de base pour la signature
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
       .map(key => `${key}=${params[key]}`)
       .join('&') + process.env.CLOUDINARY_API_SECRET
     
-    const signature = crypto.createHash('sha1').update(signatureString).digest('hex')
+    const signature = createHash('sha1').update(signatureString).digest('hex')
 
     // URL d'upload signée Cloudinary
     const uploadUrl = `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`
