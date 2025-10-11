@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import AdminRoute from '@/components/AdminRoute';
+import { S3Upload } from '@/components/S3Upload';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
@@ -83,7 +84,7 @@ export default function BeatEditPage() {
 
         try {
             setIsUploading(true);
-            
+
             const response = await fetch(`/api/beats/${beatId}`, {
                 method: 'PATCH',
                 headers: {
@@ -112,13 +113,28 @@ export default function BeatEditPage() {
         }
     };
 
+    // Gestion des uploads S3
+    const handleS3UploadComplete = (type: 'master' | 'stems', result: { url: string; key: string }) => {
+        if (!beat) return;
+        
+        const updateData = type === 'master' 
+            ? { s3MasterUrl: result.url, s3MasterKey: result.key }
+            : { s3StemsUrl: result.url, s3StemsKey: result.key };
+            
+        setBeat(prev => prev ? { ...prev, ...updateData } : null);
+    };
+
+    const handleS3UploadError = (error: string) => {
+        setError(error);
+    };
+
     // Suppression des stems
     const handleRemoveStems = async () => {
         if (!beat) return;
 
         try {
             setIsUploading(true);
-            
+
             const response = await fetch(`/api/beats/${beatId}`, {
                 method: 'PATCH',
                 headers: {
@@ -207,7 +223,7 @@ export default function BeatEditPage() {
             <AdminRoute>
                 <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
                     <DottedSurface className="size-full z-0" />
-                    
+
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 z-0 flex items-center justify-center">
                         <div
@@ -238,7 +254,7 @@ export default function BeatEditPage() {
             <AdminRoute>
                 <div className="min-h-screen bg-background pt-20 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
                     <DottedSurface className="size-full z-0" />
-                    
+
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 z-0 flex items-center justify-center">
                         <div
@@ -276,7 +292,7 @@ export default function BeatEditPage() {
         <AdminRoute>
             <div className="min-h-screen bg-background pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8">
                 <DottedSurface className="size-full z-0" />
-                
+
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 z-0 flex items-center justify-center">
                     <div
@@ -345,7 +361,7 @@ export default function BeatEditPage() {
                                             src={beat.previewUrl}
                                             controls
                                             className="w-full"
-                                            
+
                                         />
                                     </div>
                                 ) : (
@@ -392,58 +408,40 @@ export default function BeatEditPage() {
                             <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
                                 <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
                                     <FileAudio className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    Master Audio
+                                    Master Audio - AWS S3
                                 </h4>
 
-                                {beat.fullUrl ? (
+                                {beat.s3MasterUrl ? (
                                     <div className="space-y-3 sm:space-y-4">
-                                        <div className="p-3 bg-card/5 rounded-lg">
-                                            <p className="text-foreground text-xs sm:text-sm">Fichier actuel disponible</p>
+                                        <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                                            <div className="flex items-center gap-2">
+                                                <FileAudio className="w-4 h-4 text-green-400" />
+                                                <p className="text-green-300 text-xs sm:text-sm">Fichier master sur AWS S3</p>
+                                            </div>
                                         </div>
-                                        <audio
-                                            src={beat.fullUrl}
-                                            controls
-                                            className="w-full"
-                                        />
+                                        <div className="p-3 bg-white/5 rounded-lg">
+                                            <p className="text-foreground text-xs sm:text-sm">
+                                                ✅ Fichier master uploadé vers AWS S3 (limite: 500MB)
+                                            </p>
+                                            <p className="text-muted-foreground text-xs mt-1">
+                                                Clé S3: {beat.s3MasterKey}
+                                            </p>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground text-sm mb-3 sm:mb-4">Aucun fichier master</p>
+                                    <div className="space-y-3">
+                                        <p className="text-muted-foreground text-sm">Aucun fichier master sur S3</p>
+                                        <S3Upload
+                                            beatId={beatId}
+                                            folder="masters"
+                                            onUploadComplete={(result) => handleS3UploadComplete('master', result)}
+                                            onUploadError={handleS3UploadError}
+                                            maxSize={500} // 500MB
+                                            acceptedTypes={['audio/wav', 'audio/aiff', 'audio/flac']}
+                                        />
+                                    </div>
                                 )}
 
-                                <div>
-                                    <input
-                                        type="file"
-                                        accept=".wav,.aiff,.flac"
-                                        onChange={(e) => e.target.files?.[0] && handleFileSelect('master', e.target.files[0])}
-                                        className="hidden"
-                                        id="master-upload"
-                                    />
-                                    <label
-                                        htmlFor="master-upload"
-                                        className="block w-full p-3 sm:p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer touch-manipulation"
-                                    >
-                                        {uploadedFiles.master ? (
-                                            <div className="flex items-center gap-2 text-purple-300">
-                                                <FileAudio className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                <span className="text-xs sm:text-sm truncate">{uploadedFiles.master.name}</span>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        setUploadedFiles(prev => ({ ...prev, master: undefined }));
-                                                    }}
-                                                    className="ml-auto text-red-400 hover:text-red-300 touch-manipulation"
-                                                >
-                                                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-2 text-gray-400">
-                                                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                <span className="text-xs sm:text-sm">Remplacer le fichier master</span>
-                                            </div>
-                                        )}
-                                    </label>
-                                </div>
                             </div>
 
                             {/* Artwork */}
@@ -477,7 +475,7 @@ export default function BeatEditPage() {
                                     <p className="text-muted-foreground text-sm mb-3 sm:mb-4">Aucune image de couverture</p>
                                 )}
 
-                                <div>
+                                <div className="mt-3 sm:mt-4">
                                     <input
                                         type="file"
                                         accept=".jpg,.jpeg,.png,.webp"
@@ -517,7 +515,7 @@ export default function BeatEditPage() {
                             <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
                                 <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
                                     <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    Stems (ZIP)
+                                    Stems (ZIP) - AWS S3
                                 </h4>
 
                                 {beat.stemsUrl ? (
@@ -537,10 +535,20 @@ export default function BeatEditPage() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground text-sm mb-3 sm:mb-4">Aucun fichier stems</p>
+                                    <div className="space-y-3">
+                                        <p className="text-muted-foreground text-sm">Aucun fichier stems</p>
+                                        <S3Upload
+                                            beatId={beatId}
+                                            folder="stems"
+                                            onUploadComplete={(result) => handleS3UploadComplete('stems', result)}
+                                            onUploadError={handleS3UploadError}
+                                            maxSize={1024} // 1GB
+                                            acceptedTypes={['application/zip', 'application/x-zip-compressed']}
+                                        />
+                                    </div>
                                 )}
 
-                                <div>
+                                <div className="mt-3 sm:mt-4">
                                     <input
                                         type="file"
                                         accept=".zip"

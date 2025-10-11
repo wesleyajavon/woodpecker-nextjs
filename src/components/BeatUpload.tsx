@@ -6,6 +6,7 @@ import { Upload, Music, FileAudio, X, AlertCircle, Image, Archive } from 'lucide
 import { BEAT_CONFIG } from '@/config/constants';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { Beat } from '@/types/beat';
+import { S3Upload } from '@/components/S3Upload';
 
 interface BeatUploadProps {
   onUploadSuccess?: (beat: Beat) => void;
@@ -34,6 +35,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     artwork?: File;
     stems?: File;
   }>({});
+  const [s3Uploads, setS3Uploads] = useState<{
+    master?: { url: string; key: string };
+    stems?: { url: string; key: string };
+  }>({});
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -53,13 +58,11 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
   const fileInputRefs = {
     preview: useRef<HTMLInputElement>(null),
-    master: useRef<HTMLInputElement>(null),
-    artwork: useRef<HTMLInputElement>(null),
-    stems: useRef<HTMLInputElement>(null)
+    artwork: useRef<HTMLInputElement>(null)
   };
 
-  // Gestion des fichiers sélectionnés
-  const handleFileSelect = (field: keyof typeof uploadedFiles, file: File) => {
+  // Gestion des fichiers sélectionnés (Cloudinary seulement)
+  const handleFileSelect = (field: 'preview' | 'artwork', file: File) => {
     setUploadedFiles(prev => ({ ...prev, [field]: file }));
     setErrors(prev => prev.filter(error => !error.includes(field)));
   };
@@ -89,6 +92,17 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     }));
   };
 
+  // Handlers pour les uploads S3
+  const handleS3UploadComplete = (type: 'master' | 'stems', result: { url: string; key: string }) => {
+    setS3Uploads(prev => ({ ...prev, [type]: result }));
+    setErrors(prev => prev.filter(error => !error.includes(type)));
+  };
+
+  const handleS3UploadError = (error: string) => {
+    onUploadError?.(error);
+    setErrors(prev => [...prev, error]);
+  };
+
   // Validation du formulaire
   const validateForm = (): boolean => {
     const newErrors: string[] = [];
@@ -101,6 +115,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       newErrors.push(t('upload.descriptionTooLong', { max: BEAT_CONFIG.maxDescriptionLength }));
     }
     if (!uploadedFiles.preview) newErrors.push(t('upload.previewRequired'));
+    if (!s3Uploads.master) newErrors.push('Master audio required (S3 upload)');
     if (formData.wavLeasePrice <= 0) newErrors.push(t('upload.wavPriceRequired'));
     if (formData.trackoutLeasePrice <= 0) newErrors.push(t('upload.trackoutPriceRequired'));
     if (formData.unlimitedLeasePrice <= 0) newErrors.push(t('upload.unlimitedPriceRequired'));
@@ -120,11 +135,19 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     try {
       const formDataToSend = new FormData();
       
-      // Ajout des fichiers
+      // Ajout des fichiers Cloudinary
       if (uploadedFiles.preview) formDataToSend.append('preview', uploadedFiles.preview);
-      if (uploadedFiles.master) formDataToSend.append('master', uploadedFiles.master);
       if (uploadedFiles.artwork) formDataToSend.append('artwork', uploadedFiles.artwork);
-      if (uploadedFiles.stems) formDataToSend.append('stems', uploadedFiles.stems);
+      
+      // Ajout des données S3
+      if (s3Uploads.master) {
+        formDataToSend.append('s3MasterUrl', s3Uploads.master.url);
+        formDataToSend.append('s3MasterKey', s3Uploads.master.key);
+      }
+      if (s3Uploads.stems) {
+        formDataToSend.append('s3StemsUrl', s3Uploads.stems.url);
+        formDataToSend.append('s3StemsKey', s3Uploads.stems.key);
+      }
 
       // Ajout des données du formulaire
       Object.entries(formData).forEach(([key, value]) => {
@@ -177,6 +200,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           featured: false
         });
         setUploadedFiles({});
+        setS3Uploads({});
         setUploadProgress({ preview: 0, master: 0, artwork: 0, stems: 0 });
       }
 
@@ -265,45 +289,45 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             )}
           </div>
 
-          {/* Master Audio */}
+          {/* Master Audio - S3 Upload */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
               {t('upload.masterAudio')} <span className="text-red-400">*</span>
             </label>
-            <div className="relative">
-              <input
-                ref={fileInputRefs.master}
-                type="file"
-                accept=".wav,.aiff,.flac"
-                onChange={(e) => e.target.files?.[0] && handleFileSelect('master', e.target.files[0])}
-                className="hidden"
-              />
-              <div
-                onClick={() => fileInputRefs.master.current?.click()}
-                className="w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
-              >
-                {uploadedFiles.master ? (
-                  <div className="flex items-center gap-2 text-purple-300">
-                    <FileAudio className="w-5 h-5" />
-                    <span>{uploadedFiles.master.name}</span>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUploadedFiles(prev => ({ ...prev, master: undefined }));
-                      }}
-                      className="ml-auto text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </div>
+            
+            {s3Uploads.master ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="flex items-center gap-2">
+                    <FileAudio className="w-4 h-4 text-green-400" />
+                    <p className="text-green-300 text-sm">Master audio uploaded to S3</p>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Upload className="w-5 h-5" />
-                    <span>{t('upload.highQualityMaster')}</span>
-                  </div>
-                )}
+                  <button
+                    onClick={() => setS3Uploads(prev => ({ ...prev, master: undefined }))}
+                    className="text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <p className="text-foreground text-xs">
+                    ✅ Master audio uploaded to AWS S3 (max 500MB)
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    S3 Key: {s3Uploads.master.key}
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <S3Upload
+                beatId="new-beat" // Placeholder pour les nouveaux beats
+                folder="masters"
+                onUploadComplete={(result) => handleS3UploadComplete('master', result)}
+                onUploadError={handleS3UploadError}
+                maxSize={500} // 500MB
+                acceptedTypes={['audio/wav', 'audio/aiff', 'audio/flac']}
+              />
+            )}
           </div>
 
           {/* Artwork */}
@@ -355,52 +379,44 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             )}
           </div>
 
-          {/* Stems */}
+          {/* Stems - S3 Upload */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
               {t('upload.stems')}
             </label>
-            <div className="relative">
-              <input
-                ref={fileInputRefs.stems}
-                type="file"
-                accept=".zip"
-                onChange={(e) => e.target.files?.[0] && handleFileSelect('stems', e.target.files[0])}
-                className="hidden"
+            
+            {s3Uploads.stems ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="flex items-center gap-2">
+                    <Archive className="w-4 h-4 text-green-400" />
+                    <p className="text-green-300 text-sm">Stems uploaded to S3</p>
+                  </div>
+                  <button
+                    onClick={() => setS3Uploads(prev => ({ ...prev, stems: undefined }))}
+                    className="text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <p className="text-foreground text-xs">
+                    ✅ Stems ZIP uploaded to AWS S3 (max 1GB)
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    S3 Key: {s3Uploads.stems.key}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <S3Upload
+                beatId="new-beat" // Placeholder pour les nouveaux beats
+                folder="stems"
+                onUploadComplete={(result) => handleS3UploadComplete('stems', result)}
+                onUploadError={handleS3UploadError}
+                maxSize={1024} // 1GB
+                acceptedTypes={['application/zip', 'application/x-zip-compressed']}
               />
-              <div
-                onClick={() => fileInputRefs.stems.current?.click()}
-                className="w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
-              >
-                {uploadedFiles.stems ? (
-                  <div className="flex items-center gap-2 text-purple-300">
-                    <Archive className="w-5 h-5" />
-                    <span>{uploadedFiles.stems.name}</span>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUploadedFiles(prev => ({ ...prev, stems: undefined }));
-                      }}
-                      className="ml-auto text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Upload className="w-5 h-5" />
-                    <span>{t('upload.stemsZipOptional')}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            {uploadProgress.stems > 0 && (
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress.stems}%` }}
-                />
-              </div>
             )}
           </div>
 
@@ -631,7 +647,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       <div className="mt-8 text-center">
         <button
           onClick={handleUpload}
-          disabled={isUploading || !uploadedFiles.preview}
+          disabled={isUploading || !uploadedFiles.preview || !s3Uploads.master}
           className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
         >
           {isUploading ? (

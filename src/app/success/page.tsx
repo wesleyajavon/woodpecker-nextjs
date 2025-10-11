@@ -18,6 +18,7 @@ import { useTranslation } from '@/contexts/LanguageContext'
 
 interface DownloadUrls {
   master: string
+  stems?: string
   expiresAt: string
 }
 
@@ -475,12 +476,17 @@ function SuccessContent() {
                               </a>
                             </Button>
 
-                            {beatDownload.hasStems && (
-                              <DownloadStemsButton
-                                beatId={beatDownload.beatId}
-                                beatTitle={beatDownload.beatTitle}
-                                className="mt-2"
-                              />
+                            {/* Afficher le lien stems si disponible */}
+                            {beatDownload.downloadUrls.stems && (
+                              <Button asChild variant="secondary" className="w-full">
+                                <a
+                                  href={beatDownload.downloadUrls.stems}
+                                  download
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  {t('success.downloadStems')}
+                                </a>
+                              </Button>
                             )}
 
                           </div>
@@ -538,6 +544,18 @@ function SuccessContent() {
                         </a>
                       </Button>
 
+                      {/* Afficher le lien stems si disponible */}
+                      {downloadUrls.stems && (
+                        <Button asChild variant="secondary" className="w-full">
+                          <a
+                            href={downloadUrls.stems}
+                            download
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            {t('success.downloadStems')}
+                          </a>
+                        </Button>
+                      )}
                     </div>
 
                     <p className="text-xs text-primary/70 text-center">

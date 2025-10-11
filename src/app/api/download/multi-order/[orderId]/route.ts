@@ -5,6 +5,7 @@ const prisma = new PrismaClient()
 
 interface DownloadUrls {
   master: string
+  stems?: string
   expiresAt: string
 }
 
@@ -33,10 +34,19 @@ export async function POST(
     // Find the multi-item order
     const order = await prisma.multiItemOrder.findUnique({
       where: { id: orderId },
-      include: {
+      select: {
+        id: true,
+        customerEmail: true,
         items: {
-          include: {
-            beat: true
+          select: {
+            licenseType: true,
+            beat: {
+              select: {
+                id: true,
+                title: true,
+                stemsUrl: true
+              }
+            }
           }
         }
       }
@@ -67,15 +77,23 @@ export async function POST(
       // Generate secure download URLs for each beat
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
       const masterUrl = `${baseUrl}/api/download/beat/${beat.id}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=master`
+      
+      const downloadUrls: DownloadUrls = {
+        master: masterUrl,
+        expiresAt: expiresAt.toISOString(),
+      }
+      
+      // Add stems URL if license includes stems and stems are available
+      if ((item.licenseType === 'TRACKOUT_LEASE' || item.licenseType === 'UNLIMITED_LEASE') && beat.stemsUrl) {
+        downloadUrls.stems = `${baseUrl}/api/download/beat/${beat.id}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=stems`
+        console.log('✅ Generated stems URL for beat:', beat.id, 'license:', item.licenseType)
+      }
 
       beatDownloadUrls.push({
         beatId: beat.id,
         beatTitle: beat.title,
-        downloadUrls: {
-          master: masterUrl,
-          expiresAt: expiresAt.toISOString(),
-        },
-        hasStems: !!beat.stemsUrl && (order.licenseType === 'TRACKOUT_LEASE' || order.licenseType === 'UNLIMITED_LEASE')
+        downloadUrls,
+        hasStems: !!beat.stemsUrl && (item.licenseType === 'TRACKOUT_LEASE' || item.licenseType === 'UNLIMITED_LEASE')
       })
     }
 

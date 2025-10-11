@@ -64,8 +64,8 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
               <div className="absolute top-0 left-0 w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-foreground mb-1">Vérification des permissions</h3>
-              <p className="text-sm text-muted-foreground">Patientez un instant...</p>
+              <h3 className="text-lg font-semibold text-foreground mb-1">{t('admin.checkingPermissions')}</h3>
+              <p className="text-sm text-muted-foreground">{t('admin.pleaseWait')}</p>
             </div>
           </motion.div>
         </div>

@@ -19,6 +19,12 @@ export interface Beat {
   stemsUrl?: string | null
   artworkUrl?: string | null
   
+  // S3 URLs for large files
+  s3MasterUrl?: string | null
+  s3StemsUrl?: string | null
+  s3MasterKey?: string | null
+  s3StemsKey?: string | null
+  
   // Stripe Price IDs for each license type
   stripeWavPriceId?: string | null
   stripeTrackoutPriceId?: string | null
@@ -45,6 +51,10 @@ export interface CreateBeatInput {
   fullUrl?: string
   stemsUrl?: string
   artworkUrl?: string
+  s3MasterUrl?: string
+  s3StemsUrl?: string
+  s3MasterKey?: string
+  s3StemsKey?: string
   isExclusive?: boolean
   featured?: boolean
 }
@@ -64,6 +74,10 @@ export interface UpdateBeatInput {
   fullUrl?: string
   stemsUrl?: string
   artworkUrl?: string
+  s3MasterUrl?: string
+  s3StemsUrl?: string
+  s3MasterKey?: string
+  s3StemsKey?: string
   isExclusive?: boolean
   isActive?: boolean
   featured?: boolean

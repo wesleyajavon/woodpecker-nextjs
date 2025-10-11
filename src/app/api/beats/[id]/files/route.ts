@@ -4,6 +4,8 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { getUserIdFromEmail } from '@/lib/userUtils';
 import { CloudinaryService, CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
+import { s3Service } from '@/lib/s3-service';
+import { S3_CONFIG } from '@/lib/aws-s3';
 
 interface RouteParams {
   params: Promise<{
@@ -118,19 +120,30 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         console.log('Preview update completed successfully - cropped to 30 seconds');
       }
 
-      // Upload du master (optionnel)
+      // Upload du master vers S3 (optionnel)
       if (files.master && files.master[0]) {
         const masterFile = files.master[0];
-        uploadResults.master = await CloudinaryService.uploadAudio(
-          masterFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.MASTERS,
-          {
-            resource_type: 'video',
-            format: 'wav',
-            quality: 'auto:best'
+        console.log(`Starting master upload to S3: ${masterFile.originalname} (${masterFile.size} bytes)`);
+        
+        // Vérification de la taille pour S3
+        if (masterFile.size > S3_CONFIG.limits.maxFileSize) {
+          throw new Error(`Fichier master trop volumineux: ${(masterFile.size / 1024 / 1024).toFixed(2)}MB (limite: ${S3_CONFIG.limits.maxFileSize / 1024 / 1024}MB)`);
+        }
+        
+        const s3Result = await s3Service.uploadFile(masterFile.buffer, {
+          folder: S3_CONFIG.folders.BEATS.MASTERS,
+          fileName: masterFile.originalname,
+          contentType: masterFile.mimetype,
+          metadata: {
+            beatId: id,
+            uploadedBy: session.user.email,
+            originalSize: masterFile.size.toString()
           }
-        );
-        updateData.fullUrl = uploadResults.master.secure_url;
+        });
+        
+        updateData.s3MasterUrl = s3Result.url;
+        updateData.s3MasterKey = s3Result.key;
+        console.log('Master upload to S3 completed successfully');
       }
 
       // Upload de l'artwork (optionnel)
@@ -149,14 +162,30 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         updateData.artworkUrl = uploadResults.artwork.secure_url;
       }
 
-      // Upload des stems (optionnel)
+      // Upload des stems vers S3 (optionnel)
       if (files.stems && files.stems[0]) {
         const stemsFile = files.stems[0];
-        uploadResults.stems = await CloudinaryService.uploadZip(
-          stemsFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.STEMS
-        );
-        updateData.stemsUrl = uploadResults.stems.secure_url;
+        console.log(`Starting stems upload to S3: ${stemsFile.originalname} (${stemsFile.size} bytes)`);
+        
+        // Vérification de la taille pour S3
+        if (stemsFile.size > S3_CONFIG.limits.maxStemsSize) {
+          throw new Error(`Fichier stems trop volumineux: ${(stemsFile.size / 1024 / 1024).toFixed(2)}MB (limite: ${S3_CONFIG.limits.maxStemsSize / 1024 / 1024}MB)`);
+        }
+        
+        const s3Result = await s3Service.uploadFile(stemsFile.buffer, {
+          folder: S3_CONFIG.folders.BEATS.STEMS,
+          fileName: stemsFile.originalname,
+          contentType: stemsFile.mimetype,
+          metadata: {
+            beatId: id,
+            uploadedBy: session.user.email,
+            originalSize: stemsFile.size.toString()
+          }
+        });
+        
+        updateData.s3StemsUrl = s3Result.url;
+        updateData.s3StemsKey = s3Result.key;
+        console.log('Stems upload to S3 completed successfully');
       }
 
 

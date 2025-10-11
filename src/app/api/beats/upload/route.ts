@@ -89,6 +89,12 @@ export async function POST(request: NextRequest) {
 
     // Upload des fichiers vers Cloudinary
     const uploadResults: Record<string, { public_id: string; secure_url: string; resource_type: string; duration?: number }> = {};
+    
+    // Récupération des données S3 (masters et stems)
+    const s3MasterUrl = formData.get('s3MasterUrl') as string | null || undefined;
+    const s3MasterKey = formData.get('s3MasterKey') as string | null || undefined;
+    const s3StemsUrl = formData.get('s3StemsUrl') as string | null || undefined;
+    const s3StemsKey = formData.get('s3StemsKey') as string | null || undefined;
 
     try {
       // Upload de la preview
@@ -120,21 +126,6 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Upload du master (optionnel)
-      if (files.master && files.master[0]) {
-        const masterFile = files.master[0];
-        console.log(`Starting master upload: ${masterFile.originalname} (${masterFile.size} bytes)`);
-        uploadResults.master = await CloudinaryService.uploadAudio(
-          masterFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.MASTERS,
-          {
-            resource_type: 'video',
-            format: 'wav',
-            quality: 'auto:best'
-          }
-        );
-        console.log('Master upload completed successfully');
-      }
 
       // Upload de l'artwork (optionnel)
       if (files.artwork && files.artwork[0]) {
@@ -144,7 +135,6 @@ export async function POST(request: NextRequest) {
           artworkFile.buffer,
           CLOUDINARY_FOLDERS.BEATS.ARTWORKS,
           {
-            format: 'auto',
             quality: 'auto:best',
             width: 1000,
             height: 1000,
@@ -154,16 +144,6 @@ export async function POST(request: NextRequest) {
         console.log('Artwork upload completed successfully');
       }
 
-      // Upload des stems (optionnel)
-      if (files.stems && files.stems[0]) {
-        const stemsFile = files.stems[0];
-        console.log(`Starting stems upload: ${stemsFile.originalname} (${stemsFile.size} bytes)`);
-        uploadResults.stems = await CloudinaryService.uploadZip(
-          stemsFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.STEMS
-        );
-        console.log('Stems upload completed successfully');
-      }
 
 
     } catch (uploadError) {
@@ -207,9 +187,13 @@ export async function POST(request: NextRequest) {
         unlimitedLeasePrice: parseFloat(fields.unlimitedLeasePrice),
         tags: fields.tags ? JSON.parse(fields.tags) : [],
         previewUrl: uploadResults.preview?.secure_url,
-        fullUrl: uploadResults.master?.secure_url,
+        fullUrl: s3MasterUrl, // URL S3 pour le master
         artworkUrl: uploadResults.artwork?.secure_url,
-        stemsUrl: uploadResults.stems?.secure_url,
+        stemsUrl: s3StemsUrl, // URL S3 pour les stems
+        s3MasterUrl: s3MasterUrl,
+        s3MasterKey: s3MasterKey,
+        s3StemsUrl: s3StemsUrl,
+        s3StemsKey: s3StemsKey,
         isExclusive: fields.isExclusive === 'true',
         featured: fields.featured === 'true'
       };

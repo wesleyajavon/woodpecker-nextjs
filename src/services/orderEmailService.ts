@@ -63,7 +63,7 @@ export async function sendOrderConfirmationEmail(
 
       const beats = multiOrder.items.map(item => {
         const masterUrl = `${baseUrl}/api/download/beat/${item.beat.id}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=master`
-        const hasStems = !!item.beat.stemsUrl && (multiOrder.licenseType === 'TRACKOUT_LEASE' || multiOrder.licenseType === 'UNLIMITED_LEASE')
+        const hasStems = !!item.beat.stemsUrl && (item.licenseType === 'TRACKOUT_LEASE' || item.licenseType === 'UNLIMITED_LEASE')
         const stemsUrl = hasStems ? `${baseUrl}/api/download/stems/${item.beat.id}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}` : undefined
 
         return {

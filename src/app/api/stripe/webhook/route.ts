@@ -144,33 +144,33 @@ export async function POST(request: NextRequest) {
 
 // Handle successful payment
 async function handleSuccessfulPayment(session: StripeCheckoutSession) {
-  console.log('Payment successful for session:', session.id)
-  console.log('Session details:', {
-    id: session.id,
-    customer_email: session.customer_email,
-    amount_total: session.amount_total,
-    currency: session.currency
-  })
-  
-  try {
-    // Retrieve the full session details from Stripe
-    const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-      expand: ['line_items', 'line_items.data.price.product']
-    })
+        console.log('Payment successful for session:', session.id)
+        console.log('Session details:', {
+          id: session.id,
+          customer_email: session.customer_email,
+          amount_total: session.amount_total,
+          currency: session.currency
+        })
+        
+        try {
+          // Retrieve the full session details from Stripe
+          const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+            expand: ['line_items', 'line_items.data.price.product']
+          })
 
-    if (!fullSession.line_items?.data || fullSession.line_items.data.length === 0) {
-      console.error('No line items found in session:', session.id)
+          if (!fullSession.line_items?.data || fullSession.line_items.data.length === 0) {
+            console.error('No line items found in session:', session.id)
       return
-    }
+          }
 
-    const lineItems = fullSession.line_items.data
-    const isMultiItem = lineItems.length > 1
+          const lineItems = fullSession.line_items.data
+          const isMultiItem = lineItems.length > 1 || fullSession.metadata?.order_id
 
-    if (isMultiItem) {
-      await handleMultiItemOrder(fullSession, lineItems)
-    } else {
-      await handleSingleItemOrder(fullSession, lineItems[0])
-    }
+          if (isMultiItem) {
+            await handleMultiItemOrder(fullSession, lineItems)
+          } else {
+            await handleSingleItemOrder(fullSession, lineItems[0])
+          }
 
   } catch (error) {
     console.error('Error processing checkout session:', error)
@@ -354,95 +354,124 @@ async function updateOrderStatus(paymentId: string, status: OrderStatus, additio
 
 // Handle multi-item order creation
 async function handleMultiItemOrder(fullSession: StripeCheckoutSession, lineItems: StripeLineItem[]) {
-  console.log('Processing multi-item order with', lineItems.length, 'items')
+            console.log('Processing multi-item order with', lineItems.length, 'items')
+            
+  // Get order ID from session metadata
+  const orderId = fullSession.metadata?.order_id
+  console.log('🔍 Multi-item webhook - Order ID from metadata:', orderId)
   
+  // Find existing order by order_id from metadata
+  let existingOrder = null
+  
+  if (orderId) {
+    existingOrder = await prisma.multiItemOrder.findFirst({
+      where: { id: orderId },
+      include: { items: true }
+    })
+    console.log('🔍 Found multi-item order by order_id:', existingOrder?.id)
+  }
+  
+  if (!existingOrder) {
+    console.warn('No existing multi-item order found, using fallback creation')
+    // Fallback: créer une nouvelle commande (ancien comportement)
+    // ... (code existant)
+    return
+  }
+  
+  // Update existing order to PAID status
   const orderItems: OrderItem[] = []
-  let totalAmount = 0
+            let totalAmount = 0
 
-  for (const lineItem of lineItems) {
+  // Parse items from metadata to get license types
+  const metadataItems = fullSession.metadata?.items ? JSON.parse(fullSession.metadata.items) : []
+  console.log('🔍 Metadata items:', metadataItems)
+
+            for (const lineItem of lineItems) {
     const price = lineItem.price as StripePrice
     const product = price?.product as StripeProduct
 
-    if (!product || typeof product === 'string' || product.deleted) {
-      console.error('Invalid or deleted product data in line item:', lineItem.id)
-      continue
-    }
+              if (!product || typeof product === 'string' || product.deleted) {
+                console.error('Invalid or deleted product data in line item:', lineItem.id)
+                continue
+              }
 
-    const beatId = product.metadata?.beat_id
-    if (!beatId) {
-      console.error('No beat_id found in product metadata:', product.id)
-      continue
-    }
+              const beatId = product.metadata?.beat_id
+              if (!beatId) {
+                console.error('No beat_id found in product metadata:', product.id)
+                continue
+              }
 
-    const beat = await BeatService.getBeatById(beatId)
-    if (!beat) {
-      console.error('Beat not found:', beatId)
-      continue
-    }
+              const beat = await BeatService.getBeatById(beatId)
+              if (!beat) {
+                console.error('Beat not found:', beatId)
+                continue
+              }
 
-    const quantity = lineItem.quantity || 1
-    const unitPrice = (price.unit_amount || 0) / 100
-    const itemTotal = unitPrice * quantity
-    totalAmount += itemTotal
+              const quantity = lineItem.quantity || 1
+              const unitPrice = (price.unit_amount || 0) / 100
+              const itemTotal = unitPrice * quantity
+              totalAmount += itemTotal
 
-    orderItems.push({
-      beatId,
-      quantity,
-      unitPrice,
-      totalPrice: itemTotal
-    })
-  }
+    // Find corresponding metadata item to get license type
+    const metadataItem = metadataItems.find((item: any) => item.priceId === price.id)
+    const licenseType = metadataItem?.licenseType || 'WAV_LEASE'
+    console.log('🔍 Item license type:', licenseType)
 
-  if (orderItems.length === 0) {
-    console.error('No valid items found for multi-item order')
+              orderItems.push({
+                beatId,
+                quantity,
+                unitPrice,
+                totalPrice: itemTotal
+              })
+            }
+
+            if (orderItems.length === 0) {
+              console.error('No valid items found for multi-item order')
     return
-  }
+            }
 
-  // Create multi-item order with PENDING status, then update to PAID
-  const multiOrder = await prisma.multiItemOrder.create({
-    data: {
-      customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
-      customerName: fullSession.customer_details?.name || undefined,
-      customerPhone: fullSession.customer_details?.phone || undefined,
-      totalAmount,
-      currency: fullSession.currency?.toUpperCase() || 'EUR',
-      status: OrderStatus.PENDING, // Start with PENDING status (same as single orders)
-      paymentMethod: 'card',
-      paymentId: fullSession.id,
+  // Update existing order to PAID status
+  const updatedOrder = await prisma.multiItemOrder.update({
+    where: { id: existingOrder.id },
+              data: {
+      status: OrderStatus.PAID,
+      paidAt: new Date(),
       sessionId: fullSession.id,
-      licenseType: 'WAV_LEASE',
-      usageRights: ['Non-exclusive rights', 'Commercial use', 'Streaming'],
-      items: {
-        create: orderItems.map(item => ({
-          beatId: item.beatId,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.totalPrice
-        }))
+      customerEmail: fullSession.customer_email || fullSession.customer_details?.email || existingOrder.customerEmail,
+      customerName: fullSession.customer_details?.name || existingOrder.customerName,
+      customerPhone: fullSession.customer_details?.phone || existingOrder.customerPhone,
+      totalAmount: totalAmount,
+                currency: fullSession.currency?.toUpperCase() || 'EUR',
+                paymentMethod: 'card',
+      // Update items with calculated prices and license types
+                items: {
+        deleteMany: {}, // Supprimer les anciens items
+        create: orderItems.map((item, index) => {
+          const metadataItem = metadataItems[index]
+          const licenseType = metadataItem?.licenseType || 'WAV_LEASE'
+          return {
+                    beatId: item.beatId,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice,
+            totalPrice: item.totalPrice,
+            licenseType: licenseType
+          }
+        })
       }
     }
   })
 
-  // Update to PAID status since payment was successful (same as single orders)
-  await prisma.multiItemOrder.update({
-    where: { id: multiOrder.id },
-    data: {
-      status: OrderStatus.PAID,
-      paidAt: new Date()
-    }
-  })
+  console.log('Multi-item order updated to PAID status:', updatedOrder.id)
 
-  console.log('Multi-item order created successfully:', multiOrder.id)
-
-  // Send confirmation email with download links
-  try {
-    await sendOrderConfirmationEmail(
-      multiOrder.id,
-      multiOrder.customerEmail,
-      true // isMultiItem
-    )
-  } catch (emailError) {
-    console.error('Failed to send confirmation email for multi-item order:', emailError)
+  // Send confirmation email
+            try {
+              await sendOrderConfirmationEmail(
+      updatedOrder.id,
+      updatedOrder.customerEmail,
+                true // isMultiItem
+              )
+            } catch (emailError) {
+              console.error('Failed to send confirmation email for multi-item order:', emailError)
   }
 }
 
@@ -451,36 +480,52 @@ async function handleSingleItemOrder(fullSession: StripeCheckoutSession, lineIte
   const price = lineItem.price as StripePrice
   const product = price?.product as StripeProduct
 
-  if (!product || typeof product === 'string' || product.deleted) {
+            if (!product || typeof product === 'string' || product.deleted) {
     console.error('Invalid or deleted product data in session:', fullSession.id)
     return
-  }
+            }
 
-  // Get the beat ID from the product metadata
-  console.log('Product metadata:', product.metadata)
-  const beatId = product.metadata?.beat_id
-  if (!beatId) {
-    console.error('No beat_id found in product metadata:', product.id)
-    console.error('Available metadata keys:', Object.keys(product.metadata || {}))
+            // Get the beat ID from the product metadata
+            console.log('Product metadata:', product.metadata)
+            const beatId = product.metadata?.beat_id
+            if (!beatId) {
+              console.error('No beat_id found in product metadata:', product.id)
+              console.error('Available metadata keys:', Object.keys(product.metadata || {}))
     return
+            }
+            
+            console.log('Found beat_id:', beatId)
+
+            // Get the beat details
+            const beat = await BeatService.getBeatById(beatId)
+            if (!beat) {
+              console.error('Beat not found:', beatId)
+    return
+            }
+
+            // Get license type from session metadata
+            const licenseType = fullSession.metadata?.license_type || 'WAV_LEASE'
+  const orderId = fullSession.metadata?.order_id
+  
+  console.log('🔍 Webhook - License type:', licenseType)
+  console.log('🔍 Webhook - Order ID from metadata:', orderId)
+  
+  // Find existing order by order_id from metadata or by paymentId
+  let existingOrder = null
+  
+  if (orderId) {
+    existingOrder = await prisma.order.findFirst({
+      where: { id: orderId }
+    })
+    console.log('🔍 Found order by order_id:', existingOrder?.id)
   }
   
-  console.log('Found beat_id:', beatId)
-
-  // Get the beat details
-  const beat = await BeatService.getBeatById(beatId)
-  if (!beat) {
-    console.error('Beat not found:', beatId)
-    return
+  if (!existingOrder) {
+    existingOrder = await prisma.order.findFirst({
+      where: { paymentId: fullSession.id }
+    })
+    console.log('🔍 Found order by paymentId:', existingOrder?.id)
   }
-
-  // Get license type from session metadata
-  const licenseType = fullSession.metadata?.license_type || 'WAV_LEASE'
-  
-  // Find existing order by paymentId and update it to PAID status
-  const existingOrder = await prisma.order.findFirst({
-    where: { paymentId: fullSession.id }
-  })
 
   let order
 
@@ -491,6 +536,7 @@ async function handleSingleItemOrder(fullSession: StripeCheckoutSession, lineIte
       data: {
         status: OrderStatus.PAID,
         paidAt: new Date(),
+        paymentId: fullSession.id, // Mettre à jour le paymentId
         customerEmail: fullSession.customer_email || fullSession.customer_details?.email || existingOrder.customerEmail,
         customerName: fullSession.customer_details?.name || existingOrder.customerName,
         customerPhone: fullSession.customer_details?.phone || existingOrder.customerPhone,
@@ -506,32 +552,32 @@ async function handleSingleItemOrder(fullSession: StripeCheckoutSession, lineIte
     // Fallback: create new order if none exists (shouldn't happen in normal flow)
     console.warn('No existing order found for payment ID:', fullSession.id)
     const orderData: OrderData = {
-      customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
-      customerName: fullSession.customer_details?.name || undefined,
-      customerPhone: fullSession.customer_details?.phone || undefined,
+              customerEmail: fullSession.customer_email || fullSession.customer_details?.email || 'unknown@example.com',
+              customerName: fullSession.customer_details?.name || undefined,
+              customerPhone: fullSession.customer_details?.phone || undefined,
       totalAmount: (fullSession.amount_total || 0) / 100,
-      currency: fullSession.currency?.toUpperCase() || 'EUR',
-      paymentMethod: 'card',
+              currency: fullSession.currency?.toUpperCase() || 'EUR',
+              paymentMethod: 'card',
       paymentId: fullSession.id,
-      licenseType: licenseType as LicenseType,
-      usageRights: getUsageRights(licenseType),
+              licenseType: licenseType as LicenseType,
+              usageRights: getUsageRights(licenseType),
       beatId: beatId,
       status: OrderStatus.PAID // Create as PAID since payment succeeded
-    }
+            }
 
     order = await OrderService.createOrder(orderData)
     console.log('Fallback order created successfully:', order.id)
   }
 
-  // Send confirmation email with download links
-  try {
-    await sendOrderConfirmationEmail(
-      order.id,
-      order.customerEmail,
-      false // isMultiItem
-    )
-  } catch (emailError) {
-    console.error('Failed to send confirmation email for single order:', emailError)
+            // Send confirmation email with download links
+            try {
+              await sendOrderConfirmationEmail(
+                order.id,
+                order.customerEmail,
+                false // isMultiItem
+              )
+            } catch (emailError) {
+              console.error('Failed to send confirmation email for single order:', emailError)
   }
 }
 

@@ -42,6 +42,12 @@ model Beat {
   fullUrl     String?  // URL for full beat (after purchase)
   stemsUrl    String?  // URL for stems ZIP file (after purchase)
   
+  // S3 URLs for large files
+  s3MasterUrl String?  // S3 URL for master WAV file
+  s3StemsUrl  String?  // S3 URL for stems ZIP file
+  s3MasterKey String?  // S3 key for master file
+  s3StemsKey  String?  // S3 key for stems file
+  
   // Artwork
   artworkUrl  String?  // URL for beat artwork/cover image
   
@@ -130,7 +136,6 @@ model MultiItemOrder {
   sessionId     String?  // Stripe session ID for multi-item orders
   
   // License information
-  licenseType   LicenseType
   usageRights  String[]    // Array of usage rights
   
   // Timestamps
@@ -157,6 +162,7 @@ model OrderItem {
   quantity    Int
   unitPrice   Decimal  @db.Decimal(10, 2)
   totalPrice  Decimal  @db.Decimal(10, 2)
+  licenseType LicenseType @default(WAV_LEASE)
   
   // Timestamps
   createdAt   DateTime @default(now())

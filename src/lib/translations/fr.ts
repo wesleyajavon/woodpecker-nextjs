@@ -474,6 +474,7 @@ export const fr = {
     generateDownloadLinksButton: 'Générer les liens de téléchargement',
     downloadBeats: 'Télécharger vos beats',
     downloadMaster: 'Télécharger le master (WAV)',
+    downloadStems: 'Télécharger les stems (ZIP)',
     expiresAt: 'Expire le',
     checkYourEmail: 'Vérifiez votre email pour les liens de téléchargement.',
     tryAgain: 'Réessayer',

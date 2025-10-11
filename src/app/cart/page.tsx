@@ -47,6 +47,7 @@ export default function CartPage() {
         quantity: item.quantity,
         beatTitle: item.beat.title,
         licenseType: item.licenseType,
+        beatId: item.beat.id, // Ajouter l'ID du beat
       }))
 
       // Filter out items without valid price IDs

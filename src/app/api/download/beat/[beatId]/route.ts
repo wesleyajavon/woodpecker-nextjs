@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CloudinaryService } from '@/lib/cloudinary'
+import { s3Service } from '@/lib/s3-service'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
@@ -48,16 +49,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: 'Beat non trouvé' }, { status: 404 })
       }
 
-      // Extraction des public IDs depuis les URLs Cloudinary
-      const extractPublicId = (url: string): string | null => {
-        const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
-        return match ? match[1] : null
-      }
-
       let downloadUrl: string | null = null
       let filename: string
 
       if (type === 'preview') {
+        // Preview toujours sur Cloudinary
+        const extractPublicId = (url: string): string | null => {
+          const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
+          return match ? match[1] : null
+        }
+        
         const previewPublicId = beat.previewUrl ? extractPublicId(beat.previewUrl) : null
         if (!previewPublicId) {
           return NextResponse.json({ error: 'Preview indisponible' }, { status: 404 })
@@ -67,22 +68,46 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           quality: 'auto:low'
         }, 'video')
         filename = `${beat.title}_preview.mp3`
+      } else if (type === 'stems') {
+        // Stems sur S3
+        if (!beat.s3StemsKey) {
+          return NextResponse.json({ error: 'Stems indisponibles' }, { status: 404 })
+        }
+        downloadUrl = await s3Service.generatePresignedDownloadUrl(beat.s3StemsKey, 30 * 60) // 30 minutes
+        filename = `${beat.title}_stems.zip`
       } else {
-        const masterPublicId = beat.fullUrl ? extractPublicId(beat.fullUrl) : null
-        if (!masterPublicId) {
+        // Master - essayer S3 d'abord, puis fallback Cloudinary
+        if (beat.s3MasterKey) {
+          try {
+            downloadUrl = await s3Service.generatePresignedDownloadUrl(beat.s3MasterKey, 30 * 60) // 30 minutes
+            filename = `${beat.title}_master.wav`
+          } catch (s3Error) {
+            console.error('S3 download failed, falling back to Cloudinary:', s3Error)
+            // Fallback vers Cloudinary si S3 échoue
+            const extractPublicId = (url: string): string | null => {
+              const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
+              return match ? match[1] : null
+            }
+            
+            const masterPublicId = beat.fullUrl ? extractPublicId(beat.fullUrl) : null
+            if (!masterPublicId) {
+              return NextResponse.json({ error: 'Master indisponible' }, { status: 404 })
+            }
+            downloadUrl = CloudinaryService.generateSignedUrl(masterPublicId, 30, {
+              format: 'wav',
+              quality: 'auto:best'
+            }, 'video')
+            filename = `${beat.title}_master.wav`
+          }
+        } else {
           return NextResponse.json({ error: 'Master indisponible' }, { status: 404 })
         }
-        downloadUrl = CloudinaryService.generateSignedUrl(masterPublicId, 30, {
-          format: 'wav',
-          quality: 'auto:best'
-        }, 'video')
-        filename = `${beat.title}_master.wav`
       }
 
-      const response = NextResponse.redirect(downloadUrl)
+      const response = NextResponse.redirect(downloadUrl!)
       response.headers.set('Content-Disposition', `attachment; filename="${filename}"`)
       response.headers.set('Content-Type',
-        type === 'preview' ? 'audio/mpeg' : 'audio/wav')
+        type === 'preview' ? 'audio/mpeg' : type === 'stems' ? 'application/zip' : 'audio/wav')
       return response
     }
 
@@ -130,7 +155,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           order = {
             id: multiOrder.id,
             customerEmail: multiOrder.customerEmail,
-            beat: orderItem.beat
+            beat: orderItem.beat,
+            licenseType: orderItem.licenseType
           }
         }
       }
@@ -151,33 +177,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Vérification que les URLs Cloudinary existent
-    if (!order.beat.fullUrl) {
-      return NextResponse.json(
-        { error: 'Fichier de beat non disponible' },
-        { status: 404 }
-      )
-    }
-
-    // Extraction des public IDs depuis les URLs Cloudinary
-    const extractPublicId = (url: string): string | null => {
-      const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
-      return match ? match[1] : null
-    }
-
-    const masterPublicId = extractPublicId(order.beat.fullUrl)
-    if (!masterPublicId) {
-      return NextResponse.json(
-        { error: 'URL de beat invalide' },
-        { status: 400 }
-      )
-    }
-
     // Génération de l'URL de téléchargement appropriée
     let downloadUrl: string
     let filename: string
 
     if (type === 'preview' && order.beat.previewUrl) {
+      // Preview toujours sur Cloudinary
+      const extractPublicId = (url: string): string | null => {
+        const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
+        return match ? match[1] : null
+      }
+      
       const previewPublicId = extractPublicId(order.beat.previewUrl)
       if (!previewPublicId) {
         return NextResponse.json(
@@ -190,11 +200,37 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         quality: 'auto:low'
       }, 'video')
       filename = `${order.beat.title}_preview.mp3`
+    } else if (type === 'stems') {
+      // Stems sur S3 - utiliser s3StemsKey
+      const beat = await prisma.beat.findUnique({ 
+        where: { id: beatId },
+        select: { s3StemsKey: true }
+      })
+      
+      if (!beat?.s3StemsKey) {
+        return NextResponse.json(
+          { error: 'Stems indisponibles' },
+          { status: 404 }
+        )
+      }
+      
+      downloadUrl = await s3Service.generatePresignedDownloadUrl(beat.s3StemsKey, 30 * 60) // 30 minutes
+      filename = `${order.beat.title}_stems.zip`
     } else {
-      downloadUrl = CloudinaryService.generateSignedUrl(masterPublicId, 30, {
-        format: 'wav',
-        quality: 'auto:best'
-      }, 'video')
+      // Master sur S3 - utiliser s3MasterKey
+      const beat = await prisma.beat.findUnique({ 
+        where: { id: beatId },
+        select: { s3MasterKey: true }
+      })
+      
+      if (!beat?.s3MasterKey) {
+        return NextResponse.json(
+          { error: 'Master indisponible' },
+          { status: 404 }
+        )
+      }
+      
+      downloadUrl = await s3Service.generatePresignedDownloadUrl(beat.s3MasterKey, 30 * 60) // 30 minutes
       filename = `${order.beat.title}_master.wav`
     }
 
@@ -203,7 +239,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     
     // Ajout des headers pour forcer le téléchargement
     response.headers.set('Content-Disposition', `attachment; filename="${filename}"`)
-    response.headers.set('Content-Type', type === 'preview' ? 'audio/mpeg' : 'audio/wav')
+    response.headers.set('Content-Type', 
+      type === 'preview' ? 'audio/mpeg' : type === 'stems' ? 'application/zip' : 'audio/wav')
     
     return response
 
@@ -265,7 +302,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           order = {
             id: multiOrder.id,
             customerEmail: multiOrder.customerEmail,
-            beat: orderItem.beat
+            beat: orderItem.beat,
+            licenseType: orderItem.licenseType
           }
         }
       }
@@ -286,33 +324,47 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Vérification que les URLs Cloudinary existent
-    if (!order.beat.fullUrl) {
+    // Vérification que le master S3 existe
+    const beat = await prisma.beat.findUnique({ 
+      where: { id: beatId },
+      select: { s3MasterKey: true }
+    })
+    
+    if (!beat?.s3MasterKey) {
       return NextResponse.json(
         { error: 'Fichier de beat non disponible' },
         { status: 404 }
       )
     }
 
-    // Extraction des public IDs depuis les URLs Cloudinary
-    const extractPublicId = (url: string): string | null => {
-      const match = url.match(/\/v\d+\/(.+)\.(mp3|wav)$/)
-      return match ? match[1] : null
-    }
-
-    const masterPublicId = extractPublicId(order.beat.fullUrl)
-    if (!masterPublicId) {
-      return NextResponse.json(
-        { error: 'URL de beat invalide' },
-        { status: 400 }
-      )
-    }
-
-    // Génération des URLs de téléchargement direct
+    // Génération des URLs de téléchargement selon le type de licence
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const downloadUrls = {
+    const downloadUrls: any = {
       master: `${baseUrl}/api/download/beat/${beatId}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=master`,
       expiresAt: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes
+    }
+
+    // Ajouter les stems si licence Trackout ou Unlimited
+    const licenseType = order.licenseType
+    console.log('🔍 License type:', licenseType)
+    
+    if (licenseType === 'TRACKOUT_LEASE' || licenseType === 'UNLIMITED_LEASE') {
+      // Vérifier que les stems existent
+      const beatWithStems = await prisma.beat.findUnique({ 
+        where: { id: beatId },
+        select: { s3StemsKey: true, stemsUrl: true }
+      })
+      
+      console.log('🔍 Beat stems data:', beatWithStems)
+      
+      if (beatWithStems?.s3StemsKey || beatWithStems?.stemsUrl) {
+        downloadUrls.stems = `${baseUrl}/api/download/beat/${beatId}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=stems`
+        console.log('✅ Stems URL generated:', downloadUrls.stems)
+      } else {
+        console.log('❌ No stems available for this beat')
+      }
+    } else {
+      console.log('❌ License type does not include stems:', licenseType)
     }
 
     return NextResponse.json({
@@ -327,7 +379,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
         downloadUrls: {
           master: downloadUrls.master,
-          expiresAt: downloadUrls.expiresAt
+          expiresAt: downloadUrls.expiresAt,
+          ...(downloadUrls.stems && { stems: downloadUrls.stems })
         },
         order: {
           id: order.id,

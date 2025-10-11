@@ -289,9 +289,10 @@ export async function createCheckoutSessionWithPriceId(params: {
   beatTitle: string;
   successUrl: string;
   cancelUrl: string;
+  orderId?: string;
 }) {
   try {
-    const { priceId, beatId, licenseType, beatTitle, successUrl, cancelUrl } = params;
+    const { priceId, beatId, licenseType, beatTitle, successUrl, cancelUrl, orderId } = params;
     
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -308,6 +309,7 @@ export async function createCheckoutSessionWithPriceId(params: {
         beat_id: beatId,
         license_type: licenseType,
         beat_title: beatTitle,
+        ...(orderId && { order_id: orderId }),
       },
     })
 
@@ -326,9 +328,10 @@ export async function createCheckoutSessionWithLicense(params: {
   price: number;
   successUrl: string;
   cancelUrl: string;
+  orderId?: string;
 }) {
   try {
-    const { beatId, licenseType, beatTitle, price, successUrl, cancelUrl } = params;
+    const { beatId, licenseType, beatTitle, price, successUrl, cancelUrl, orderId } = params;
     
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -357,6 +360,7 @@ export async function createCheckoutSessionWithLicense(params: {
         license_type: licenseType,
         beat_title: beatTitle,
         price: price.toString(),
+        ...(orderId && { order_id: orderId }),
       },
     })
 
@@ -369,9 +373,10 @@ export async function createCheckoutSessionWithLicense(params: {
 
 // Helper function to create a multi-item checkout session
 export async function createMultiItemCheckoutSession(
-  items: Array<{ priceId: string; quantity: number; beatTitle: string }>,
+  items: Array<{ priceId: string; quantity: number; beatTitle: string; licenseType?: string }>,
   successUrl: string,
-  cancelUrl: string
+  cancelUrl: string,
+  orderId?: string
 ) {
   try {
     const lineItems = items.map(item => ({
@@ -390,8 +395,10 @@ export async function createMultiItemCheckoutSession(
         items: JSON.stringify(items.map(item => ({
           priceId: item.priceId,
           quantity: item.quantity,
-          title: item.beatTitle
+          title: item.beatTitle,
+          licenseType: item.licenseType
         }))),
+        ...(orderId && { order_id: orderId }),
       },
     })
 
