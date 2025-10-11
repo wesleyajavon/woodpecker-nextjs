@@ -33,7 +33,6 @@ export interface MultiItemOrder {
   paymentMethod?: string | null
   paymentId?: string | null
   paidAt?: Date | null
-  licenseType: LicenseType
   usageRights: string[]
   createdAt: Date
   updatedAt: Date
@@ -49,6 +48,7 @@ export interface OrderItem {
   quantity: number
   unitPrice: number
   totalPrice: number
+  licenseType: LicenseType
   createdAt: Date
   updatedAt: Date
 }

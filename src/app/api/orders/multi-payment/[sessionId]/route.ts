@@ -23,6 +23,7 @@ interface OrderItemWithPartialBeat {
   quantity: number
   unitPrice: number
   totalPrice: number
+  licenseType: LicenseType
   createdAt: Date
   updatedAt: Date
 }
@@ -91,7 +92,6 @@ export async function GET(
       paymentMethod: order.paymentMethod,
       paymentId: order.paymentId,
       paidAt: order.paidAt,
-      licenseType: order.licenseType as LicenseType,
       usageRights: order.usageRights,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
@@ -103,6 +103,7 @@ export async function GET(
         quantity: item.quantity,
         unitPrice: Number(item.unitPrice),
         totalPrice: Number(item.totalPrice),
+        licenseType: item.licenseType,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       })),
