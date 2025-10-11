@@ -19,6 +19,14 @@ type StripeLineItem = Stripe.LineItem
 type StripePrice = Stripe.Price
 type StripeProduct = Stripe.Product
 
+interface MetadataItem {
+  priceId: string
+  quantity: number
+  title: string
+  licenseType: LicenseType
+  beatId?: string
+}
+
 interface OrderStatusUpdateData {
   reason?: string
   cancelledAt?: Date
@@ -383,7 +391,7 @@ async function handleMultiItemOrder(fullSession: StripeCheckoutSession, lineItem
             let totalAmount = 0
 
   // Parse items from metadata to get license types
-  const metadataItems = fullSession.metadata?.items ? JSON.parse(fullSession.metadata.items) : []
+  const metadataItems: MetadataItem[] = fullSession.metadata?.items ? JSON.parse(fullSession.metadata.items) : []
   console.log('🔍 Metadata items:', metadataItems)
 
             for (const lineItem of lineItems) {
@@ -413,7 +421,7 @@ async function handleMultiItemOrder(fullSession: StripeCheckoutSession, lineItem
               totalAmount += itemTotal
 
     // Find corresponding metadata item to get license type
-    const metadataItem = metadataItems.find((item: any) => item.priceId === price.id)
+    const metadataItem = metadataItems.find((item: MetadataItem) => item.priceId === price.id)
     const licenseType = metadataItem?.licenseType || 'WAV_LEASE'
     console.log('🔍 Item license type:', licenseType)
 

@@ -8,6 +8,13 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { s3Client, S3_CONFIG, S3UploadResult, S3UploadOptions } from './aws-s3'
 
+interface S3FileMetadata {
+  size?: number
+  contentType?: string
+  lastModified?: Date
+  metadata?: Record<string, string>
+}
+
 export class S3Service {
   private client: S3Client
 
@@ -163,7 +170,7 @@ export class S3Service {
   /**
    * Obtient les métadonnées d'un fichier
    */
-  async getFileMetadata(key: string): Promise<any> {
+  async getFileMetadata(key: string): Promise<S3FileMetadata> {
     try {
       const command = new HeadObjectCommand({
         Bucket: S3_CONFIG.bucketName,

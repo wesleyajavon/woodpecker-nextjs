@@ -13,6 +13,12 @@ interface RouteParams {
   }>
 }
 
+interface DownloadUrls {
+  master: string
+  stems?: string
+  expiresAt: string
+}
+
 interface OrderWithBeat {
   id: string
   customerEmail: string
@@ -339,9 +345,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Génération des URLs de téléchargement selon le type de licence
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const downloadUrls: any = {
+    const downloadUrls: DownloadUrls = {
       master: `${baseUrl}/api/download/beat/${beatId}?orderId=${orderId}&customerEmail=${encodeURIComponent(customerEmail)}&type=master`,
-      expiresAt: new Date(Date.now() + (30 * 60 * 1000)) // 30 minutes
+      expiresAt: new Date(Date.now() + (30 * 60 * 1000)).toISOString() // 30 minutes
     }
 
     // Ajouter les stems si licence Trackout ou Unlimited
