@@ -30,12 +30,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     artwork: 0,
     stems: 0
   });
-  const [uploadedFiles, setUploadedFiles] = useState<{
-    preview?: File;
-    master?: File;
-    artwork?: File;
-    stems?: File;
-  }>({});
+  // uploadedFiles supprimé - maintenant nous utilisons cloudinaryUploads et s3Uploads
   const [s3Uploads, setS3Uploads] = useState<{
     master?: { url: string; key: string };
     stems?: { url: string; key: string };
@@ -66,11 +61,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     artwork: useRef<HTMLInputElement>(null)
   };
 
-  // Gestion des fichiers sélectionnés (Cloudinary seulement)
-  const handleFileSelect = (field: 'preview' | 'artwork', file: File) => {
-    setUploadedFiles(prev => ({ ...prev, [field]: file }));
-    setErrors(prev => prev.filter(error => !error.includes(field)));
-  };
+  // Gestion des fichiers sélectionnés supprimée - maintenant gérée par CloudinaryUpload et S3Upload
 
   // Gestion des changements de formulaire
   const handleInputChange = (field: keyof typeof formData, value: string | number | boolean) => {
@@ -210,8 +201,8 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           isExclusive: false,
           featured: false
         });
-        setUploadedFiles({});
         setS3Uploads({});
+        setCloudinaryUploads({});
         setUploadProgress({ preview: 0, master: 0, artwork: 0, stems: 0 });
       }
 
@@ -638,9 +629,19 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
 
       {/* Bouton d'upload */}
       <div className="mt-8 text-center">
+        {/* Debug info pour comprendre l'état du bouton */}
+        <div className="mb-4 p-3 bg-white/5 rounded-lg text-xs text-gray-300">
+          <p>État des uploads:</p>
+          <p>• Preview Cloudinary: {cloudinaryUploads.preview ? '✅ Uploadé' : '❌ Manquant'}</p>
+          <p>• Master S3: {s3Uploads.master ? '✅ Uploadé' : '❌ Manquant'}</p>
+          <p>• Artwork Cloudinary: {cloudinaryUploads.artwork ? '✅ Uploadé' : '⏸️ Optionnel'}</p>
+          <p>• Stems S3: {s3Uploads.stems ? '✅ Uploadé' : '⏸️ Optionnel'}</p>
+          <p>• Bouton activé: {(!isUploading && cloudinaryUploads.preview && s3Uploads.master) ? '✅ Oui' : '❌ Non'}</p>
+        </div>
+        
         <button
           onClick={handleUpload}
-          disabled={isUploading || !uploadedFiles.preview || !s3Uploads.master}
+          disabled={isUploading || !cloudinaryUploads.preview || !s3Uploads.master}
           className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
         >
           {isUploading ? (
