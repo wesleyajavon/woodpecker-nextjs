@@ -131,4 +131,9 @@ export async function POST(request: NextRequest) {
 // Configuration pour les gros fichiers
 export const config = {
   maxDuration: 300, // 5 minutes
+  api: {
+    bodyParser: {
+      sizeLimit: '100mb', // Augmenter la limite de taille
+    },
+  },
 }
