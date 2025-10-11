@@ -61,49 +61,8 @@ export function CloudinaryUpload({
     setErrorMessage('')
 
     try {
-      // Étape 1: Obtenir l'URL signée Cloudinary
-      const params = new URLSearchParams({
-        fileName: file.name,
-        contentType: file.type,
-        folder: `beats/${folder}`,
-        beatId: beatId,
-        fileSize: file.size.toString()
-      })
-
-      const presignedResponse = await fetch(`/api/cloudinary/upload?${params}`)
-      
-      if (!presignedResponse.ok) {
-        const errorData = await presignedResponse.json()
-        throw new Error(errorData.message || 'Erreur lors de la génération de l\'URL signée')
-      }
-
-      const presignedData = await presignedResponse.json()
-      
-      // Étape 2: Upload direct vers Cloudinary avec progression
-      setProgress(50) // Progression après obtention de l'URL signée
-      
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('public_id', presignedData.data.publicId)
-      formData.append('resource_type', presignedData.data.resourceType)
-
-      const uploadResponse = await fetch(presignedData.data.uploadUrl, {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!uploadResponse.ok) {
-        throw new Error(`Erreur lors de l'upload vers Cloudinary: ${uploadResponse.status}`)
-      }
-
-      setProgress(100)
-      setUploadStatus('success')
-      
-      // Retourner les données avec la clé Cloudinary et l'URL publique
-      onUploadComplete({
-        url: presignedData.data.publicUrl,
-        publicId: presignedData.data.publicId
-      })
+      // Utiliser directement le proxy API pour éviter les problèmes CORS
+      await uploadViaProxy(file)
       
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erreur inconnue'
@@ -113,6 +72,30 @@ export function CloudinaryUpload({
     } finally {
       setUploading(false)
     }
+  }
+
+  const uploadViaProxy = async (file: File) => {
+    // Upload via proxy API (pas de problème CORS)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('folder', `beats/${folder}`)
+    formData.append('beatId', beatId)
+
+    const response = await fetch('/api/cloudinary/upload-proxy', {
+      method: 'POST',
+      body: formData
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Erreur lors de l\'upload via proxy')
+    }
+
+    const result = await response.json()
+    
+    setProgress(100)
+    setUploadStatus('success')
+    onUploadComplete(result.data)
   }
 
   const triggerFileSelect = () => {
@@ -178,7 +161,7 @@ export function CloudinaryUpload({
             ></div>
           </div>
           <p className="text-xs text-center text-gray-500">
-            {progress}% - {progress < 50 ? 'Génération URL signée...' : 'Upload vers Cloudinary...'}
+            {progress}% - Upload vers Cloudinary via proxy...
           </p>
         </div>
       )}
