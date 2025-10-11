@@ -61,47 +61,14 @@ export function S3Upload({
     setErrorMessage('')
 
     try {
-      // Étape 1: Obtenir l'URL signée
-      const params = new URLSearchParams({
-        fileName: file.name,
-        contentType: file.type,
-        folder: `beats/${folder}`,
-        beatId: beatId,
-        fileSize: file.size.toString()
-      })
-
-      const presignedResponse = await fetch(`/api/s3/upload?${params}`)
-      
-      if (!presignedResponse.ok) {
-        const errorData = await presignedResponse.json()
-        throw new Error(errorData.message || 'Erreur lors de la génération de l\'URL signée')
+      // Essayer d'abord l'upload direct avec URL signée
+      try {
+        await uploadDirectToS3(file)
+      } catch (corsError) {
+        console.warn('Upload direct échoué (CORS), utilisation du proxy:', corsError)
+        // Fallback vers le proxy API
+        await uploadViaProxy(file)
       }
-
-      const presignedData = await presignedResponse.json()
-      
-      // Étape 2: Upload direct vers S3 avec progression
-      setProgress(50) // Progression après obtention de l'URL signée
-      
-      const uploadResponse = await fetch(presignedData.data.uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type
-        }
-      })
-
-      if (!uploadResponse.ok) {
-        throw new Error(`Erreur lors de l'upload vers S3: ${uploadResponse.status}`)
-      }
-
-      setProgress(100)
-      setUploadStatus('success')
-      
-      // Retourner les données avec la clé S3 et l'URL publique
-      onUploadComplete({
-        url: presignedData.data.publicUrl,
-        key: presignedData.data.key
-      })
       
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Erreur inconnue'
@@ -111,6 +78,74 @@ export function S3Upload({
     } finally {
       setUploading(false)
     }
+  }
+
+  const uploadDirectToS3 = async (file: File) => {
+    // Étape 1: Obtenir l'URL signée
+    const params = new URLSearchParams({
+      fileName: file.name,
+      contentType: file.type,
+      folder: `beats/${folder}`,
+      beatId: beatId,
+      fileSize: file.size.toString()
+    })
+
+    const presignedResponse = await fetch(`/api/s3/upload?${params}`)
+    
+    if (!presignedResponse.ok) {
+      const errorData = await presignedResponse.json()
+      throw new Error(errorData.message || 'Erreur lors de la génération de l\'URL signée')
+    }
+
+    const presignedData = await presignedResponse.json()
+    
+    // Étape 2: Upload direct vers S3 avec progression
+    setProgress(50) // Progression après obtention de l'URL signée
+    
+    const uploadResponse = await fetch(presignedData.data.uploadUrl, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type
+      }
+    })
+
+    if (!uploadResponse.ok) {
+      throw new Error(`Erreur lors de l'upload vers S3: ${uploadResponse.status}`)
+    }
+
+    setProgress(100)
+    setUploadStatus('success')
+    
+    // Retourner les données avec la clé S3 et l'URL publique
+    onUploadComplete({
+      url: presignedData.data.publicUrl,
+      key: presignedData.data.key
+    })
+  }
+
+  const uploadViaProxy = async (file: File) => {
+    // Upload via proxy API (pas de problème CORS)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('folder', `beats/${folder}`)
+    formData.append('beatId', beatId)
+
+    const response = await fetch('/api/s3/upload-proxy', {
+      method: 'POST',
+      body: formData
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Erreur lors de l\'upload via proxy')
+    }
+
+    const result = await response.json()
+    
+    setProgress(100)
+    setUploadStatus('success')
+    onUploadComplete(result.data)
   }
 
   const triggerFileSelect = () => {
@@ -176,7 +211,7 @@ export function S3Upload({
             ></div>
           </div>
           <p className="text-xs text-center text-gray-500">
-            {progress}% - {progress < 50 ? 'Génération URL signée...' : 'Upload direct vers AWS S3...'}
+            {progress}% - {progress < 50 ? 'Génération URL signée...' : 'Upload vers AWS S3...'}
           </p>
         </div>
       )}
