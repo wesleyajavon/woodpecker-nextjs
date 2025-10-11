@@ -61,17 +61,60 @@ export function CloudinaryUpload({
     setErrorMessage('')
 
     try {
-      // Utiliser directement le proxy API pour éviter les problèmes CORS
-      await uploadViaProxy(file)
+      // Essayer d'abord l'upload direct vers Cloudinary
+      await uploadDirectToCloudinary(file)
       
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Erreur inconnue'
-      setErrorMessage(errorMsg)
-      setUploadStatus('error')
-      onUploadError(errorMsg)
+    } catch (directError) {
+      console.warn('Upload direct échoué, utilisation du proxy:', directError)
+      try {
+        // Fallback vers le proxy API
+        await uploadViaProxy(file)
+      } catch (proxyError) {
+        const errorMsg = proxyError instanceof Error ? proxyError.message : 'Erreur inconnue'
+        setErrorMessage(errorMsg)
+        setUploadStatus('error')
+        onUploadError(errorMsg)
+        throw proxyError
+      }
     } finally {
       setUploading(false)
     }
+  }
+
+  const uploadDirectToCloudinary = async (file: File) => {
+    // 1. Obtenir l'URL d'upload depuis notre API
+    const uploadUrlResponse = await fetch(`/api/cloudinary/upload?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}&folder=beats/${folder}&beatId=${beatId}&fileSize=${file.size}`)
+    
+    if (!uploadUrlResponse.ok) {
+      const errorData = await uploadUrlResponse.json()
+      throw new Error(errorData.message || 'Erreur lors de la génération de l\'URL d\'upload')
+    }
+
+    const uploadData = await uploadUrlResponse.json()
+    setProgress(50)
+
+    // 2. Upload direct vers Cloudinary
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await fetch(uploadData.data.uploadUrl, {
+      method: 'POST',
+      body: formData
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Erreur Cloudinary: ${response.status} - ${errorText}`)
+    }
+
+    const result = await response.json()
+    
+    setProgress(100)
+    setUploadStatus('success')
+    onUploadComplete({
+      url: result.secure_url,
+      publicId: result.public_id
+    })
   }
 
   const uploadViaProxy = async (file: File) => {
@@ -161,7 +204,7 @@ export function CloudinaryUpload({
             ></div>
           </div>
           <p className="text-xs text-center text-gray-500">
-            {progress}% - Upload vers Cloudinary via proxy...
+            {progress}% - Upload vers Cloudinary...
           </p>
         </div>
       )}

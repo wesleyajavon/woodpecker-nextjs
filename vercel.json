@@ -5,6 +5,12 @@
     },
     "src/app/api/beats/upload/route.ts": {
       "maxDuration": 300
+    },
+    "src/app/api/cloudinary/upload-proxy/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/s3/upload-proxy/route.ts": {
+      "maxDuration": 300
     }
   },
   "headers": [
