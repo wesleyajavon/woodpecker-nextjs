@@ -51,44 +51,11 @@ export async function POST(request: NextRequest) {
     // Récupération des données de la requête
     const formData = await request.formData();
     
-    // Extraction des fichiers
-    const files: UploadedFiles = {};
-    const fields: Record<string, string> = {};
-    
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        // Convertir File en MulterFile
-        const multerFile: MulterFile = {
-          fieldname: key,
-          originalname: value.name,
-          encoding: '7bit',
-          mimetype: value.type,
-          buffer: Buffer.from(await value.arrayBuffer()),
-          size: value.size
-        };
-        
-        if (key === 'preview' || key === 'master' || key === 'artwork') {
-          if (!files[key]) {
-            files[key] = [];
-          }
-          files[key].push(multerFile);
-        }
-      } else {
-        fields[key] = value;
-      }
-    }
-
-    // Validation des fichiers
-    const validation = validateUploadedFiles(files, ['preview']);
-    if (!validation.isValid) {
-      return NextResponse.json({
-        error: 'Validation des fichiers échouée',
-        details: validation.errors
-      }, { status: 400 });
-    }
-
-    // Upload des fichiers vers Cloudinary
-    const uploadResults: Record<string, { public_id: string; secure_url: string; resource_type: string; duration?: number }> = {};
+    // Récupération des URLs Cloudinary (upload direct)
+    const previewUrl = formData.get('previewUrl') as string | null;
+    const previewPublicId = formData.get('previewPublicId') as string | null;
+    const artworkUrl = formData.get('artworkUrl') as string | null;
+    const artworkPublicId = formData.get('artworkPublicId') as string | null;
     
     // Récupération des données S3 (masters et stems)
     const s3MasterUrl = formData.get('s3MasterUrl') as string | null || undefined;
@@ -96,96 +63,67 @@ export async function POST(request: NextRequest) {
     const s3StemsUrl = formData.get('s3StemsUrl') as string | null || undefined;
     const s3StemsKey = formData.get('s3StemsKey') as string | null || undefined;
 
-    try {
-      // Upload de la preview
-      if (files.preview && files.preview[0]) {
-        const previewFile = files.preview[0];
-        console.log(`Starting preview upload: ${previewFile.originalname} (${previewFile.size} bytes) - will be cropped to 30 seconds`);
-        console.log('Upload options:', {
-          resource_type: 'video',
-          format: 'mp3',
-          quality: 'auto:low',
-          crop_duration: 30
-        });
-        
-        uploadResults.preview = await CloudinaryService.uploadAudio(
-          previewFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.PREVIEWS,
-          {
-            resource_type: 'video',
-            format: 'mp3',
-            quality: 'auto:low',
-            crop_duration: 30 // Couper à 30 secondes pour la preview
-          }
-        );
-        
-        console.log('Preview upload result:', {
-          public_id: uploadResults.preview.public_id,
-          secure_url: uploadResults.preview.secure_url,
-          duration: uploadResults.preview.duration
-        });
-      }
-
-
-      // Upload de l'artwork (optionnel)
-      if (files.artwork && files.artwork[0]) {
-        const artworkFile = files.artwork[0];
-        console.log(`Starting artwork upload: ${artworkFile.originalname} (${artworkFile.size} bytes)`);
-        uploadResults.artwork = await CloudinaryService.uploadImage(
-          artworkFile.buffer,
-          CLOUDINARY_FOLDERS.BEATS.ARTWORKS,
-          {
-            quality: 'auto:best',
-            width: 1000,
-            height: 1000,
-            crop: 'limit'
-          }
-        );
-        console.log('Artwork upload completed successfully');
-      }
-
-
-
-    } catch (uploadError) {
-      console.error('Erreur lors de l\'upload vers Cloudinary:', uploadError);
-      console.error('Type d\'erreur:', typeof uploadError);
-      console.error('Message d\'erreur:', uploadError instanceof Error ? uploadError.message : 'Unknown error');
-      console.error('Stack trace:', uploadError instanceof Error ? uploadError.stack : 'No stack trace');
-      
-      // Nettoyage des fichiers déjà uploadés en cas d'erreur
-      for (const result of Object.values(uploadResults)) {
-        if (result && result.public_id) {
-          try {
-            await CloudinaryService.deleteResource(
-              result.public_id,
-              result.resource_type === 'video' ? 'video' : 'image'
-            );
-          } catch (cleanupError) {
-            console.error('Erreur lors du nettoyage:', cleanupError);
-          }
-        }
-      }
-
+    // Validation des données requises
+    if (!previewUrl || !previewPublicId) {
       return NextResponse.json({
-        error: 'Échec de l\'upload vers Cloudinary',
-        details: uploadError instanceof Error ? uploadError.message : 'Erreur inconnue',
-        type: typeof uploadError
+        error: 'Preview audio requis (upload Cloudinary)'
+      }, { status: 400 });
+    }
+
+    if (!s3MasterUrl || !s3MasterKey) {
+      return NextResponse.json({
+        error: 'Master audio requis (upload S3)'
+      }, { status: 400 });
+    }
+
+    // Préparation des résultats d'upload
+    const uploadResults: Record<string, { public_id: string; secure_url: string; resource_type: string; duration?: number }> = {};
+    
+    // Ajout des données Cloudinary
+    uploadResults.preview = {
+      public_id: previewPublicId,
+      secure_url: previewUrl,
+      resource_type: 'video'
+    };
+
+    if (artworkUrl && artworkPublicId) {
+      uploadResults.artwork = {
+        public_id: artworkPublicId,
+        secure_url: artworkUrl,
+        resource_type: 'image'
+      };
+    }
+
+    try {
+      // Les fichiers sont déjà uploadés directement vers Cloudinary et S3
+      // On utilise les URLs et clés fournies
+      console.log('Using pre-uploaded files:', {
+        preview: uploadResults.preview?.public_id,
+        artwork: uploadResults.artwork?.public_id,
+        s3Master: s3MasterKey,
+        s3Stems: s3StemsKey
+      });
+    } catch (error) {
+      console.error('Erreur lors de la création du beat:', error);
+      return NextResponse.json({
+        error: 'Erreur lors de la création du beat',
+        details: error instanceof Error ? error.message : 'Erreur inconnue'
       }, { status: 500 });
     }
 
     // Création du beat dans la base de données
     try {
       const beatData: CreateBeatInput = {
-        title: fields.title,
-        description: fields.description,
-        genre: fields.genre,
-        bpm: parseInt(fields.bpm),
-        key: fields.key,
-        duration: fields.duration,
-        wavLeasePrice: parseFloat(fields.wavLeasePrice),
-        trackoutLeasePrice: parseFloat(fields.trackoutLeasePrice),
-        unlimitedLeasePrice: parseFloat(fields.unlimitedLeasePrice),
-        tags: fields.tags ? JSON.parse(fields.tags) : [],
+        title: formData.get('title') as string,
+        description: formData.get('description') as string,
+        genre: formData.get('genre') as string,
+        bpm: parseInt(formData.get('bpm') as string),
+        key: formData.get('key') as string,
+        duration: formData.get('duration') as string,
+        wavLeasePrice: parseFloat(formData.get('wavLeasePrice') as string),
+        trackoutLeasePrice: parseFloat(formData.get('trackoutLeasePrice') as string),
+        unlimitedLeasePrice: parseFloat(formData.get('unlimitedLeasePrice') as string),
+        tags: formData.get('tags') ? JSON.parse(formData.get('tags') as string) : [],
         previewUrl: uploadResults.preview?.secure_url,
         fullUrl: s3MasterUrl, // URL S3 pour le master
         artworkUrl: uploadResults.artwork?.secure_url,
@@ -194,8 +132,8 @@ export async function POST(request: NextRequest) {
         s3MasterKey: s3MasterKey,
         s3StemsUrl: s3StemsUrl,
         s3StemsKey: s3StemsKey,
-        isExclusive: fields.isExclusive === 'true',
-        featured: fields.featured === 'true'
+        isExclusive: formData.get('isExclusive') === 'true',
+        featured: formData.get('featured') === 'true'
       };
 
       const newBeat = await BeatService.createBeat(beatData, userId);

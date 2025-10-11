@@ -7,6 +7,7 @@ import { BEAT_CONFIG } from '@/config/constants';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { Beat } from '@/types/beat';
 import { S3Upload } from '@/components/S3Upload';
+import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 
 interface BeatUploadProps {
   onUploadSuccess?: (beat: Beat) => void;
@@ -38,6 +39,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
   const [s3Uploads, setS3Uploads] = useState<{
     master?: { url: string; key: string };
     stems?: { url: string; key: string };
+  }>({});
+  const [cloudinaryUploads, setCloudinaryUploads] = useState<{
+    preview?: { url: string; publicId: string };
+    artwork?: { url: string; publicId: string };
   }>({});
   const [formData, setFormData] = useState({
     title: '',
@@ -114,7 +119,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     if (formData.description && formData.description.length > BEAT_CONFIG.maxDescriptionLength) {
       newErrors.push(t('upload.descriptionTooLong', { max: BEAT_CONFIG.maxDescriptionLength }));
     }
-    if (!uploadedFiles.preview) newErrors.push(t('upload.previewRequired'));
+    if (!cloudinaryUploads.preview) newErrors.push(t('upload.previewRequired'));
     if (!s3Uploads.master) newErrors.push('Master audio required (S3 upload)');
     if (formData.wavLeasePrice <= 0) newErrors.push(t('upload.wavPriceRequired'));
     if (formData.trackoutLeasePrice <= 0) newErrors.push(t('upload.trackoutPriceRequired'));
@@ -135,9 +140,15 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
     try {
       const formDataToSend = new FormData();
       
-      // Ajout des fichiers Cloudinary
-      if (uploadedFiles.preview) formDataToSend.append('preview', uploadedFiles.preview);
-      if (uploadedFiles.artwork) formDataToSend.append('artwork', uploadedFiles.artwork);
+      // Ajout des URLs Cloudinary (au lieu des fichiers)
+      if (cloudinaryUploads.preview) {
+        formDataToSend.append('previewUrl', cloudinaryUploads.preview.url);
+        formDataToSend.append('previewPublicId', cloudinaryUploads.preview.publicId);
+      }
+      if (cloudinaryUploads.artwork) {
+        formDataToSend.append('artworkUrl', cloudinaryUploads.artwork.url);
+        formDataToSend.append('artworkPublicId', cloudinaryUploads.artwork.publicId);
+      }
       
       // Ajout des données S3
       if (s3Uploads.master) {
@@ -245,47 +256,38 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             <label className="block text-sm font-medium text-gray-300">
               {t('upload.previewAudio')} <span className="text-red-400">*</span>
             </label>
-            <div className="relative">
-              <input
-                ref={fileInputRefs.preview}
-                type="file"
-                accept=".mp3,.wav,.aiff,.flac"
-                onChange={(e) => e.target.files?.[0] && handleFileSelect('preview', e.target.files[0])}
-                className="hidden"
+            {cloudinaryUploads.preview ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="flex items-center gap-2">
+                    <Music className="w-4 h-4 text-green-400" />
+                    <p className="text-green-300 text-sm">Preview uploaded to Cloudinary</p>
+                  </div>
+                  <button
+                    onClick={() => setCloudinaryUploads(prev => ({ ...prev, preview: undefined }))}
+                    className="text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <p className="text-foreground text-xs">
+                    ✅ Preview audio uploaded to Cloudinary (max 100MB)
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    Public ID: {cloudinaryUploads.preview.publicId}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <CloudinaryUpload
+                beatId="new-beat" // Placeholder pour les nouveaux beats
+                folder="previews"
+                onUploadComplete={(result) => setCloudinaryUploads(prev => ({ ...prev, preview: result }))}
+                onUploadError={(error) => console.error('Preview upload error:', error)}
+                maxSize={100} // 100MB
+                acceptedTypes={['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/flac']}
               />
-              <div
-                onClick={() => fileInputRefs.preview.current?.click()}
-                className="w-full p-4 border-2 border-dashed border-purple-400/50 rounded-lg hover:border-purple-400 transition-colors text-center cursor-pointer"
-              >
-                {uploadedFiles.preview ? (
-                  <div className="flex items-center gap-2 text-purple-300">
-                    <Music className="w-5 h-5" />
-                    <span>{uploadedFiles.preview.name}</span>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUploadedFiles(prev => ({ ...prev, preview: undefined }));
-                      }}
-                      className="ml-auto text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Upload className="w-5 h-5" />
-                    <span>{t('upload.selectAudioFile')}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            {uploadProgress.preview > 0 && (
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress.preview}%` }}
-                />
-              </div>
             )}
           </div>
 
@@ -335,47 +337,38 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             <label className="block text-sm font-medium text-gray-300">
               {t('upload.artwork')}
             </label>
-            <div className="relative">
-              <input
-                ref={fileInputRefs.artwork}
-                type="file"
-                accept=".jpg,.jpeg,.png,.webp"
-                onChange={(e) => e.target.files?.[0] && handleFileSelect('artwork', e.target.files[0])}
-                className="hidden"
+            {cloudinaryUploads.artwork ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="flex items-center gap-2">
+                    <Image className="w-4 h-4 text-green-400" />
+                    <p className="text-green-300 text-sm">Artwork uploaded to Cloudinary</p>
+                  </div>
+                  <button
+                    onClick={() => setCloudinaryUploads(prev => ({ ...prev, artwork: undefined }))}
+                    className="text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <p className="text-foreground text-xs">
+                    ✅ Artwork uploaded to Cloudinary (max 20MB)
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    Public ID: {cloudinaryUploads.artwork.publicId}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <CloudinaryUpload
+                beatId="new-beat" // Placeholder pour les nouveaux beats
+                folder="artworks"
+                onUploadComplete={(result) => setCloudinaryUploads(prev => ({ ...prev, artwork: result }))}
+                onUploadError={(error) => console.error('Artwork upload error:', error)}
+                maxSize={20} // 20MB
+                acceptedTypes={['image/jpeg', 'image/png', 'image/webp', 'image/gif']}
               />
-              <div
-                onClick={() => fileInputRefs.artwork.current?.click()}
-                className="w-full p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer"
-              >
-                {uploadedFiles.artwork ? (
-                  <div className="flex items-center gap-2 text-purple-300">
-                    <Image className="w-5 h-5" />
-                    <span>{uploadedFiles.artwork.name}</span>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUploadedFiles(prev => ({ ...prev, artwork: undefined }));
-                      }}
-                      className="ml-auto text-red-400 hover:text-red-300 cursor-pointer p-1 rounded hover:bg-red-400/10 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Upload className="w-5 h-5" />
-                    <span>{t('upload.coverImageOptional')}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            {uploadProgress.artwork > 0 && (
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress.artwork}%` }}
-                />
-              </div>
             )}
           </div>
 
