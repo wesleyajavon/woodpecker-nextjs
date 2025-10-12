@@ -309,7 +309,7 @@ export default function BeatEditPage() {
                     />
                 </div>
 
-                <div className="max-w-4xl mx-auto py-4 sm:py-8 relative z-10">
+                <div className="max-w-6xl mx-auto py-4 sm:py-8 relative z-10">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
@@ -348,7 +348,7 @@ export default function BeatEditPage() {
                         </motion.div>
                     )}
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                         {/* Section des fichiers */}
                         <div className="space-y-4 sm:space-y-6">
                             <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">{t('admin.currentFiles')}</h3>
@@ -457,6 +457,12 @@ export default function BeatEditPage() {
                                 </CardContent>
                             </Card>
 
+                        </div>
+
+                        {/* Section Artwork - Troisième colonne */}
+                        <div className="space-y-4 sm:space-y-6">
+                            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">{t('upload.artwork')}</h3>
+
                             {/* Artwork */}
                             <Card variant="outlined">
                                 <CardHeader>
@@ -526,8 +532,6 @@ export default function BeatEditPage() {
                                 </div>
                                 </CardContent>
                             </Card>
-
-
                         </div>
 
                         {/* Section des progrès et actions */}

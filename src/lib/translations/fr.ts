@@ -338,7 +338,7 @@ export const fr = {
 
   // Admin
   admin: {
-    title: 'Administration',
+    title: 'Panneau d\'administration',
     dashboard: 'Gestion de la plateforme l.outsider',
     beats: 'Gestion des Beats',
     orders: 'Commandes',

@@ -67,7 +67,7 @@ export default function AdminDropdown({ className }: AdminDropdownProps) {
           isOpen && 'bg-card/30 text-primary'
         )}
       >
-        <Upload className="h-4 w-4" />
+        {/* <Upload className="h-4 w-4" /> */}
         <span className="hidden sm:block text-sm">{t('nav.admin')}</span>
         <ChevronDown 
           className={cn(

@@ -323,7 +323,7 @@ export const en = {
 
   // Admin
   admin: {
-    title: 'Administration',
+    title: 'Admin Panel',
     dashboard: 'l.outsider platform management',
     beats: 'Beat management',
     orders: 'Orders',
