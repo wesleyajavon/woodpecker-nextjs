@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Upload, Music, Settings, BarChart3, Plus, ShoppingBag } from 'lucide-react';
@@ -22,8 +22,30 @@ export default function AdminUploadPage() {
   const [activeTab, setActiveTab] = useState<TabId>('upload');
   const [uploadedBeats, setUploadedBeats] = useState<Beat[]>([]);
 
+  // Handle hash navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) as TabId;
+      if (['upload', 'manage', 'stats', 'orders'].includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+
+    // Check initial hash
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const handleUploadSuccess = (beat: Beat) => {
     setUploadedBeats(prev => [beat, ...prev]);
+  };
+
+  const handleTabChange = (tabId: TabId) => {
+    setActiveTab(tabId);
+    window.location.hash = tabId;
   };
 
   const handleUploadError = (error: string) => {
@@ -82,7 +104,7 @@ export default function AdminUploadPage() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => handleTabChange(tab.id)}
                     className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:cursor-pointer ${activeTab === tab.id
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-card/20 backdrop-blur-lg text-foreground hover:bg-card/30 border border-border/20'

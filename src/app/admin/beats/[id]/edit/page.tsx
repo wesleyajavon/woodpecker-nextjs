@@ -22,8 +22,10 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Title, Subtitle } from '@/components/ui/Title';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 export default function BeatEditPage() {
+    const { t } = useTranslation();
     const params = useParams();
     const router = useRouter();
     const beatId = params?.id as string;
@@ -320,12 +322,12 @@ export default function BeatEditPage() {
                                 className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30 text-sm sm:text-base touch-manipulation"
                             >
                                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                                Retour
+                                {t('common.back')}
                             </Link>
                         </div>
 
                         <Title variant="page" size="4xl" gradient={true}>
-                            Modifier les fichiers
+                            {t('admin.editFiles')}
                         </Title>
                         <Subtitle>
                             {beat.title}
@@ -349,13 +351,13 @@ export default function BeatEditPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                         {/* Section des fichiers */}
                         <div className="space-y-4 sm:space-y-6">
-                            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Fichiers actuels</h3>
+                            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">{t('admin.currentFiles')}</h3>
 
                             {/* Preview Audio */}
                             <Card variant="elevated">
                                 <CardHeader>
                                     <CardTitle icon={<Music className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                                        Preview Audio
+                                        {t('upload.previewAudio')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -363,7 +365,7 @@ export default function BeatEditPage() {
                                 {beat.previewUrl ? (
                                     <div className="space-y-3 sm:space-y-4">
                                         <div className="p-3 bg-card/5 rounded-lg">
-                                            <p className="text-foreground text-xs sm:text-sm">Fichier actuel disponible</p>
+                                            <p className="text-foreground text-xs sm:text-sm">{t('admin.currentFileAvailable')}</p>
                                         </div>
                                         <audio
                                             src={beat.previewUrl}
@@ -373,7 +375,7 @@ export default function BeatEditPage() {
                                         />
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground text-sm">Aucun fichier preview</p>
+                                    <p className="text-muted-foreground text-sm">{t('admin.noPreviewFile')}</p>
                                 )}
 
                                 <div className="mt-3 sm:mt-4">
@@ -405,7 +407,7 @@ export default function BeatEditPage() {
                                         ) : (
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                <span className="text-xs sm:text-sm">Remplacer le fichier preview</span>
+                                                <span className="text-xs sm:text-sm">{t('admin.replacePreviewFile')}</span>
                                             </div>
                                         )}
                                     </label>
@@ -417,7 +419,7 @@ export default function BeatEditPage() {
                             <Card variant="glass">
                                 <CardHeader>
                                     <CardTitle icon={<FileAudio className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                                        Master Audio - AWS S3
+                                        {t('upload.masterAudio')} - AWS S3
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -427,21 +429,21 @@ export default function BeatEditPage() {
                                         <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
                                             <div className="flex items-center gap-2">
                                                 <FileAudio className="w-4 h-4 text-green-400" />
-                                                <p className="text-green-300 text-xs sm:text-sm">Fichier master sur AWS S3</p>
+                                                <p className="text-green-300 text-xs sm:text-sm">{t('admin.masterFileOnS3')}</p>
                                             </div>
                                         </div>
                                         <div className="p-3 bg-white/5 rounded-lg">
                                             <p className="text-foreground text-xs sm:text-sm">
-                                                ✅ Fichier master uploadé vers AWS S3 (limite: 500MB)
+                                                ✅ {t('admin.masterUploadedToS3')} (limite: 500MB)
                                             </p>
                                             <p className="text-muted-foreground text-xs mt-1">
-                                                Clé S3: {beat.s3MasterKey}
+                                                {t('admin.s3Key')}: {beat.s3MasterKey}
                                             </p>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
-                                        <p className="text-muted-foreground text-sm">Aucun fichier master sur S3</p>
+                                        <p className="text-muted-foreground text-sm">{t('admin.noMasterFileOnS3')}</p>
                                         <S3Upload
                                             beatId={beatId}
                                             folder="masters"
@@ -459,7 +461,7 @@ export default function BeatEditPage() {
                             <Card variant="outlined">
                                 <CardHeader>
                                     <CardTitle icon={<Image className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                                        Artwork/Cover Image
+                                        {t('upload.artwork')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -467,11 +469,11 @@ export default function BeatEditPage() {
                                 {beat.artworkUrl ? (
                                     <div className="space-y-3 sm:space-y-4">
                                         <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                            <p className="text-foreground text-xs sm:text-sm">Image actuelle disponible</p>
+                                            <p className="text-foreground text-xs sm:text-sm">{t('admin.currentImageAvailable')}</p>
                                             <button
                                                 onClick={() => handleRemoveArtwork()}
                                                 className="text-red-400 hover:text-red-300 transition-colors touch-manipulation"
-                                                title="Supprimer l'image"
+                                                title={t('common.remove')}
                                             >
                                                 <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </button>
@@ -479,13 +481,13 @@ export default function BeatEditPage() {
                                         <div className="relative">
                                             <img
                                                 src={beat.artworkUrl}
-                                                alt="Artwork actuel"
+                                                alt={t('upload.artwork')}
                                                 className="w-full h-32 sm:h-48 object-cover rounded-lg"
                                             />
                                         </div>
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground text-sm mb-3 sm:mb-4">Aucune image de couverture</p>
+                                    <p className="text-muted-foreground text-sm mb-3 sm:mb-4">{t('admin.noCoverImage')}</p>
                                 )}
 
                                 <div className="mt-3 sm:mt-4">
@@ -517,7 +519,7 @@ export default function BeatEditPage() {
                                         ) : (
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                <span className="text-xs sm:text-sm">Remplacer l&apos;image de couverture</span>
+                                                <span className="text-xs sm:text-sm">{t('admin.replaceCoverImage')}</span>
                                             </div>
                                         )}
                                     </label>
@@ -534,29 +536,29 @@ export default function BeatEditPage() {
                             <Card variant="elevated">
                                 <CardHeader>
                                     <CardTitle icon={<Archive className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                                        Stems (ZIP) - AWS S3
+                                        {t('upload.stems')} - AWS S3
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     {beat.stemsUrl ? (
                                         <div className="space-y-3 sm:space-y-4">
                                             <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                                <p className="text-foreground text-xs sm:text-sm">Fichier stems disponible</p>
+                                                <p className="text-foreground text-xs sm:text-sm">{t('admin.stemsFileAvailable')}</p>
                                                 <button
                                                     onClick={() => handleRemoveStems()}
                                                     className="text-red-400 hover:text-red-300 transition-colors touch-manipulation"
-                                                    title="Supprimer les stems"
+                                                    title={t('common.remove')}
                                                 >
                                                     <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 </button>
                                             </div>
                                             <div className="p-3 bg-white/5 rounded-lg">
-                                                <p className="text-foreground text-xs sm:text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
+                                                <p className="text-foreground text-xs sm:text-sm">{t('upload.stemsZipOptional')}</p>
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="space-y-3">
-                                            <p className="text-muted-foreground text-sm">Aucun fichier stems</p>
+                                            <p className="text-muted-foreground text-sm">{t('admin.noStemsFile')}</p>
                                             <S3Upload
                                                 beatId={beatId}
                                                 folder="stems"
@@ -597,7 +599,7 @@ export default function BeatEditPage() {
                                             ) : (
                                                 <div className="flex items-center gap-2 text-gray-400">
                                                     <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                    <span className="text-xs sm:text-sm">Remplacer le fichier stems</span>
+                                                    <span className="text-xs sm:text-sm">{t('admin.replaceStemsFile')}</span>
                                                 </div>
                                             )}
                                         </label>
@@ -608,7 +610,7 @@ export default function BeatEditPage() {
                             <Card variant="glass">
                                 <CardHeader>
                                     <CardTitle icon={<Upload className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                                        Progrès d'upload
+                                        {t('admin.uploadProgress')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -681,7 +683,7 @@ export default function BeatEditPage() {
                             <Card variant="outlined">
                                 <CardHeader>
                                     <CardTitle icon={<Save className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                                        Actions
+                                        {t('admin.actions')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -695,12 +697,12 @@ export default function BeatEditPage() {
                                         {isUploading ? (
                                             <div className="flex items-center justify-center gap-2">
                                                 <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-primary-foreground"></div>
-                                                <span className="text-xs sm:text-sm">Upload en cours...</span>
+                                                <span className="text-xs sm:text-sm">{t('admin.uploading')}</span>
                                             </div>
                                         ) : (
                                             <div className="flex items-center justify-center gap-2">
                                                 <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                <span className="text-xs sm:text-sm">Sauvegarder les fichiers</span>
+                                                <span className="text-xs sm:text-sm">{t('admin.saveFiles')}</span>
                                             </div>
                                         )}
                                     </button>
@@ -709,7 +711,7 @@ export default function BeatEditPage() {
                                         href={`/admin/beats/${beatId}`}
                                         className="block w-full px-4 sm:px-6 py-3 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground text-center rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30 text-sm sm:text-base touch-manipulation"
                                     >
-                                        Annuler
+                                        {t('common.cancel')}
                                     </Link>
                                 </div>
                                 </CardContent>

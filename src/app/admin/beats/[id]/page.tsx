@@ -355,7 +355,7 @@ export default function BeatManagementPage() {
               <Card variant="elevated">
                 <CardHeader>
                   <CardTitle icon={<Music className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                    Aperçu
+                    {t('admin.preview')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -377,13 +377,13 @@ export default function BeatManagementPage() {
               <Card variant="glass">
                 <CardHeader>
                   <CardTitle icon={<Tag className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                    Détails
+                    {t('admin.details')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs sm:text-sm text-muted-foreground">Genre</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">{t('upload.genre')}</label>
                     {isEditing ? (
                       <select
                         value={editData.genre || ''}
@@ -407,7 +407,7 @@ export default function BeatManagementPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-xs sm:text-sm text-muted-foreground">BPM</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">{t('upload.bpm')}</label>
                     {isEditing ? (
                       <input
                         type="number"
@@ -423,7 +423,7 @@ export default function BeatManagementPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-xs sm:text-sm text-muted-foreground">Tonalité</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">{t('upload.key')}</label>
                     {isEditing ? (
                       <select
                         value={editData.key || ''}
@@ -449,7 +449,7 @@ export default function BeatManagementPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-xs sm:text-sm text-muted-foreground">Durée</label>
+                    <label className="text-xs sm:text-sm text-muted-foreground">{t('upload.duration')}</label>
                     {isEditing ? (
                       <input
                         type="text"
@@ -469,7 +469,7 @@ export default function BeatManagementPage() {
 
                 {/* Tags */}
                 <div className="mt-4 sm:mt-6">
-                  <label className="text-xs sm:text-sm text-muted-foreground mb-2 block">Tags</label>
+                  <label className="text-xs sm:text-sm text-muted-foreground mb-2 block">{t('upload.tags')}</label>
                   {isEditing ? (
                     <div className="space-y-3">
                       <div className="flex flex-wrap gap-2">
@@ -496,7 +496,7 @@ export default function BeatManagementPage() {
                       <div className="flex flex-col sm:flex-row gap-2">
                         <input
                           type="text"
-                          placeholder="Ajouter un tag..."
+                          placeholder={t('upload.addTag')}
                           className="flex-1 p-2 sm:p-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base touch-manipulation"
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
@@ -523,11 +523,11 @@ export default function BeatManagementPage() {
                           }}
                           className="px-3 sm:px-4 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors text-sm touch-manipulation"
                         >
-                          Ajouter
+                          {t('common.add')}
                         </button>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Appuyez sur Entrée ou cliquez sur &quot;Ajouter&quot; pour ajouter un tag
+                        {t('upload.tagInstructions')}
                       </p>
                     </div>
                   ) : (
@@ -544,7 +544,7 @@ export default function BeatManagementPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground text-xs sm:text-sm">Aucun tag</p>
+                      <p className="text-muted-foreground text-xs sm:text-sm">{t('upload.noTags')}</p>
                     )
                   )}
                 </div>
@@ -555,14 +555,14 @@ export default function BeatManagementPage() {
               <Card variant="outlined">
                 <CardHeader>
                   <CardTitle icon={<Download className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                    Fichiers
+                    {t('admin.files')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <FilesList>
                     {beat.previewUrl && (
                       <FileItem
-                        name="Preview (30s)"
+                        name={t('upload.previewAudio')}
                         type="preview"
                         onDownload={() => {
                           const url = `/api/download/beat/${beat.id}?type=preview&admin=true`
@@ -573,7 +573,7 @@ export default function BeatManagementPage() {
                     
                     {beat.fullUrl && (
                       <FileItem
-                        name="Master (WAV)"
+                        name={t('upload.masterAudio')}
                         type="master"
                         onDownload={() => {
                           const url = `/api/download/beat/${beat.id}?type=master&admin=true`
@@ -597,7 +597,7 @@ export default function BeatManagementPage() {
               <Card variant="elevated">
                 <CardHeader>
                   <CardTitle icon={<DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                    Prix
+                    {t('admin.pricing')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -613,7 +613,7 @@ export default function BeatManagementPage() {
                     Unlimited: {beat.unlimitedLeasePrice}€
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                    {beat.isExclusive ? 'Exclusif' : 'Non-exclusif'}
+                    {beat.isExclusive ? t('admin.exclusive') : t('admin.nonExclusive')}
                   </div>
                   
                   {isEditing && (
@@ -625,7 +625,7 @@ export default function BeatManagementPage() {
                           onChange={(e) => handleEditChange('isExclusive', e.target.checked)}
                           className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary touch-manipulation"
                         />
-                        Exclusif
+                        {t('admin.exclusive')}
                       </label>
                       <label className="flex items-center gap-2 text-muted-foreground text-sm">
                         <input
@@ -634,14 +634,14 @@ export default function BeatManagementPage() {
                           onChange={(e) => handleEditChange('featured', e.target.checked)}
                           className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary touch-manipulation"
                         />
-                        En vedette
+                        {t('admin.featured')}
                       </label>
                     </div>
                   )}
                   
                   {isEditing && <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
                     <p className="text-yellow-300 text-xs sm:text-sm">
-                      💡 Le prix ne peut pas être modifié ici. Contactez l&apos;administrateur pour changer le prix.
+                      💡 {t('admin.priceEditNote')}
                     </p>
                   </div>}
                 </div>
@@ -652,15 +652,15 @@ export default function BeatManagementPage() {
               <Card variant="glass">
                 <CardHeader>
                   <CardTitle icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                    Statistiques
+                    {t('admin.statistics')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <StatsGrid>
-                    <StatItem label="Vues" value="0" icon={<Eye className="w-3 h-3" />} />
-                    <StatItem label="Téléchargements" value="0" icon={<Download className="w-3 h-3" />} />
-                    <StatItem label="Achats" value="0" icon={<Users className="w-3 h-3" />} />
-                    <StatItem label="Revenus" value="0€" trend="up" icon={<DollarSign className="w-3 h-3" />} />
+                    <StatItem label={t('admin.views')} value="0" icon={<Eye className="w-3 h-3" />} />
+                    <StatItem label={t('admin.downloads')} value="0" icon={<Download className="w-3 h-3" />} />
+                    <StatItem label={t('admin.purchases')} value="0" icon={<Users className="w-3 h-3" />} />
+                    <StatItem label={t('admin.revenue')} value="0€" trend="up" icon={<DollarSign className="w-3 h-3" />} />
                   </StatsGrid>
                 </CardContent>
               </Card>
@@ -669,32 +669,32 @@ export default function BeatManagementPage() {
               <Card variant="outlined">
                 <CardHeader>
                   <CardTitle icon={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />}>
-                    Informations
+                    {t('admin.information')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <StatsGrid>
                     <StatItem 
-                      label="ID" 
+                      label={t('admin.id')} 
                       value={beat.id} 
                       className="flex-col items-start gap-1"
                     />
                     <StatItem 
-                      label="Créé le" 
+                      label={t('admin.createdAt')} 
                       value={new Date(beat.createdAt).toLocaleDateString('fr-FR')} 
                     />
                     <StatItem 
-                      label="Modifié le" 
+                      label={t('admin.updatedAt')} 
                       value={new Date(beat.updatedAt).toLocaleDateString('fr-FR')} 
                     />
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-muted-foreground text-sm">Statut</span>
+                      <span className="text-muted-foreground text-sm">{t('admin.status')}</span>
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         beat.featured 
                           ? 'bg-green-500/20 text-green-400' 
                           : 'bg-gray-500/20 text-gray-400'
                       }`}>
-                        {beat.featured ? 'En vedette' : 'Normal'}
+                        {beat.featured ? t('admin.featured') : t('admin.normal')}
                       </span>
                     </div>
                   </StatsGrid>

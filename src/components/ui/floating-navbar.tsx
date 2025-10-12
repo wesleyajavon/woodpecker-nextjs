@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 import { cn } from "@/lib/utils";
 import AuthButton from "@/components/AuthButton";
+import AdminDropdown from "@/components/AdminDropdown";
 
 
 export const FloatingNav = ({
@@ -85,6 +86,10 @@ export const FloatingNav = ({
             <span className="hidden sm:block text-sm">{navItem.name}</span>
           </a>
         ))}
+        
+        {/* Admin Dropdown */}
+        <AdminDropdown />
+        
         <div className="border border-border/20 rounded-full hover:bg-muted/50 transition-colors">
           <AuthButton variant="floating" />
         </div>

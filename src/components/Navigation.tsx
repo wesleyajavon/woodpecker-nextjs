@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Music, Sparkles, Upload, Home, Menu, X, User } from 'lucide-react';
+import { ShoppingCart, Music, Sparkles, Upload, Home, Menu, X, User, ShoppingBag, BarChart3 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { FloatingNav } from './ui/floating-navbar';
 import { useCartCount } from '@/hooks/useCart';
 import LanguageSwitcher from './LanguageSwitcher';
 import AuthButton from './AuthButton';
+import AdminDropdown from './AdminDropdown';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -47,11 +48,6 @@ const Navigation = () => {
       name: t('nav.contact'), 
       link: '/contact', 
       icon: <Sparkles className="h-4 w-4" />
-    },
-    { 
-      name: t('nav.admin'), 
-      link: '/admin/upload', 
-      icon: <Upload className="h-4 w-4" />
     },
   ];
 
@@ -199,6 +195,62 @@ const Navigation = () => {
                           </Link>
                         </motion.div>
                       ))}
+                      
+                      {/* Admin Section */}
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: navItems.length * 0.1 }}
+                        className="border-t border-border/20 pt-4 mt-4"
+                      >
+                        <div className="px-4 py-2">
+                          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                            {t('nav.admin')}
+                          </h3>
+                          <div className="space-y-2">
+                            <Link
+                              href="/admin/upload#upload"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500 group-hover:bg-purple-500/20 transition-colors">
+                                <Upload className="h-4 w-4" />
+                              </div>
+                              <span className="font-medium text-foreground">{t('admin.upload')}</span>
+                            </Link>
+                            <Link
+                              href="/admin/upload#manage"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500 group-hover:bg-blue-500/20 transition-colors">
+                                <Music className="h-4 w-4" />
+                              </div>
+                              <span className="font-medium text-foreground">{t('admin.beats')}</span>
+                            </Link>
+                            <Link
+                              href="/admin/upload#orders"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="p-2 rounded-lg bg-green-500/10 text-green-500 group-hover:bg-green-500/20 transition-colors">
+                                <ShoppingBag className="h-4 w-4" />
+                              </div>
+                              <span className="font-medium text-foreground">{t('admin.orders')}</span>
+                            </Link>
+                            <Link
+                              href="/admin/upload#stats"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 group-hover:bg-orange-500/20 transition-colors">
+                                <BarChart3 className="h-4 w-4" />
+                              </div>
+                              <span className="font-medium text-foreground">{t('admin.stats')}</span>
+                            </Link>
+                          </div>
+                        </div>
+                      </motion.div>
                     </div>
                   </nav>
 
