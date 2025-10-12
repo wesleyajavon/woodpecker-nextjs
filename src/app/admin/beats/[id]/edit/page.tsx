@@ -18,6 +18,8 @@ import Link from 'next/link';
 import AdminRoute from '@/components/AdminRoute';
 import { S3Upload } from '@/components/S3Upload';
 import { DottedSurface } from '@/components/ui/dotted-surface';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Title, Subtitle } from '@/components/ui/Title';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
 
@@ -322,8 +324,12 @@ export default function BeatEditPage() {
                             </Link>
                         </div>
 
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 leading-tight">Modifier les fichiers</h1>
-                        <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">{beat.title}</p>
+                        <Title variant="page" size="4xl" gradient={true}>
+                            Modifier les fichiers
+                        </Title>
+                        <Subtitle>
+                            {beat.title}
+                        </Subtitle>
                     </motion.div>
 
                     {/* Affichage des erreurs */}
@@ -346,11 +352,13 @@ export default function BeatEditPage() {
                             <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Fichiers actuels</h3>
 
                             {/* Preview Audio */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                                    <Music className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    Preview Audio
-                                </h4>
+                            <Card variant="elevated">
+                                <CardHeader>
+                                    <CardTitle icon={<Music className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                                        Preview Audio
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
 
                                 {beat.previewUrl ? (
                                     <div className="space-y-3 sm:space-y-4">
@@ -402,14 +410,17 @@ export default function BeatEditPage() {
                                         )}
                                     </label>
                                 </div>
-                            </div>
+                                </CardContent>
+                            </Card>
 
                             {/* Master Audio */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                                    <FileAudio className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    Master Audio - AWS S3
-                                </h4>
+                            <Card variant="glass">
+                                <CardHeader>
+                                    <CardTitle icon={<FileAudio className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                                        Master Audio - AWS S3
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
 
                                 {beat.s3MasterUrl ? (
                                     <div className="space-y-3 sm:space-y-4">
@@ -441,15 +452,17 @@ export default function BeatEditPage() {
                                         />
                                     </div>
                                 )}
-
-                            </div>
+                                </CardContent>
+                            </Card>
 
                             {/* Artwork */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                                    <Image className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    Artwork/Cover Image
-                                </h4>
+                            <Card variant="outlined">
+                                <CardHeader>
+                                    <CardTitle icon={<Image className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                                        Artwork/Cover Image
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
 
                                 {beat.artworkUrl ? (
                                     <div className="space-y-3 sm:space-y-4">
@@ -509,87 +522,96 @@ export default function BeatEditPage() {
                                         )}
                                     </label>
                                 </div>
-                            </div>
+                                </CardContent>
+                            </Card>
 
-                            {/* Stems */}
-                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                                <h4 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                                    <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    Stems (ZIP) - AWS S3
-                                </h4>
-
-                                {beat.stemsUrl ? (
-                                    <div className="space-y-3 sm:space-y-4">
-                                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                            <p className="text-foreground text-xs sm:text-sm">Fichier stems disponible</p>
-                                            <button
-                                                onClick={() => handleRemoveStems()}
-                                                className="text-red-400 hover:text-red-300 transition-colors touch-manipulation"
-                                                title="Supprimer les stems"
-                                            >
-                                                <X className="w-3 h-3 sm:w-4 sm:h-4" />
-                                            </button>
-                                        </div>
-                                        <div className="p-3 bg-white/5 rounded-lg">
-                                            <p className="text-foreground text-xs sm:text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-3">
-                                        <p className="text-muted-foreground text-sm">Aucun fichier stems</p>
-                                        <S3Upload
-                                            beatId={beatId}
-                                            folder="stems"
-                                            onUploadComplete={(result) => handleS3UploadComplete('stems', result)}
-                                            onUploadError={handleS3UploadError}
-                                            maxSize={1024} // 1GB
-                                            acceptedTypes={['application/zip', 'application/x-zip-compressed']}
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="mt-3 sm:mt-4">
-                                    <input
-                                        type="file"
-                                        accept=".zip"
-                                        onChange={(e) => e.target.files?.[0] && handleFileSelect('stems', e.target.files[0])}
-                                        className="hidden"
-                                        id="stems-upload"
-                                    />
-                                    <label
-                                        htmlFor="stems-upload"
-                                        className="block w-full p-3 sm:p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer touch-manipulation"
-                                    >
-                                        {uploadedFiles.stems ? (
-                                            <div className="flex items-center gap-2 text-purple-300">
-                                                <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                <span className="text-xs sm:text-sm truncate">{uploadedFiles.stems.name}</span>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        setUploadedFiles(prev => ({ ...prev, stems: undefined }));
-                                                    }}
-                                                    className="ml-auto text-red-400 hover:text-red-300 touch-manipulation"
-                                                >
-                                                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-2 text-gray-400">
-                                                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                <span className="text-xs sm:text-sm">Remplacer le fichier stems</span>
-                                            </div>
-                                        )}
-                                    </label>
-                                </div>
-                            </div>
 
                         </div>
 
                         {/* Section des progrès et actions */}
                         <div className="space-y-4 sm:space-y-6">
-                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Progrès d&apos;upload</h3>
+                            {/* Stems */}
+                            <Card variant="elevated">
+                                <CardHeader>
+                                    <CardTitle icon={<Archive className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                                        Stems (ZIP) - AWS S3
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {beat.stemsUrl ? (
+                                        <div className="space-y-3 sm:space-y-4">
+                                            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                                                <p className="text-foreground text-xs sm:text-sm">Fichier stems disponible</p>
+                                                <button
+                                                    onClick={() => handleRemoveStems()}
+                                                    className="text-red-400 hover:text-red-300 transition-colors touch-manipulation"
+                                                    title="Supprimer les stems"
+                                                >
+                                                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                </button>
+                                            </div>
+                                            <div className="p-3 bg-white/5 rounded-lg">
+                                                <p className="text-foreground text-xs sm:text-sm">Fichier ZIP contenant les pistes séparées (.wav)</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <p className="text-muted-foreground text-sm">Aucun fichier stems</p>
+                                            <S3Upload
+                                                beatId={beatId}
+                                                folder="stems"
+                                                onUploadComplete={(result) => handleS3UploadComplete('stems', result)}
+                                                onUploadError={handleS3UploadError}
+                                                maxSize={1024} // 1GB
+                                                acceptedTypes={['application/zip', 'application/x-zip-compressed']}
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="mt-3 sm:mt-4">
+                                        <input
+                                            type="file"
+                                            accept=".zip"
+                                            onChange={(e) => e.target.files?.[0] && handleFileSelect('stems', e.target.files[0])}
+                                            className="hidden"
+                                            id="stems-upload"
+                                        />
+                                        <label
+                                            htmlFor="stems-upload"
+                                            className="block w-full p-3 sm:p-4 border-2 border-dashed border-purple-400/30 rounded-lg hover:border-purple-400/50 transition-colors text-center cursor-pointer touch-manipulation"
+                                        >
+                                            {uploadedFiles.stems ? (
+                                                <div className="flex items-center gap-2 text-purple-300">
+                                                    <Archive className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                    <span className="text-xs sm:text-sm truncate">{uploadedFiles.stems.name}</span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setUploadedFiles(prev => ({ ...prev, stems: undefined }));
+                                                        }}
+                                                        className="ml-auto text-red-400 hover:text-red-300 touch-manipulation"
+                                                    >
+                                                        <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2 text-gray-400">
+                                                    <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                    <span className="text-xs sm:text-sm">Remplacer le fichier stems</span>
+                                                </div>
+                                            )}
+                                        </label>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card variant="glass">
+                                <CardHeader>
+                                    <CardTitle icon={<Upload className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                                        Progrès d'upload
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
 
                                 <div className="space-y-3 sm:space-y-4">
                                     {uploadedFiles.preview && (
@@ -653,10 +675,16 @@ export default function BeatEditPage() {
                                     )}
 
                                 </div>
-                            </div>
+                                </CardContent>
+                            </Card>
 
-                            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Actions</h3>
+                            <Card variant="outlined">
+                                <CardHeader>
+                                    <CardTitle icon={<Save className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                                        Actions
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
 
                                 <div className="space-y-3 sm:space-y-4">
                                     <button
@@ -684,7 +712,8 @@ export default function BeatEditPage() {
                                         Annuler
                                     </Link>
                                 </div>
-                            </div>
+                                </CardContent>
+                            </Card>
                         </div>
                     </div>
                 </div>

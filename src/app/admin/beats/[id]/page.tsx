@@ -26,6 +26,10 @@ import Link from 'next/link';
 import AdminRoute from '@/components/AdminRoute';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { Button } from '@/components/ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { StatItem, StatsGrid } from '@/components/ui/Stats';
+import { FileItem, FilesList } from '@/components/ui/Files';
+import { Title, Subtitle } from '@/components/ui/Title';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
 import { useTranslation } from '@/contexts/LanguageContext';
@@ -329,8 +333,12 @@ export default function BeatManagementPage() {
               </div>
             ) : (
               <>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 leading-tight">{beat.title}</h1>
-                <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">{beat.description}</p>
+                <Title variant="page" size="4xl" gradient={true}>
+                  {beat.title}
+                </Title>
+                <Subtitle>
+                  {beat.description}
+                </Subtitle>
               </>
             )}
           </motion.div>
@@ -344,30 +352,35 @@ export default function BeatManagementPage() {
               className="lg:col-span-2 space-y-4 sm:space-y-6"
             >
               {/* Player audio */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                  <Music className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Aperçu
-                </h3>
-                
-
-                {beat.previewUrl && (
-                  <audio
-                    src={beat.previewUrl}
-                    controls
-                    preload="metadata"
-                    className="w-full"
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    onEnded={() => setIsPlaying(false)}
-                  />
-                )}
-              </div>
+              <Card variant="elevated">
+                <CardHeader>
+                  <CardTitle icon={<Music className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                    Aperçu
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {beat.previewUrl && (
+                    <audio
+                      src={beat.previewUrl}
+                      controls
+                      preload="metadata"
+                      className="w-full"
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onEnded={() => setIsPlaying(false)}
+                    />
+                  )}
+                </CardContent>
+              </Card>
 
               {/* Détails du beat */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Détails</h3>
-                
+              <Card variant="glass">
+                <CardHeader>
+                  <CardTitle icon={<Tag className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                    Détails
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
                     <label className="text-xs sm:text-sm text-muted-foreground">Genre</label>
@@ -535,53 +548,42 @@ export default function BeatManagementPage() {
                     )
                   )}
                 </div>
-              </div>
+                </CardContent>
+              </Card>
 
               {/* Fichiers disponibles */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4">Fichiers</h3>
-                
-                <div className="space-y-3">
-                  {beat.previewUrl && (
-                    <div className="flex items-center justify-between p-3 bg-card/5 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Music className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                        <span className="text-foreground text-sm sm:text-base">Preview (30s)</span>
-                      </div>
-                      <button
-                        onClick={() => {
+              <Card variant="outlined">
+                <CardHeader>
+                  <CardTitle icon={<Download className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                    Fichiers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <FilesList>
+                    {beat.previewUrl && (
+                      <FileItem
+                        name="Preview (30s)"
+                        type="preview"
+                        onDownload={() => {
                           const url = `/api/download/beat/${beat.id}?type=preview&admin=true`
                           window.location.href = url
                         }}
-                        className="text-primary hover:text-primary/80 touch-manipulation"
-                        title="Télécharger la preview"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                  
-                  {beat.fullUrl && (
-                    <div className="flex items-center justify-between p-3 bg-card/5 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Music className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
-                        <span className="text-foreground text-sm sm:text-base">Master (WAV)</span>
-                      </div>
-                      <button
-                        onClick={() => {
+                      />
+                    )}
+                    
+                    {beat.fullUrl && (
+                      <FileItem
+                        name="Master (WAV)"
+                        type="master"
+                        onDownload={() => {
                           const url = `/api/download/beat/${beat.id}?type=master&admin=true`
                           window.location.href = url
                         }}
-                        className="text-green-400 hover:text-green-300 touch-manipulation"
-                        title="Télécharger le master"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                  
-                </div>
-              </div>
+                      />
+                    )}
+                  </FilesList>
+                </CardContent>
+              </Card>
             </motion.div>
 
             {/* Sidebar */}
@@ -592,11 +594,13 @@ export default function BeatManagementPage() {
               className="space-y-4 sm:space-y-6"
             >
               {/* Prix et statut */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Prix
-                </h3>
+              <Card variant="elevated">
+                <CardHeader>
+                  <CardTitle icon={<DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                    Prix
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                 
                 <div className="text-center">
                   <div className="text-base sm:text-lg font-bold text-foreground mb-2">
@@ -641,77 +645,61 @@ export default function BeatManagementPage() {
                     </p>
                   </div>}
                 </div>
-              </div>
+                </CardContent>
+              </Card>
 
               {/* Statistiques */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Statistiques
-                </h3>
-                
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">Vues</span>
-                    <span className="text-foreground font-medium text-sm">0</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">Téléchargements</span>
-                    <span className="text-foreground font-medium text-sm">0</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">Achats</span>
-                    <span className="text-foreground font-medium text-sm">0</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">Revenus</span>
-                    <span className="text-green-400 font-medium text-sm">0€</span>
-                  </div>
-                </div>
-              </div>
+              <Card variant="glass">
+                <CardHeader>
+                  <CardTitle icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                    Statistiques
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <StatsGrid>
+                    <StatItem label="Vues" value="0" icon={<Eye className="w-3 h-3" />} />
+                    <StatItem label="Téléchargements" value="0" icon={<Download className="w-3 h-3" />} />
+                    <StatItem label="Achats" value="0" icon={<Users className="w-3 h-3" />} />
+                    <StatItem label="Revenus" value="0€" trend="up" icon={<DollarSign className="w-3 h-3" />} />
+                  </StatsGrid>
+                </CardContent>
+              </Card>
 
               {/* Informations système */}
-              <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border/20">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Informations
-                </h3>
-                
-                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">ID</span>
-                    <span className="text-foreground font-mono text-xs break-all">{beat.id}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Créé le</span>
-                    <span className="text-foreground">
-                      {new Date(beat.createdAt).toLocaleDateString('fr-FR')}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Modifié le</span>
-                    <span className="text-foreground">
-                      {new Date(beat.updatedAt).toLocaleDateString('fr-FR')}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Statut</span>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      beat.featured 
-                        ? 'bg-green-500/20 text-green-400' 
-                        : 'bg-gray-500/20 text-gray-400'
-                    }`}>
-                      {beat.featured ? 'En vedette' : 'Normal'}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <Card variant="outlined">
+                <CardHeader>
+                  <CardTitle icon={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />}>
+                    Informations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <StatsGrid>
+                    <StatItem 
+                      label="ID" 
+                      value={beat.id} 
+                      className="flex-col items-start gap-1"
+                    />
+                    <StatItem 
+                      label="Créé le" 
+                      value={new Date(beat.createdAt).toLocaleDateString('fr-FR')} 
+                    />
+                    <StatItem 
+                      label="Modifié le" 
+                      value={new Date(beat.updatedAt).toLocaleDateString('fr-FR')} 
+                    />
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-muted-foreground text-sm">Statut</span>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        beat.featured 
+                          ? 'bg-green-500/20 text-green-400' 
+                          : 'bg-gray-500/20 text-gray-400'
+                      }`}>
+                        {beat.featured ? 'En vedette' : 'Normal'}
+                      </span>
+                    </div>
+                  </StatsGrid>
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
         </div>
