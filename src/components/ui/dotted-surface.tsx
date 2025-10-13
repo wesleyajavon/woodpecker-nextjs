@@ -4,7 +4,6 @@ import { useTheme } from 'next-themes';
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { ClientOnly } from '@/components/ClientOnly';
-import { WebGLDebug } from '@/components/WebGLDebug';
 
 type DottedSurfaceProps = Omit<React.ComponentProps<'div'>, 'ref'>;
 
