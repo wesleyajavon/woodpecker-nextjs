@@ -275,7 +275,9 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 beatId="new-beat" // Placeholder pour les nouveaux beats
                 folder="previews"
                 onUploadComplete={(result) => setCloudinaryUploads(prev => ({ ...prev, preview: result }))}
-                onUploadError={(error) => console.error('Preview upload error:', error)}
+                onUploadError={(error) => {
+                  // Preview upload error handled by component
+                }}
                 maxSize={100} // 100MB
                 acceptedTypes={['audio/wav', 'audio/mpeg', 'audio/mp3', 'audio/flac']}
               />
@@ -356,7 +358,9 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 beatId="new-beat" // Placeholder pour les nouveaux beats
                 folder="artworks"
                 onUploadComplete={(result) => setCloudinaryUploads(prev => ({ ...prev, artwork: result }))}
-                onUploadError={(error) => console.error('Artwork upload error:', error)}
+                onUploadError={(error) => {
+                  // Artwork upload error handled by component
+                }}
                 maxSize={20} // 20MB
                 acceptedTypes={['image/jpeg', 'image/png', 'image/webp', 'image/gif']}
               />

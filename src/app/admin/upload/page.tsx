@@ -49,7 +49,7 @@ export default function AdminUploadPage() {
   };
 
   const handleUploadError = (error: string) => {
-    console.error('Upload error:', error);
+    // Upload error handled by parent component
   };
 
   const tabs: Array<{ id: TabId; label: string; icon: React.ComponentType<{ className?: string }> }> = [
@@ -179,15 +179,12 @@ export default function AdminUploadPage() {
 
                 <BeatManager
                   onEdit={(beat) => {
-                    console.log('Modifier le beat:', beat);
                     // TODO: Implémenter la modification
                   }}
                   onDelete={(beatId) => {
-                    console.log('Beat supprimé:', beatId);
                     // TODO: Rafraîchir la liste
                   }}
                   onToggleStatus={(beatId, isActive) => {
-                    console.log('Statut modifié:', beatId, isActive);
                     // TODO: Rafraîchir la liste
                   }}
                 />
