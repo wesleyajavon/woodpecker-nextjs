@@ -200,7 +200,7 @@ export default function ProfilePage() {
                     <Button
                       type="submit"
                       disabled={updating}
-                      className="w-full sm:w-auto"
+                      className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white"
                     >
 {updating ? t('profile.updating') : t('profile.update')}
                     </Button>

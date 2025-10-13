@@ -111,8 +111,8 @@ export const en = {
 
   // Beats
   beats: {
-    title: 'My Beats',
-    description: 'Discover my exclusive collection of original beats. Unique instrumentals for rappers, singers and producers.',
+    title: 'L.outsider | Official Beat Store',
+    description: 'Tap in to my latest beats — original sounds built for artists, rappers, and creators ready to make waves.',
     searchPlaceholder: 'Search for a beat...',
     genres: 'Genres',
     allGenres: 'All',
@@ -189,12 +189,13 @@ export const en = {
 
   // Featured Products
   featured: {
-    title: 'The beats',
-    words: ['on fire', 'masterclass', 'bangers', 'gems', 'hot', 'fire'],
+    title: 'These beats are ',
+    words: ['trending🔝', 'viral 🫶', 'bangers 💣', 'gems 💎', 'gas 💨', 'fire 🔥'],
     description: 'Only bangers in this selection of instrumentals that are turning everything upside down right now.',
     viewAllBeats: 'View all my beats',
     loading: 'Loading beats...',
     noBeats: 'No featured beats at the moment',
+    badge: 'Featured Selection',
   },
 
   // Auth
@@ -261,6 +262,8 @@ export const en = {
   contact: {
     title: 'Contact',
     subtitle: 'Have a question? A project? Don\'t hesitate to contact us.',
+    cardtitle: 'Tell us !',
+    cardsubtitle: 'If you have any questions regarding our Services or need help, please fill out the form here. We do our best to respond within 1 business day.',
     form: {
       name: 'Full name',
       namePlaceholder: 'Your name',
@@ -324,15 +327,44 @@ export const en = {
   // Admin
   admin: {
     title: 'Admin Panel',
-    dashboard: 'l.outsider platform management',
+    dashboard: 'Upload beats, manage your catalog, track orders and analyze your statistics',
+    dashboardTitle: 'Dashboard',
+    dashboardSubtitle: 'Overview of your activity and performance',
+    beatManagement: 'Beat Management',
+    beatManagementDescription: 'Edit details, manage files and track your beat\'s performance',
+    editFilesDescription: 'Manage all uploaded files: preview, master, stems and artwork. Replace, delete or add new files to your beat.',
+    noDescription: 'No description available',
+    navigation: 'Navigation',
+    beatActions: 'Beat Actions',
+    fileTypes: 'File Types',
+    backToDashboard: 'Back to Dashboard',
+    expandSidebar: 'Expand Sidebar',
+    collapseSidebar: 'Collapse Sidebar',
+    openMenu: 'Open Menu',
+    closeMenu: 'Close Menu',
     beats: 'Beat management',
     orders: 'Orders',
     users: 'Users',
     stats: 'Statistics',
     upload: 'Beat Upload',
     uploadNewBeat: 'Upload a new beat',
+    // Dashboard specific
+    totalBeats: 'Total Beats',
+    totalOrders: 'Orders',
+    totalRevenue: 'Revenue',
+    totalViews: 'Views',
+    recentActivity: 'Recent Activity',
+    quickActions: 'Quick Actions',
+    newBeatUploaded: 'New beat uploaded',
+    orderReceived: 'Order received',
+    beatModified: 'Beat modified',
+    uploadBeat: 'Upload Beat',
+    manageBeats: 'Manage Beats',
+    viewOrders: 'View Orders',
+    detailedAnalytics: 'Detailed Analytics',
+    ago: 'ago',
     recentlyUploaded: 'Recently uploaded beats',
-    editFiles: 'Edit files',
+    editFiles: 'Uploaded files',
     accessDenied: 'Access denied',
     accessDeniedDescription: 'You don\'t have the necessary administrator permissions to access this page.',
     backToHome: 'Back to main page',
@@ -347,9 +379,6 @@ export const en = {
     deleteError: 'Delete error',
     confirmDelete: 'Are you sure you want to delete this beat?',
     statsError: 'Error retrieving statistics',
-    totalBeats: 'Total Beats',
-    totalOrders: 'Total Orders',
-    totalRevenue: 'Revenue',
     totalUsers: 'Users',
     beatsLoadError: 'Error loading beats',
     updateError: 'Update error',

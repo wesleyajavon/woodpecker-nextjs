@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Music, ShoppingBag, BarChart3, ChevronDown } from 'lucide-react';
+import { Upload, Music, ShoppingBag, BarChart3, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { useTranslation } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -18,27 +18,33 @@ export default function AdminDropdown({ className }: AdminDropdownProps) {
 
   const adminLinks = [
     {
+      id: 'dashboard',
+      label: 'Dashboard',
+      href: '/admin/dashboard',
+      icon: LayoutDashboard,
+    },
+    {
       id: 'upload',
       label: t('admin.upload'),
-      href: '/admin/upload#upload',
+      href: '/admin/upload',
       icon: Upload,
     },
     {
       id: 'manage',
       label: t('admin.beats'),
-      href: '/admin/upload#manage',
+      href: '/admin/manage',
       icon: Music,
     },
     {
       id: 'orders',
       label: t('admin.orders'),
-      href: '/admin/upload#orders',
+      href: '/admin/orders',
       icon: ShoppingBag,
     },
     {
       id: 'stats',
       label: t('admin.stats'),
-      href: '/admin/upload#stats',
+      href: '/admin/stats',
       icon: BarChart3,
     },
   ];

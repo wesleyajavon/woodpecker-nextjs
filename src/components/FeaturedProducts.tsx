@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Music } from 'lucide-react';
+import { Music, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useFeaturedBeats } from '@/hooks/useFeaturedBeats';
 import BeatCard from '@/components/BeatCard';
@@ -84,6 +84,18 @@ export default function FeaturedProducts() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 md:mb-16"
         >
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-full mb-6 backdrop-blur-sm"
+          >
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <span className="text-sm font-medium text-purple-300">{t('featured.badge')}</span>
+          </motion.div>
+
           <motion.div className="relative mx-2 my-2 md:mx-4 md:my-4 flex flex-col items-center justify-center gap-2 md:gap-4 text-center sm:mx-0 sm:mb-0 sm:flex-row">
             <LayoutTextFlip
               text={`${t('featured.title')} `}

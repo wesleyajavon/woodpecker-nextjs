@@ -69,7 +69,7 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
         </p>
         <Button
           onClick={() => window.location.href = '/beats'}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+          className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
         >
           {t('cart.browseBeat')}
         </Button>
@@ -151,7 +151,7 @@ export default function CartSummary({ onCheckout }: CartSummaryProps) {
       {/* Checkout Button */}
       <Button
         onClick={onCheckout}
-        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 touch-manipulation"
+        className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 touch-manipulation"
       >
         <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
         <span className="text-sm sm:text-base">{t('cart.proceedToCheckout')}</span>

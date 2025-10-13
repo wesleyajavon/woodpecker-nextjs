@@ -81,7 +81,7 @@ export default function AddToCartButton({
         isAdded 
           ? 'bg-green-500 hover:bg-green-600 text-white' 
           : variant === 'primary' 
-            ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white' 
+            ? 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white' 
             : ''
       } transition-all duration-300`}
     >

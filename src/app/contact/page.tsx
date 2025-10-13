@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { ContactCard } from '@/components/ui/contact-card';
 import { DottedSurface } from '@/components/ui/dotted-surface';
+import { TextRewind } from '@/components/ui/text-rewind';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/LanguageContext';
 
@@ -99,9 +101,26 @@ const ContactPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-12 relative z-10">
+        {/* Header Section */}
+        <div className="text-center mb-8 sm:mb-12 px-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-16 mt-6"
+          >
+            <TextRewind text={t('contact.title')} />
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+          >
+            {t('contact.subtitle')}
+          </motion.p>
+        </div>
+
         <ContactCard
-          title={t('contact.title')}
-          description={t('contact.subtitle')}
           contactInfo={contactInfo}
           className="shadow-2xl"
         >
@@ -196,7 +215,7 @@ const ContactPage = () => {
                 "w-full py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base touch-manipulation",
                 isSubmitting
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transform hover:scale-105"
+                  : "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600  hover:to-purple-600 text-white transform hover:scale-105"
               )}
             >
               {isSubmitting ? (

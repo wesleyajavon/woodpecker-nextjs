@@ -14,6 +14,19 @@ export const LayoutTextFlip = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Système d'ombres similaire à text-rewind
+  const shadowColors = {
+    first: "rgba(99, 102, 241, 0.6)",    // indigo-500
+    second: "rgba(139, 92, 246, 0.5)",    // purple-500  
+    third: "rgba(124, 58, 237, 0.4)",     // purple-600
+    fourth: "rgba(99, 102, 241, 0.3)",   // indigo-500
+    glow: "rgba(139, 92, 246, 0.2)"       // purple-500 glow
+  };
+
+  const regularShadowStyle = {
+    textShadow: "0 4px 8px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2), 0 0 20px rgba(99, 102, 241, 0.4), 0 0 40px rgba(139, 92, 246, 0.3), 0 0 60px rgba(124, 58, 237, 0.2)",
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length);
@@ -34,6 +47,7 @@ export const LayoutTextFlip = ({
       <motion.span
         layout
         className="relative w-fit overflow-hidden rounded-md border border-transparent px-4 py-2 font-sans text-2xl font-bold tracking-tight text-black shadow-sm ring shadow-black/10 ring-black/10 drop-shadow-lg md:text-4xl backdrop-blur-md dark:text-white dark:shadow-sm dark:ring-1 dark:shadow-white/10 dark:ring-white/10"
+        style={regularShadowStyle}
       >
         <AnimatePresence mode="popLayout">
           <motion.span
@@ -47,12 +61,12 @@ export const LayoutTextFlip = ({
             transition={{
               duration: 0.5,
             }}
-            className={cn("inline-block whitespace-nowrap bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent font-bold")}
+            className={cn("inline-block whitespace-nowrap bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent font-bold cursor-pointer transition-all duration-300 ease-in-out hover:scale-105 transform-gpu")}
           >
             {words[currentIndex]}
           </motion.span>
-        </AnimatePresence>
-      </motion.span>
+        </AnimatePresence >
+      </motion.span >
     </>
   );
 };

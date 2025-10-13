@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Grid3X3, List, ChevronLeft, ChevronRight, Music } from 'lucide-react';
+import { Search, Filter, Grid3X3, List, ChevronLeft, ChevronRight, Music, TrendingUp, Users, Clock, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useBeats } from '@/hooks/useBeats';
 import BeatCard from '@/components/BeatCard';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
+import { TextRewind } from '@/components/ui/text-rewind';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/LanguageContext';
 
@@ -35,6 +36,11 @@ export default function BeatsPage() {
 
   // Genres disponibles
   const genres = [t('beats.allGenres'), 'Trap', 'Hip-Hop', 'Drill', 'Jazz', 'Electronic', 'Boom Bap', 'Synthwave', 'R&B', 'Pop', 'Rock'];
+  
+  // Calculer les statistiques réelles
+  const uniqueGenres = new Set(beats.map(beat => beat.genre)).size;
+  const beatsWithStems = beats.filter(beat => beat.stemsUrl).length;
+  const stemsPercentage = totalBeats > 0 ? Math.round((beatsWithStems / totalBeats) * 100) : 0;
 
   // Gestion de la lecture/arrêt
   const togglePlay = async (beatId: string, previewUrl?: string) => {
@@ -208,13 +214,13 @@ export default function BeatsPage() {
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 px-2">
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-3 sm:mb-4 leading-tight"
+            className="mb-16 mt-6"
           >
-{t('beats.title')}
-          </motion.h1>
+            <TextRewind text={t('beats.title')} />
+          </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -278,7 +284,7 @@ export default function BeatsPage() {
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 sm:p-2 rounded-md transition-colors touch-manipulation ${
-                    viewMode === 'grid' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
+                    viewMode === 'grid' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -286,7 +292,7 @@ export default function BeatsPage() {
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-2 sm:p-2 rounded-md transition-colors touch-manipulation ${
-                    viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
+                    viewMode === 'list' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <List className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -296,29 +302,136 @@ export default function BeatsPage() {
           </div>
         </motion.div>
 
-        {/* Statistiques */}
+        {/* Enhanced Stats Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8"
+          className="mb-8 sm:mb-12"
         >
-          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">{totalBeats}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.beats')}</p>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {/* Total Beats */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ duration: 0.2 }}
+              className="group relative bg-gradient-to-br from-purple-500/10 via-purple-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-purple-500/20 rounded-xl">
+                    <Music className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground">{totalBeats}</p>
+                    <p className="text-xs text-purple-300 font-medium">{t('beats.stats.beats')}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <TrendingUp className="w-3 h-3 text-green-400" />
+                  <span>Professional quality</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Available Genres */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ duration: 0.2 }}
+              className="group relative bg-gradient-to-br from-blue-500/10 via-blue-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-blue-500/20 hover:border-blue-400/40 transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-blue-500/20 rounded-xl">
+                    <Music className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground">{uniqueGenres}</p>
+                    <p className="text-xs text-blue-300 font-medium">Genres</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <TrendingUp className="w-3 h-3 text-green-400" />
+                  <span>Diverse styles</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Beats with Stems */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ duration: 0.2 }}
+              className="group relative bg-gradient-to-br from-green-500/10 via-green-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-green-500/20 hover:border-green-400/40 transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-green-500/20 rounded-xl">
+                    <Music className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground">{beatsWithStems}</p>
+                    <p className="text-xs text-green-300 font-medium">With Stems</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <TrendingUp className="w-3 h-3 text-green-400" />
+                  <span>{stemsPercentage}% of beats</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Featured Beats */}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ duration: 0.2 }}
+              className="group relative bg-gradient-to-br from-orange-500/10 via-orange-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-orange-500/20 hover:border-orange-400/40 transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-orange-500/20 rounded-xl">
+                    <Star className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground">{beats.filter(beat => beat.featured).length}</p>
+                    <p className="text-xs text-orange-300 font-medium">Featured</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Star className="w-3 h-3 text-yellow-400" />
+                  <span>Premium selection</span>
+                </div>
+              </div>
+            </motion.div>
           </div>
-          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">{genres.length - 1}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.genres')}</p>
-          </div>
-          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">∞</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.possibilities')}</p>
-          </div>
-          <div className="bg-card/10 backdrop-blur-lg rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-border/20">
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">24/7</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">{t('beats.stats.available')}</p>
-          </div>
+
+          {/* Trust Indicators */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span>SSL Secured</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+              <span>Instant Download</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+              <span>Commercial Rights</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+              <span>24/7 Support</span>
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Grille des beats */}
@@ -400,7 +513,7 @@ export default function BeatsPage() {
                           onClick={() => goToPage(pageNum)}
                           className={`px-3 sm:px-3 py-2 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                             currentPage === pageNum
-                              ? 'bg-purple-600 text-white'
+                              ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
                               : 'bg-card/10 text-muted-foreground hover:bg-card/20'
                           }`}
                         >

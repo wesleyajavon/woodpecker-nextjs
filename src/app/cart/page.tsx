@@ -158,7 +158,7 @@ export default function CartPage() {
               
               <div className="space-y-3 sm:space-y-4">
                 <Link href="/beats" className="block">
-                  <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-6 sm:px-8 rounded-xl touch-manipulation">
+                  <Button className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-3 px-6 sm:px-8 rounded-xl touch-manipulation">
                     <Music className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     {t('cart.browseBeat')}
                   </Button>

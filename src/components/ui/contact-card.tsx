@@ -4,6 +4,7 @@ import {
 	LucideIcon,
 	PlusIcon,
 } from 'lucide-react';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 type ContactInfoProps = React.ComponentProps<'div'> & {
 	icon: LucideIcon;
@@ -20,14 +21,19 @@ type ContactCardProps = React.ComponentProps<'div'> & {
 };
 
 export function ContactCard({
-	title = 'Contact With Us',
-	description = 'If you have any questions regarding our Services or need help, please fill out the form here. We do our best to respond within 1 business day.',
+	title,
+	description,
 	contactInfo,
 	className,
 	formSectionClassName,
 	children,
 	...props
 }: ContactCardProps) {
+	const { t } = useTranslation();
+	
+	// Utiliser les traductions par défaut si aucun titre/description n'est fourni
+	const defaultTitle = title || t('contact.cardtitle');
+	const defaultDescription = description || t('contact.cardsubtitle');
 	return (
 		<div
 			className={cn(
@@ -42,12 +48,16 @@ export function ContactCard({
 			<PlusIcon className="absolute -right-2 -bottom-2 sm:-right-3 sm:-bottom-3 h-4 w-4 sm:h-6 sm:w-6" />
 			<div className="flex flex-col justify-between lg:col-span-2">
 				<div className="relative h-full space-y-3 sm:space-y-4 px-3 py-6 sm:px-4 sm:py-8 md:p-8">
-					<h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-						{title}
-					</h1>
-					<p className="text-muted-foreground max-w-xl text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed">
-						{description}
-					</p>
+					{defaultTitle && (
+						<h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+							{defaultTitle}
+						</h1>
+					)}
+					{defaultDescription && (
+						<p className="text-muted-foreground max-w-xl text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed">
+							{defaultDescription}
+						</p>
+					)}
 					<div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 						{contactInfo?.map((info, index) => (
 							<ContactInfo key={index} {...info} />

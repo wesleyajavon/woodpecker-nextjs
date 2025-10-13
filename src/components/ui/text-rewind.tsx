@@ -48,7 +48,7 @@ export function TextRewind({
                 className={cn(
                     "w-full text-center cursor-pointer text-4xl sm:text-6xl lg:text-7xl font-bold",
                     "transition-all duration-300 ease-in-out tracking-wider",
-                    "bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent",
+                    "bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent",
                     "hover:scale-105 transform-gpu",
                     className
                 )}

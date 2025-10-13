@@ -74,7 +74,7 @@ const Navigation = () => {
           <div className="flex items-center justify-between px-4 py-3">
             {/* Logo/Brand */}
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
                 <Home className="h-4 w-4 text-white" />
               </div>
             </Link>
@@ -89,7 +89,7 @@ const Navigation = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg transition-all duration-300"
+                  className="relative p-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg transition-all duration-300"
                 >
                   <ShoppingCart className="h-5 w-5" />
                   {cartCount > 0 && (
@@ -209,7 +209,17 @@ const Navigation = () => {
                           </h3>
                           <div className="space-y-2">
                             <Link
-                              href="/admin/upload#upload"
+                              href="/admin/dashboard"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                            >
+                              <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 group-hover:bg-indigo-500/20 transition-colors">
+                                <BarChart3 className="h-4 w-4" />
+                              </div>
+                              <span className="font-medium text-foreground">Dashboard</span>
+                            </Link>
+                            <Link
+                              href="/admin/upload"
                               onClick={() => setIsMobileMenuOpen(false)}
                               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                             >
@@ -219,7 +229,7 @@ const Navigation = () => {
                               <span className="font-medium text-foreground">{t('admin.upload')}</span>
                             </Link>
                             <Link
-                              href="/admin/upload#manage"
+                              href="/admin/manage"
                               onClick={() => setIsMobileMenuOpen(false)}
                               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                             >
@@ -229,7 +239,7 @@ const Navigation = () => {
                               <span className="font-medium text-foreground">{t('admin.beats')}</span>
                             </Link>
                             <Link
-                              href="/admin/upload#orders"
+                              href="/admin/orders"
                               onClick={() => setIsMobileMenuOpen(false)}
                               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                             >
@@ -239,7 +249,7 @@ const Navigation = () => {
                               <span className="font-medium text-foreground">{t('admin.orders')}</span>
                             </Link>
                             <Link
-                              href="/admin/upload#stats"
+                              href="/admin/stats"
                               onClick={() => setIsMobileMenuOpen(false)}
                               className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                             >
@@ -280,7 +290,7 @@ const Navigation = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="relative p-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
+            className="relative p-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25"
           >
             <ShoppingCart className="h-5 w-5" />
             {cartCount > 0 && (
