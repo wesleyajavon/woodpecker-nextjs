@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import Avatar from '@/components/Avatar'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { DottedSurface } from '@/components/ui/dotted-surface'
+import { TextRewind } from '@/components/ui/text-rewind'
 import { cn } from '@/lib/utils'
 import { useTranslation, useLanguage } from '@/contexts/LanguageContext'
 
@@ -108,6 +109,16 @@ export default function ProfilePage() {
         </div>
 
         <div className="max-w-4xl mx-auto relative z-10">
+          {/* Page Title */}
+          <div className="text-center mb-8 sm:mb-12 px-2">
+            <div className="mb-16 mt-6">
+              <TextRewind text={t('profile.title')} />
+            </div>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {t('profile.description')}
+            </p>
+          </div>
+
           <div className="bg-card/10 backdrop-blur-lg shadow-xl rounded-2xl overflow-hidden border border-border/20">
             <div className="px-6 py-8 sm:px-8 sm:py-10">
               {loading ? (

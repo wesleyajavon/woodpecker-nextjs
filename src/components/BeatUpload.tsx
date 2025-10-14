@@ -423,7 +423,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
               type="text"
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
-              className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder={t('upload.beatName')}
               maxLength={BEAT_CONFIG.maxTitleLength}
             />
@@ -437,7 +437,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder={t('upload.beatDescription')}
               rows={3}
               maxLength={BEAT_CONFIG.maxDescriptionLength}
@@ -471,7 +471,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 type="number"
                 value={formData.bpm}
                 onChange={(e) => handleInputChange('bpm', parseInt(e.target.value))}
-                className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 min="60"
                 max="200"
               />
@@ -505,7 +505,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 type="text"
                 value={formData.duration}
                 onChange={(e) => handleInputChange('duration', e.target.value)}
-                className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 placeholder="3:24"
               />
             </div>
@@ -525,7 +525,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                   type="number"
                   value={formData.wavLeasePrice}
                   onChange={(e) => handleInputChange('wavLeasePrice', parseFloat(e.target.value))}
-                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   min="0"
                   step="0.01"
                 />
@@ -540,7 +540,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                   type="number"
                   value={formData.trackoutLeasePrice}
                   onChange={(e) => handleInputChange('trackoutLeasePrice', parseFloat(e.target.value))}
-                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   min="0"
                   step="0.01"
                 />
@@ -555,7 +555,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                   type="number"
                   value={formData.unlimitedLeasePrice}
                   onChange={(e) => handleInputChange('unlimitedLeasePrice', parseFloat(e.target.value))}
-                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   min="0"
                   step="0.01"
                 />
@@ -581,7 +581,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
               <button
                 onClick={addTag}
                 disabled={!currentTag.trim() || formData.tags.length >= BEAT_CONFIG.maxTags}
-                className="px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
               >
 {t('common.add')}
               </button>
@@ -591,12 +591,12 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 {formData.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-300 border border-indigo-500/30 rounded-full text-sm"
                   >
                     {tag}
                     <button
                       onClick={() => removeTag(tag)}
-                      className="text-purple-400 hover:text-purple-300"
+                      className="text-indigo-400 hover:text-indigo-300"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -613,7 +613,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 type="checkbox"
                 checked={formData.isExclusive}
                 onChange={(e) => handleInputChange('isExclusive', e.target.checked)}
-                className="w-4 h-4 text-purple-600 bg-white/20 border-white/30 rounded focus:ring-purple-500"
+                className="w-4 h-4 text-indigo-600 bg-white/20 border-white/30 rounded focus:ring-indigo-500"
               />
               {t('upload.exclusiveBeat')}
             </label>
@@ -623,7 +623,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 type="checkbox"
                 checked={formData.featured}
                 onChange={(e) => handleInputChange('featured', e.target.checked)}
-                className="w-4 h-4 text-purple-600 bg-white/20 border-white/30 rounded focus:ring-purple-500"
+                className="w-4 h-4 text-indigo-600 bg-white/20 border-white/30 rounded focus:ring-indigo-500"
               />
               {t('upload.featured')}
             </label>
@@ -646,7 +646,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
         <button
           onClick={handleUpload}
           disabled={isUploading || !cloudinaryUploads.preview || !s3Uploads.master}
-          className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
+          className="px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
         >
           {isUploading ? (
             <div className="flex items-center gap-2">

@@ -111,7 +111,7 @@ export const en = {
 
   // Beats
   beats: {
-    title: 'L.outsider | Official Beat Store',
+    title: 'l.outsider | Official Beat Store',
     description: 'Tap in to my latest beats — original sounds built for artists, rappers, and creators ready to make waves.',
     searchPlaceholder: 'Search for a beat...',
     genres: 'Genres',
@@ -184,7 +184,7 @@ export const en = {
     customLicenseTitle: 'Need a custom license?',
     customLicenseDescription: 'For special projects, exclusive licenses or particular needs, don\'t hesitate to contact us for a tailor-made solution.',
     includedFeatures: 'Included Features',
-    completeInformation: 'Complete information about this license',
+    tableOfContents: 'Table of Contents',
   },
 
   // Featured Products
@@ -230,6 +230,7 @@ export const en = {
   // Profile
   profile: {
     title: 'My Profile',
+    description: 'Manage your personal information, update your profile details, and view your account settings.',
     personalInfo: 'Personal information',
     updateProfile: 'Update profile',
     profileUpdated: 'Profile updated successfully!',
@@ -294,6 +295,8 @@ export const en = {
 
   // FAQ
   faq: {
+    title: 'Frequently Asked ',
+    titleHighlight: 'Questions',
     subtitle: 'Quickly find answers to your questions about our beats, licenses and services.',
     searchPlaceholder: 'Search for a question...',
     categories: {
@@ -303,19 +306,22 @@ export const en = {
       download: 'Download',
       usage: 'Usage',
       account: 'Account',
+      word: 'Categories'
     },
     noResults: 'No questions found',
     noResultsDescription: 'Try modifying your search or selecting another category.',
     questionsFound: '{count} question found',
     questionsFound_plural: '{count} questions found',
     pageInfo: 'Page {current} of {total}',
+    totalQuestions: 'Total Questions',
+    filterByCategory: 'Filter by Category',
+    showingResults: 'Showing {start}-{end} of {total} results',
     contactCTA: {
       title: 'Can\'t find your answer?',
       description: 'Our team is here to help. Don\'t hesitate to contact us for any specific question.',
       button: 'Contact us',
     },
-    title: 'Frequently',
-    titleHighlight: 'Asked Questions',
+
     resultsCount: '{count} questions found',
     resultsCountSingle: '1 question found',
     noQuestionsFound: 'No questions found',
@@ -329,9 +335,9 @@ export const en = {
     title: 'Admin Panel',
     dashboard: 'Upload beats, manage your catalog, track orders and analyze your statistics',
     dashboardTitle: 'Dashboard',
-    dashboardSubtitle: 'Overview of your activity and performance',
+    dashboardSubtitle: 'Comprehensive analytics dashboard providing real-time insights into your music catalog performance, sales metrics, and revenue optimization opportunities.',
     beatManagement: 'Beat Management',
-    beatManagementDescription: 'Edit details, manage files and track your beat\'s performance',
+    beatManagementDescription: 'Comprehensive beat management suite enabling detailed editing, file organization, performance analytics, and strategic optimization of your music catalog assets.',
     editFilesDescription: 'Manage all uploaded files: preview, master, stems and artwork. Replace, delete or add new files to your beat.',
     noDescription: 'No description available',
     navigation: 'Navigation',
@@ -344,8 +350,10 @@ export const en = {
     closeMenu: 'Close Menu',
     beats: 'Beat management',
     orders: 'Orders',
+    ordersDescription: 'Comprehensive order management system providing real-time tracking, payment processing, and detailed sales analytics for optimal business performance.',
     users: 'Users',
     stats: 'Statistics',
+    statsDescription: 'Advanced analytics platform delivering comprehensive insights into beat performance, revenue optimization, and sales trend analysis for data-driven business decisions.',
     upload: 'Beat Upload',
     uploadNewBeat: 'Upload a new beat',
     // Dashboard specific
@@ -358,7 +366,8 @@ export const en = {
     newBeatUploaded: 'New beat uploaded',
     orderReceived: 'Order received',
     beatModified: 'Beat modified',
-    uploadBeat: 'Upload Beat',
+    uploadBeat: 'Beat Upload',
+    uploadBeatDescription: 'Create and publish professional-quality beats to expand your music catalog. Upload audio files, set pricing tiers, and manage licensing options for maximum revenue potential.',
     manageBeats: 'Manage Beats',
     viewOrders: 'View Orders',
     detailedAnalytics: 'Detailed Analytics',
@@ -658,13 +667,18 @@ export const en = {
     questionsDescription: 'Our team is at your disposal to answer all your questions regarding the protection of your personal data and the exercise of your rights.',
     exerciseRights: 'Exercise my rights',
     gdprBadge: 'GDPR Compliant • Protected Data',
+    tableOfContents: 'Table of Contents',
+
   },
+
 
   // Terms Page
   terms: {
-    title: 'Terms of Use',
+    title: 'Terms of',
+    titleHighlight: 'Use',
     subtitle: 'Please read these terms of use carefully before using our services. By using l.outsider, you agree to be bound by these terms.',
     lastUpdated: 'Last updated',
+    tableOfContents: 'Table of Contents',
     importantNotice: 'Important Notice',
     importantNoticeDescription: 'These terms of use constitute a legally binding agreement between you and l.outsider. By using our website or services, you acknowledge that you have read, understood and agreed to be bound by these terms.',
     questionsContact: 'If you have any questions regarding these terms, please feel free to contact us at',
@@ -686,4 +700,6 @@ export const en = {
   admin_dailyRevenue: 'Daily Revenue (Last 14 Days)',
   admin_totalRevenue30Days: 'Total Revenue (30 Days)',
   admin_noRevenueData: 'No revenue data available for selected period',
+  
+
 };

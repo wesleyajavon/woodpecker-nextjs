@@ -72,7 +72,7 @@ export default function AdminStats() {
         <p className="text-red-400">{error}</p>
         <button
           onClick={fetchStats}
-          className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+          className="mt-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
         >
 {t('errors.tryAgain')}
         </button>
@@ -89,37 +89,37 @@ export default function AdminStats() {
       icon: Music,
       value: stats.totalBeats,
       label: t('admin.totalBeats'),
-      color: 'purple',
-      bgColor: 'bg-purple-500/20',
-      textColor: 'text-purple-400',
-      borderColor: 'border-purple-500/30'
+      color: 'indigo',
+      bgColor: 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20',
+      textColor: 'text-indigo-400',
+      borderColor: 'border-indigo-500/30'
     },
     {
       icon: ShoppingCart,
       value: stats.totalOrders,
       label: t('admin.totalOrders'),
-      color: 'blue',
-      bgColor: 'bg-blue-500/20',
-      textColor: 'text-blue-400',
-      borderColor: 'border-blue-500/30'
+      color: 'indigo',
+      bgColor: 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20',
+      textColor: 'text-indigo-400',
+      borderColor: 'border-indigo-500/30'
     },
     {
       icon: DollarSign,
       value: `${stats.totalRevenue}€`,
       label: t('admin.totalRevenue'),
-      color: 'green',
-      bgColor: 'bg-green-500/20',
-      textColor: 'text-green-400',
-      borderColor: 'border-green-500/30'
+      color: 'indigo',
+      bgColor: 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20',
+      textColor: 'text-indigo-400',
+      borderColor: 'border-indigo-500/30'
     },
     {
       icon: Users,
       value: stats.uniqueCustomers,
       label: t('admin.totalUsers'),
-      color: 'yellow',
-      bgColor: 'bg-yellow-500/20',
-      textColor: 'text-yellow-400',
-      borderColor: 'border-yellow-500/30'
+      color: 'indigo',
+      bgColor: 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20',
+      textColor: 'text-indigo-400',
+      borderColor: 'border-indigo-500/30'
     }
   ];
 
@@ -131,7 +131,7 @@ export default function AdminStats() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          className={`${card.bgColor} backdrop-blur-lg rounded-xl p-6 text-center border ${card.borderColor} hover:scale-105 transition-transform duration-300`}
+          className={`${card.bgColor} backdrop-blur-lg rounded-xl p-6 text-center border ${card.borderColor} hover:scale-105 hover:from-indigo-500/30 hover:to-purple-500/30 hover:border-indigo-500/50 transition-all duration-300 shadow-lg hover:shadow-xl`}
         >
           <div className="flex items-center justify-center mb-4">
             <div className={`p-3 rounded-full ${card.bgColor} border ${card.borderColor}`}>

@@ -3,8 +3,6 @@
 import { motion } from 'framer-motion';
 import { Music } from 'lucide-react';
 import BeatManager from '@/components/BeatManager';
-import AdminRoute from '@/components/AdminRoute';
-import AdminSidebar from '@/components/admin/AdminSidebar';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { TextRewind } from '@/components/ui/text-rewind';
 import { cn } from '@/lib/utils';
@@ -14,14 +12,7 @@ export default function AdminManagePage() {
   const { t } = useTranslation();
 
   return (
-    <AdminRoute>
-      <div className="min-h-screen bg-background flex">
-        {/* Sidebar */}
-        <AdminSidebar />
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col min-h-screen">
-          <div className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8 relative">
+    <div className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8 relative">
             <DottedSurface className="size-full z-0" />
 
             {/* Gradient overlay */}
@@ -93,8 +84,5 @@ export default function AdminManagePage() {
               </motion.div>
             </div>
           </div>
-        </div>
-      </div>
-    </AdminRoute>
   );
 }

@@ -12,6 +12,7 @@ import {
   Image, 
   Archive,
   Settings,
+  LayoutDashboard,
   BarChart3,
   Users,
   ShoppingCart,
@@ -39,7 +40,7 @@ export default function AdminSidebar({ beatId }: AdminSidebarProps) {
       id: 'dashboard',
       label: t('admin.backToDashboard'),
       href: '/admin/dashboard',
-      icon: <ArrowLeft className="w-5 h-5" />
+      icon: <LayoutDashboard className="h-5 w-5" />   
     },
     {
       id: 'upload',
@@ -136,9 +137,7 @@ export default function AdminSidebar({ beatId }: AdminSidebarProps) {
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center gap-3 mb-4 pr-12"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <Settings className="w-4 h-4 text-white" />
-              </div>
+
               <AnimatePresence>
                 {!isCollapsed && (
                   <motion.h2
@@ -171,7 +170,7 @@ export default function AdminSidebar({ beatId }: AdminSidebarProps) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="absolute top-4 right-4 w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 z-20"
+              className="absolute top-4 right-4 w-10 h-10 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border border-indigo-500/30 hover:from-indigo-500/30 hover:to-purple-500/30 hover:text-indigo-300 hover:border-indigo-500/50 rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 z-20"
               title={isCollapsed ? t('admin.expandSidebar') : t('admin.collapseSidebar')}
             >
               {isCollapsed ? (
@@ -270,7 +269,7 @@ export default function AdminSidebar({ beatId }: AdminSidebarProps) {
                         className={cn(
                           "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group relative",
                           isActive(link.href)
-                            ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-400 border border-purple-500/30"
+                            ? "bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border border-indigo-500/30"
                             : "text-muted-foreground hover:text-foreground hover:bg-card/20",
                           isCollapsed ? "justify-center" : ""
                         )}
@@ -426,7 +425,7 @@ export default function AdminSidebar({ beatId }: AdminSidebarProps) {
                             className={cn(
                               "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group",
                               isActive(link.href)
-                                ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-400 border border-purple-500/30"
+                                ? "bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border border-indigo-500/30"
                                 : "text-muted-foreground hover:text-foreground hover:bg-card/20"
                             )}
                           >

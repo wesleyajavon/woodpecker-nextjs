@@ -17,9 +17,12 @@ import {
   Download,
   AlertCircle,
   Info,
-  ExternalLink
+  ExternalLink,
+  BookOpen,
+  ChevronRight
 } from 'lucide-react';
 import { DottedSurface } from '@/components/ui/dotted-surface';
+import { TextRewind } from '@/components/ui/text-rewind';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/LanguageContext';
 
@@ -286,9 +289,155 @@ const importantNotes = [
   "Revente ou redistribution des fichiers interdite"
 ];
 
+// Sections organisées pour la table des matières
+const licenseSections = [
+  {
+    id: 'comparison',
+    title: 'Comparaison des Licences',
+    icon: <Check className="w-5 h-5" />,
+    color: 'indigo',
+    content: `Tableau comparatif détaillé des trois types de licences disponibles : WAV Lease, Trackout Lease et Unlimited Lease. Comparez les fonctionnalités, limitations et cas d'usage pour chaque licence.`
+  },
+  {
+    id: 'wav-lease',
+    title: 'WAV Lease - Licence Basique',
+    icon: <Music className="w-5 h-5" />,
+    color: 'blue',
+    content: `Licence non-exclusive de 10 ans permettant l'usage commercial du beat avec des droits essentiels pour artistes et producteurs. Inclut fichiers WAV haute qualité et MP3 320kbps.`,
+    features: [
+      'Fichiers WAV haute qualité (24-bit/44.1kHz) et MP3 320kbps',
+      'Droit d\'enregistrer des voix sur le beat pour créer une nouvelle chanson',
+      'Modification autorisée (arrangement, tempo, tonalité, durée)',
+      'Distribution jusqu\'à 5 000 copies physiques et digitales',
+      'Jusqu\'à 100 000 streams audio monétisés',
+      '1 clip vidéo monétisé (max 5 minutes)',
+      'Performances live non-profit illimitées',
+      'Vente en format single, EP ou album',
+      'Partage des droits d\'auteur : 50% Producteur / 50% Artiste',
+      'Pas de redevances supplémentaires à payer'
+    ],
+    limitations: [
+      'Licence NON-EXCLUSIVE (le beat peut être vendu à d\'autres)',
+      'Pas de fichiers stems/trackouts inclus',
+      'Aucune performance live payante autorisée',
+      'Pas de diffusion radio/TV commerciale',
+      'Pas de synchronisation (films, pubs, jeux vidéo)',
+      'Interdiction de revendre le beat dans sa forme originale',
+      'Pas de droit de sous-licencier à des tiers',
+      'Crédit producteur \'Prod. l.outsider\' OBLIGATOIRE',
+      'Durée limitée à 10 ans à partir de l\'achat',
+      'Interdiction d\'enregistrer le beat seul avec Content ID'
+    ],
+    useCases: [
+      'Singles et projets musicaux indépendants',
+      'Mixtapes et compilations gratuites',
+      'Streaming sur Spotify, Apple Music, Deezer',
+      'Concerts et festivals non-commerciaux',
+      'Promotion sur réseaux sociaux',
+      'Vente digitale et physique limitée'
+    ]
+  },
+  {
+    id: 'trackout-lease',
+    title: 'Trackout Lease - Licence Premium',
+    icon: <Archive className="w-5 h-5" />,
+    color: 'purple',
+    content: `Licence non-exclusive de 10 ans incluant les stems pour un contrôle créatif total et des droits commerciaux étendus. Parfait pour les producteurs et artistes nécessitant une flexibilité créative.`,
+    features: [
+      'Fichiers WAV haute qualité (24-bit/44.1kHz) et MP3 320kbps',
+      'Stems/Trackouts complets (pistes séparées)',
+      'Droit d\'enregistrer et modifier librement le beat',
+      'Remixage et arrangements personnalisés autorisés',
+      'Distribution jusqu\'à 10 000 copies physiques et digitales',
+      'Jusqu\'à 250 000 streams audio monétisés',
+      '3 clips vidéo monétisés (max 5 minutes chacun)',
+      'Performances live non-profit illimitées',
+      'Vente en format single, EP ou album',
+      'Partage des droits d\'auteur : 50% Producteur / 50% Artiste',
+      'Pas de redevances supplémentaires à payer'
+    ],
+    limitations: [
+      'Licence NON-EXCLUSIVE (le beat peut être vendu à d\'autres)',
+      'Aucune performance live payante autorisée',
+      'Pas de diffusion radio/TV commerciale',
+      'Pas de synchronisation (films, pubs, jeux vidéo)',
+      'Interdiction de revendre le beat ou les stems dans leur forme originale',
+      'Pas de droit de sous-licencier à des tiers',
+      'Crédit producteur \'Prod. l.outsider\' OBLIGATOIRE',
+      'Durée limitée à 10 ans à partir de l\'achat'
+    ],
+    useCases: [
+      'Albums et EPs professionnels',
+      'Remixage et production avancée',
+      'Collaborations artistiques',
+      'Clips vidéo multiples et promotion',
+      'Distribution élargie sur plateformes',
+      'Projets créatifs nécessitant les stems'
+    ]
+  },
+  {
+    id: 'unlimited-lease',
+    title: 'Unlimited Lease - Licence Complète',
+    icon: <Crown className="w-5 h-5" />,
+    color: 'orange',
+    content: `Licence non-exclusive de 10 ans offrant tous les droits commerciaux pour une utilisation professionnelle sans limitations de distribution. La solution complète pour tous les projets commerciaux.`,
+    features: [
+      'Fichiers WAV haute qualité (24-bit/44.1kHz) et MP3 320kbps',
+      'Stems/Trackouts complets (pistes séparées)',
+      'Droit d\'enregistrer et modifier librement le beat',
+      'Distribution ILLIMITÉE de copies physiques et digitales',
+      'Streams audio monétisés ILLIMITÉS',
+      'Clips vidéo monétisés ILLIMITÉS',
+      'Performances live payantes AUTORISÉES',
+      'Diffusion radio et télévision commerciale',
+      'Synchronisation (films, publicités, documentaires, jeux vidéo)',
+      'Vente en format single, EP ou album sans restriction',
+      'Partage des droits d\'auteur : 50% Producteur / 50% Artiste',
+      'Pas de redevances supplémentaires à payer'
+    ],
+    limitations: [
+      'Licence NON-EXCLUSIVE (le beat peut être vendu à d\'autres)',
+      'Interdiction de revendre le beat ou les stems dans leur forme originale',
+      'Pas de droit de sous-licencier à des tiers',
+      'Crédit producteur \'Prod. l.outsider\' OBLIGATOIRE',
+      'Durée limitée à 10 ans à partir de l\'achat'
+    ],
+    useCases: [
+      'Projets commerciaux majeurs et albums',
+      'Tournées et concerts payants',
+      'Campagnes publicitaires et marketing',
+      'Films, documentaires et contenus audiovisuels',
+      'Diffusion radio/TV et podcasts',
+      'Distribution mondiale sans restriction',
+      'Synchronisation pour médias et jeux vidéo',
+      'Projets nécessitant une flexibilité commerciale totale'
+    ]
+  },
+  {
+    id: 'usage-examples',
+    title: 'Exemples d\'Utilisation',
+    icon: <ExternalLink className="w-5 h-5" />,
+    color: 'green',
+    content: `Découvrez les différents cas d'usage pour chaque type de licence. De Spotify aux clips vidéo, en passant par les performances live et la diffusion radio/TV.`
+  },
+  {
+    id: 'important-notes',
+    title: 'Points Importants',
+    icon: <AlertCircle className="w-5 h-5" />,
+    color: 'yellow',
+    content: `Informations essentielles à connaître avant d'acheter une licence. Règles importantes, limitations et obligations légales.`
+  }
+];
+
 export default function LicensesPage() {
   const { t } = useTranslation();
   const [selectedLicense, setSelectedLicense] = useState<'wav' | 'trackout' | 'unlimited' | null>(null);
+  const [activeSection, setActiveSection] = useState('');
+  const [showTableOfContents, setShowTableOfContents] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [showComparison, setShowComparison] = useState(false);
+  const [showUsageExamples, setShowUsageExamples] = useState(false);
+  const [showImportantPoints, setShowImportantPoints] = useState(false);
 
   const openModal = (licenseType: 'wav' | 'trackout' | 'unlimited') => {
     setSelectedLicense(licenseType);
@@ -296,6 +445,28 @@ export default function LicensesPage() {
 
   const closeModal = () => {
     setSelectedLicense(null);
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    
+    // Trouver la section dans les sections
+    const section = licenseSections.find(s => s.id === sectionId);
+    if (section) {
+      setSelectedContent(section);
+    }
+  };
+
+  const getColorClasses = (color: string) => {
+    const colors = {
+      indigo: 'from-indigo-500/10 to-purple-500/10 border-indigo-500/20 text-indigo-400',
+      blue: 'from-blue-500/10 to-cyan-500/10 border-blue-500/20 text-blue-400',
+      purple: 'from-purple-500/10 to-pink-500/10 border-purple-500/20 text-purple-400',
+      orange: 'from-orange-500/10 to-yellow-500/10 border-orange-500/20 text-orange-400',
+      green: 'from-green-500/10 to-emerald-500/10 border-green-500/20 text-green-400',
+      yellow: 'from-yellow-500/10 to-amber-500/10 border-yellow-500/20 text-yellow-400'
+    };
+    return colors[color as keyof typeof colors] || colors.indigo;
   };
 
   return (
@@ -322,15 +493,168 @@ export default function LicensesPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12 sm:mb-16"
           >
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
-              {t('licenses.pageTitle')}{' '}
-              <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent">
-                {t('licenses.pageTitleHighlight')}
-              </span>
-            </h1>
+            <div className="mb-16 mt-6">
+              <TextRewind text={`${t('licenses.pageTitle')} ${t('licenses.pageTitleHighlight')}`} />
+            </div>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
               {t('licenses.pageSubtitle')}
             </p>
+          </motion.div>
+
+          {/* Table of Contents */}
+          <motion.div
+            id="table-of-contents"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-16"
+          >
+            <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  {t('licenses.tableOfContents')}
+                </h2>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowTableOfContents(!showTableOfContents)}
+                  className="p-2 rounded-lg bg-card/10 hover:bg-card/20 transition-colors"
+                >
+                  <ChevronRight className={cn("w-4 h-4 transition-transform", showTableOfContents && "rotate-90")} />
+                </motion.button>
+              </div>
+              
+              <AnimatePresence>
+                {showTableOfContents && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {licenseSections.map((section) => (
+                        <button
+                          key={section.id}
+                          onClick={() => scrollToSection(section.id)}
+                          className={cn(
+                            "w-full text-left p-4 rounded-lg transition-all duration-200 border",
+                            activeSection === section.id
+                              ? "bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border-indigo-500/30"
+                              : "text-muted-foreground hover:text-foreground hover:bg-card/10 border-border/20"
+                          )}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className={cn("p-2 rounded-lg", `bg-gradient-to-r ${getColorClasses(section.color).split(' ')[0]} ${getColorClasses(section.color).split(' ')[1]} border ${getColorClasses(section.color).split(' ')[2]}`)}>
+                              {section.icon}
+                            </div>
+                            <h3 className="font-medium text-sm">{section.title}</h3>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {section.content}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Selected Content Display */}
+              <AnimatePresence>
+                {selectedContent && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, y: -20 }}
+                    animate={{ opacity: 1, height: 'auto', y: 0 }}
+                    exit={{ opacity: 0, height: 0, y: -20 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="mt-8 overflow-hidden"
+                  >
+                    <div className="bg-gradient-to-r from-card/30 to-card/10 backdrop-blur-xl rounded-2xl border border-border/40 p-8 shadow-xl">
+                      <div className="flex items-start gap-6">
+                        <div className={cn("p-3 rounded-xl flex-shrink-0", `bg-gradient-to-r ${getColorClasses(selectedContent.color).split(' ')[0]} ${getColorClasses(selectedContent.color).split(' ')[1]} border ${getColorClasses(selectedContent.color).split(' ')[2]}`)}>
+                          {selectedContent.icon}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-2xl font-bold text-foreground">
+                              {selectedContent.title}
+                            </h3>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setSelectedContent(null)}
+                              className="p-2 rounded-lg bg-card/10 hover:bg-card/20 transition-colors text-muted-foreground hover:text-foreground"
+                              title="Fermer le contenu"
+                            >
+                              <X className="w-4 h-4" />
+                            </motion.button>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed mb-6">
+                            {selectedContent.content}
+                          </p>
+                          
+                          {/* Features, Limitations, Use Cases */}
+                          {selectedContent.features && (
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                              {/* Features */}
+                              <div>
+                                <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                                  <Check className="w-5 h-5 text-green-400" />
+                                  Fonctionnalités
+                                </h4>
+                                <ul className="space-y-2">
+                                  {selectedContent.features.map((feature: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                      <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2 flex-shrink-0" />
+                                      <span>{feature}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              {/* Limitations */}
+                              <div>
+                                <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                                  <AlertCircle className="w-5 h-5 text-yellow-400" />
+                                  Limitations
+                                </h4>
+                                <ul className="space-y-2">
+                                  {selectedContent.limitations.map((limitation: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                      <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full mt-2 flex-shrink-0" />
+                                      <span>{limitation}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              {/* Use Cases */}
+                              <div>
+                                <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                                  <ExternalLink className="w-5 h-5 text-blue-400" />
+                                  Cas d'Usage
+                                </h4>
+                                <ul className="space-y-2">
+                                  {selectedContent.useCases.map((useCase: string, index: number) => (
+                                    <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                      <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
+                                      <span>{useCase}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
 
           {/* License Comparison Table */}
@@ -340,11 +664,37 @@ export default function LicensesPage() {
             transition={{ delay: 0.1 }}
             className="mb-12 sm:mb-16"
           >
-            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-border/20 overflow-hidden">
-              <div className="p-4 sm:p-6 border-b border-border/20">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">{t('licenses.comparisonTitle')}</h2>
-                <p className="text-sm sm:text-base text-muted-foreground">{t('licenses.comparisonSubtitle')}</p>
+            <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+                    <Check className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-foreground">{t('licenses.comparisonTitle')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('licenses.comparisonSubtitle')}</p>
+                  </div>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowComparison(!showComparison)}
+                  className="p-2 rounded-lg bg-card/10 hover:bg-card/20 transition-colors"
+                >
+                  <ChevronRight className={cn("w-4 h-4 transition-transform", showComparison && "rotate-90")} />
+                </motion.button>
               </div>
+              
+              <AnimatePresence>
+                {showComparison && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 overflow-hidden">
               
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[600px]">
@@ -437,6 +787,10 @@ export default function LicensesPage() {
                   </tbody>
                 </table>
               </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
 
@@ -447,10 +801,36 @@ export default function LicensesPage() {
             transition={{ delay: 0.2 }}
             className="mb-12 sm:mb-16"
           >
-            <div className="text-center mb-6 sm:mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">{t('licenses.usageExamples')}</h2>
-              <p className="text-sm sm:text-base text-muted-foreground px-2 sm:px-0">{t('licenses.usageExamplesSubtitle')}</p>
-            </div>
+            <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
+                    <ExternalLink className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-foreground">{t('licenses.usageExamples')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('licenses.usageExamplesSubtitle')}</p>
+                  </div>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowUsageExamples(!showUsageExamples)}
+                  className="p-2 rounded-lg bg-card/10 hover:bg-card/20 transition-colors"
+                >
+                  <ChevronRight className={cn("w-4 h-4 transition-transform", showUsageExamples && "rotate-90")} />
+                </motion.button>
+              </div>
+              
+              <AnimatePresence>
+                {showUsageExamples && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {usageExamples.map((example, index) => (
@@ -478,6 +858,10 @@ export default function LicensesPage() {
                 </motion.div>
               ))}
             </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
 
           {/* Important Notes */}
@@ -487,11 +871,36 @@ export default function LicensesPage() {
             transition={{ delay: 0.4 }}
             className="mb-12 sm:mb-16"
           >
-            <div className="bg-card/10 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-border/20 p-4 sm:p-6">
-              <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground">{t('licenses.importantPoints')}</h2>
+            <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
+                    <AlertCircle className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-foreground">{t('licenses.importantPoints')}</h2>
+                    <p className="text-sm text-muted-foreground">Informations essentielles à connaître avant d'acheter une licence</p>
+                  </div>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowImportantPoints(!showImportantPoints)}
+                  className="p-2 rounded-lg bg-card/10 hover:bg-card/20 transition-colors"
+                >
+                  <ChevronRight className={cn("w-4 h-4 transition-transform", showImportantPoints && "rotate-90")} />
+                </motion.button>
               </div>
+              
+              <AnimatePresence>
+                {showImportantPoints && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {importantNotes.map((note, index) => (
@@ -501,6 +910,9 @@ export default function LicensesPage() {
                   </div>
                 ))}
               </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
 
@@ -519,7 +931,7 @@ export default function LicensesPage() {
               </p>
               <a
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-colors font-medium text-sm sm:text-base touch-manipulation"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl transition-all duration-300 font-medium text-sm sm:text-base touch-manipulation shadow-lg hover:shadow-xl"
               >
                 {t('common.contactUs')}
               </a>

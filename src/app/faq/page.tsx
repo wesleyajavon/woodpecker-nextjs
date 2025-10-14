@@ -16,6 +16,7 @@ import {
   Search
 } from 'lucide-react';
 import { DottedSurface } from '@/components/ui/dotted-surface';
+import { TextRewind } from '@/components/ui/text-rewind';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/LanguageContext';
 
@@ -46,7 +47,7 @@ export default function FAQPage() {
     { id: 'account', name: t('faq.categories.account'), icon: Users }
   ];
 
-  const ITEMS_PER_PAGE = 6;
+  const ITEMS_PER_PAGE = 3;
 
   // Fetch FAQ data from API
   useEffect(() => {
@@ -160,59 +161,80 @@ export default function FAQPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              {t('faq.title')}{' '}
-              <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-yellow-500 bg-clip-text text-transparent">
-                {t('faq.titleHighlight')}
-              </span>
-            </h1>
+            <div className="mb-16 mt-6">
+              <TextRewind text={`${t('faq.title')} ${t('faq.titleHighlight')}`} />
+            </div>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               {t('faq.subtitle')}
             </p>
           </motion.div>
 
-          {/* FAQ Stats */}
+          {/* Search & Stats Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-8 mb-8"
+            className="mb-8"
           >
-            <div className="relative max-w-md mx-auto">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder={t('faq.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-card/10 backdrop-blur-lg border border-border/20 rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+            <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl">
+              {/* Search Bar */}
+              <div className="relative max-w-2xl mx-auto mb-6">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder={t('faq.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-background/50 backdrop-blur-lg border border-border/40 rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all duration-300 shadow-lg"
+                />
+              </div>
+
+              {/* Stats */}
+              <div className="flex flex-wrap justify-center gap-6 text-center">
+                {/* <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl p-4 border border-indigo-500/20">
+                  <div className="text-2xl font-bold text-indigo-400">{filteredFAQs.length}</div>
+                  <div className="text-sm text-muted-foreground">{t('faq.resultsCount', { count: filteredFAQs.length })}</div>
+                </div> */}
+                <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl p-4 border border-purple-500/20">
+                  <div className="text-2xl font-bold text-purple-400">{faqData.length}</div>
+                  <div className="text-sm text-muted-foreground">{t('faq.totalQuestions')}</div>
+                </div>
+                <div className="bg-gradient-to-r from-pink-500/10 to-orange-500/10 rounded-xl p-4 border border-pink-500/20">
+                  <div className="text-2xl font-bold text-pink-400">{faqCategories.length - 1}</div>
+                  <div className="text-sm text-muted-foreground">{t('faq.categories.word')}</div>
+                </div>
+              </div>
             </div>
           </motion.div>
 
-          {/* Category Filter */}
+          {/* Category Filter Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3}}
-            className="mb-16"
+            transition={{ delay: 0.2 }}
+            className="mb-12"
           >
-            <div className="flex flex-wrap justify-center gap-2">
-              {faqCategories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => handleCategoryChange(category.id)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg border transition-all",
-                    selectedCategory === category.id
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card/10 text-foreground border-border hover:bg-card/20"
-                  )}
-                >
-                  <category.icon className="w-4 h-4" />
-                  {category.name}
-                </button>
-              ))}
+            <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4 text-center">{t('faq.filterByCategory')}</h3>
+              <div className="flex flex-wrap justify-center gap-3">
+                {faqCategories.map((category) => (
+                  <motion.button
+                    key={category.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleCategoryChange(category.id)}
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-3 rounded-xl border transition-all duration-300 font-medium",
+                      selectedCategory === category.id
+                        ? "bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border-indigo-500/30 shadow-lg"
+                        : "bg-card/10 text-foreground border-border/40 hover:bg-card/20 hover:border-border/60"
+                    )}
+                  >
+                    <category.icon className="w-4 h-4" />
+                    {category.name}
+                  </motion.button>
+                ))}
+              </div>
             </div>
           </motion.div>
 
@@ -220,56 +242,74 @@ export default function FAQPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="space-y-4 mb-16"
+            transition={{ delay: 0.3 }}
+            className="space-y-6 mb-16"
           >
-        {filteredFAQs.length === 0 ? (
-          <div className="text-center py-12">
-            <HelpCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">No questions found</h3>
-            <p className="text-muted-foreground">
-              Try adjusting your search or category filter.
-            </p>
-          </div>
-        ) : (
-          paginatedFAQs.map((faq, index) => (
-            <motion.div
-              key={faq.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + index * 0.05 }}
-              className="bg-card/10 backdrop-blur-lg rounded-xl border border-border/20 overflow-hidden"
-            >
-              <button
-                onClick={() => toggleExpanded(faq.id)}
-                className="w-full p-6 text-left flex items-center justify-between hover:bg-card/5 transition-colors"
+            {filteredFAQs.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-12 text-center shadow-xl"
               >
-                <h3 className="font-semibold text-foreground pr-4">{faq.question}</h3>
-                {expandedItems.includes(faq.id) ? (
-                  <ChevronUp className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                )}
-              </button>
-
-              <AnimatePresence>
-                {expandedItems.includes(faq.id) && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
+                <HelpCircle className="w-20 h-20 text-muted-foreground mx-auto mb-6" />
+                <h3 className="text-2xl font-semibold text-foreground mb-3">{t('faq.noResults')}</h3>
+                <p className="text-muted-foreground text-lg">
+                  {t('faq.noResultsDescription')}
+                </p>
+              </motion.div>
+            ) : (
+              paginatedFAQs.map((faq, index) => (
+                <motion.div
+                  key={faq.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.05 }}
+                  className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.01 }}
+                    onClick={() => toggleExpanded(faq.id)}
+                    className="w-full p-6 text-left flex items-center justify-between hover:bg-card/10 transition-all duration-300"
                   >
-                    <div className="px-6 pb-6 text-muted-foreground">
-                      <p>{faq.answer}</p>
+                    <div className="flex-1 pr-4">
+                      <h3 className="font-semibold text-foreground text-lg mb-2">{faq.question}</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="px-3 py-1 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full border border-indigo-500/20">
+                          <span className="text-xs font-medium text-indigo-400 capitalize">{faq.category}</span>
+                        </div>
+                        {faq.featured && (
+                          <div className="px-3 py-1 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-full border border-yellow-500/20">
+                            <span className="text-xs font-medium text-yellow-400">Featured</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))
-          )}
+                    <motion.div
+                      animate={{ rotate: expandedItems.includes(faq.id) ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ChevronDown className="w-6 h-6 text-muted-foreground flex-shrink-0" />
+                    </motion.div>
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {expandedItems.includes(faq.id) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                        className="overflow-hidden border-t border-border/20"
+                      >
+                        <div className="p-6 bg-gradient-to-r from-card/5 to-card/10">
+                          <p className="text-muted-foreground leading-relaxed text-base">{faq.answer}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))
+            )}
           </motion.div>
 
           {/* Pagination */}
@@ -277,24 +317,76 @@ export default function FAQPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex justify-center"
+              transition={{ delay: 0.4 }}
+              className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl"
             >
-              <div className="flex gap-2">
-                {Array.from({ length: totalPages }).map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentPage(index + 1)}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-muted-foreground">
+                  {t('faq.showingResults', { 
+                    start: startIndex + 1, 
+                    end: Math.min(endIndex, filteredFAQs.length), 
+                    total: filteredFAQs.length 
+                  })}
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {/* Previous Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
                     className={cn(
-                      "px-3 py-2 rounded-lg border transition-all",
-                      currentPage === index + 1
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card/10 text-foreground border-border hover:bg-card/20"
+                      "px-4 py-2 rounded-xl border transition-all duration-300 font-medium",
+                      currentPage === 1
+                        ? "bg-card/10 text-muted-foreground border-border/40 cursor-not-allowed"
+                        : "bg-card/10 text-foreground border-border/40 hover:bg-card/20 hover:border-border/60"
                     )}
                   >
-                    {index + 1}
-                  </button>
-                ))}
+                    {t('common.previous')}
+                  </motion.button>
+
+                  {/* Page Numbers */}
+                  <div className="flex gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }).map((_, index) => {
+                      const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + index;
+                      if (pageNum > totalPages) return null;
+                      
+                      return (
+                        <motion.button
+                          key={pageNum}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={cn(
+                            "w-10 h-10 rounded-xl border transition-all duration-300 font-medium",
+                            currentPage === pageNum
+                              ? "bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border-indigo-500/30 shadow-lg"
+                              : "bg-card/10 text-foreground border-border/40 hover:bg-card/20 hover:border-border/60"
+                          )}
+                        >
+                          {pageNum}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Next Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className={cn(
+                      "px-4 py-2 rounded-xl border transition-all duration-300 font-medium",
+                      currentPage === totalPages
+                        ? "bg-card/10 text-muted-foreground border-border/40 cursor-not-allowed"
+                        : "bg-card/10 text-foreground border-border/40 hover:bg-card/20 hover:border-border/60"
+                    )}
+                  >
+                    {t('common.next')}
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           )}

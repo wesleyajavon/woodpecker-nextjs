@@ -402,11 +402,11 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
 
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/20">
-                    <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm sm:text-base touch-manipulation">
+                    <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg transition-all duration-300 text-sm sm:text-base touch-manipulation shadow-lg hover:shadow-xl">
                       <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                       {t('admin.viewDetails')}
                     </button>
-                    <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm sm:text-base touch-manipulation">
+                    <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-2 bg-gradient-to-r from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white rounded-lg transition-all duration-300 text-sm sm:text-base touch-manipulation shadow-lg hover:shadow-xl">
                       <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                       {t('common.download')}
                     </button>
@@ -432,7 +432,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm touch-manipulation"
+              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-lg text-white hover:from-indigo-500/30 hover:to-purple-500/30 hover:border-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 text-xs sm:text-sm touch-manipulation"
             >
               <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t('pagination.previous')}</span>
@@ -456,10 +456,10 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
+                    className={`px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 touch-manipulation ${
                       currentPage === pageNum
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                        ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
+                        : 'bg-white/10 text-gray-300 hover:bg-gradient-to-r hover:from-indigo-500/20 hover:to-purple-500/20 hover:text-white'
                     }`}
                   >
                     {pageNum}
@@ -472,7 +472,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs sm:text-sm touch-manipulation"
+              className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 rounded-lg text-white hover:from-indigo-500/30 hover:to-purple-500/30 hover:border-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 text-xs sm:text-sm touch-manipulation"
             >
               <span className="hidden sm:inline">{t('pagination.next')}</span>
               <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />

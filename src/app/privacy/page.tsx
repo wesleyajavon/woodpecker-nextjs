@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DottedSurface } from '@/components/ui/dotted-surface';
-import { 
-  Shield, 
-  Eye, 
-  Lock, 
-  Users, 
-  Database, 
-  Globe, 
-  Mail, 
+import { TextRewind } from '@/components/ui/text-rewind';
+import {
+  Shield,
+  Eye,
+  Lock,
+  Users,
+  Database,
+  Globe,
+  Mail,
   Settings,
   FileText,
   AlertTriangle,
@@ -19,22 +20,51 @@ import {
   UserCheck,
   Trash2,
   Download,
-  Share2
+  Share2,
+  BookOpen,
+  ChevronRight,
+  X
 } from 'lucide-react';
 import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 
 export default function PrivacyPage() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [lastUpdated, setLastUpdated] = useState('2 janvier 2025');
+  const [activeSection, setActiveSection] = useState('');
+  const [showTableOfContents, setShowTableOfContents] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<any>(null);
 
   useEffect(() => {
-    setLastUpdated(new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    setLastUpdated(new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     }));
   }, [language]);
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+
+    // Trouver la section dans les sections
+    const section = sections.find(s => s.id === sectionId);
+    if (section) {
+      setSelectedContent(section);
+    }
+  };
+
+  const getColorClasses = (color: string) => {
+    const colors = {
+      indigo: 'from-indigo-500/10 to-purple-500/10 border-indigo-500/20 text-indigo-400',
+      blue: 'from-blue-500/10 to-cyan-500/10 border-blue-500/20 text-blue-400',
+      purple: 'from-purple-500/10 to-pink-500/10 border-purple-500/20 text-purple-400',
+      orange: 'from-orange-500/10 to-yellow-500/10 border-orange-500/20 text-orange-400',
+      green: 'from-green-500/10 to-emerald-500/10 border-green-500/20 text-green-400',
+      yellow: 'from-yellow-500/10 to-amber-500/10 border-yellow-500/20 text-yellow-400'
+    };
+    return colors[color as keyof typeof colors] || colors.indigo;
+  };
 
   const sections = [
     {
@@ -426,149 +456,208 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <DottedSurface />
-      
+
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="pt-32 pb-20">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="pt-24 pb-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center"
+              className="text-center mb-12"
             >
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="p-3 bg-blue-500/10 rounded-2xl">
-                  <Shield className="w-8 h-8 text-blue-400" />
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-                  {t('privacy.title')}{' '}
-                  <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    {t('privacy.titleHighlight')}
-                  </span>
-                </h1>
+              <div className="mb-16 mt-6">
+                <TextRewind text={`${t('privacy.title')} ${t('privacy.titleHighlight')}`} />
               </div>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
                 {t('privacy.subtitle')}
               </p>
-              <div className="mt-8 p-4 bg-card/50 backdrop-blur-lg rounded-xl border border-border/50">
-                <p className="text-sm text-muted-foreground">
-                  <strong>{t('privacy.lastUpdated')}:</strong> {lastUpdated} • <strong>{t('privacy.gdprCompliant')}</strong>
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </section>
 
-        {/* Privacy Content */}
-        <section className="pb-20">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="space-y-8">
-              {sections.map((section, index) => (
-                <motion.div
-                  key={section.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-card/50 backdrop-blur-lg rounded-2xl border border-border/50 p-6 md:p-8"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-lg flex-shrink-0 mt-1">
-                      {section.icon}
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="text-2xl font-bold text-foreground mb-4">
-                        {section.title}
-                      </h2>
-                      <div className="prose prose-invert max-w-none">
-                        {section.content.split('\n').map((paragraph, pIndex) => {
-                          if (paragraph.trim() === '') return null;
-                          
-                          // Handle bullet points
-                          if (paragraph.trim().startsWith('•')) {
-                            return (
-                              <div key={pIndex} className="flex items-start gap-2 mb-2">
-                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
-                                <p className="text-muted-foreground leading-relaxed">
-                                  {paragraph.trim().substring(1).trim()}
-                                </p>
-                              </div>
-                            );
-                          }
-                          
-                          // Handle section headers (lines ending with :)
-                          if (paragraph.trim().endsWith(':') && paragraph.trim().length < 50) {
-                            return (
-                              <h3 key={pIndex} className="text-lg font-semibold text-foreground mt-6 mb-3">
-                                {paragraph.trim()}
-                              </h3>
-                            );
-                          }
-                          
-                          return (
-                            <p key={pIndex} className="text-muted-foreground leading-relaxed mb-4">
-                              {paragraph.trim()}
-                            </p>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Contact CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="mt-12 bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-lg rounded-2xl border border-blue-500/20 p-6 md:p-8"
-            >
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-blue-500/20 rounded-lg flex-shrink-0">
-                  <Mail className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">
-                    {t('privacy.questionsTitle')}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed mb-4">
-                    {t('privacy.questionsDescription')}
+              {/* Last Updated Card */}
+              <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl max-w-md mx-auto">
+                <div className="flex items-center justify-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    <strong>{t('privacy.lastUpdated')}:</strong> {lastUpdated} • <strong>{t('privacy.gdprCompliant')}</strong>
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href="mailto:contact@loutsider.com"
-                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors font-medium"
-                    >
-                      <Mail className="w-4 h-4" />
-                      {t('common.contactUs')}
-                    </a>
-                    <a
-                      href="/contact"
-                      className="inline-flex items-center gap-2 bg-card/20 hover:bg-card/30 text-foreground px-6 py-3 rounded-xl transition-colors font-medium border border-border/50"
-                    >
-                      <Eye className="w-4 h-4" />
-                      {t('privacy.exerciseRights')}
-                    </a>
-                  </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* GDPR Compliance Badge */}
+            {/* Table of Contents */}
             <motion.div
+              id="table-of-contents"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-              className="mt-8 text-center"
+              transition={{ delay: 0.1 }}
+              className="mb-16"
             >
-              <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-400 px-4 py-2 rounded-full border border-green-500/20">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">{t('privacy.gdprBadge')}</span>
+              <div className="bg-card/20 backdrop-blur-xl rounded-2xl border border-border/30 p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" />
+                    {t('privacy.tableOfContents')}
+                  </h2>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowTableOfContents(!showTableOfContents)}
+                    className="p-2 rounded-lg bg-card/10 hover:bg-card/20 transition-colors"
+                  >
+                    <ChevronRight className={cn("w-4 h-4 transition-transform", showTableOfContents && "rotate-90")} />
+                  </motion.button>
+                </div>
+
+                <AnimatePresence>
+                  {showTableOfContents && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {sections.map((section) => (
+                          <button
+                            key={section.id}
+                            onClick={() => scrollToSection(section.id)}
+                            className={cn(
+                              "w-full text-left p-4 rounded-lg transition-all duration-200 border",
+                              activeSection === section.id
+                                ? "bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-400 border-indigo-500/30"
+                                : "text-muted-foreground hover:text-foreground hover:bg-card/10 border-border/20"
+                            )}
+                          >
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
+                                {section.icon}
+                              </div>
+                              <h3 className="font-medium text-sm">{section.title}</h3>
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {section.content.split('\n')[0].trim()}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Selected Content Display */}
+                <AnimatePresence>
+                  {selectedContent && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0, y: -20 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -20 }}
+                      transition={{ duration: 0.4, ease: "easeInOut" }}
+                      className="mt-8 overflow-hidden"
+                    >
+                      <div className="bg-gradient-to-r from-card/30 to-card/10 backdrop-blur-xl rounded-2xl border border-border/40 p-8 shadow-xl">
+                        <div className="flex items-start gap-6">
+                          <div className="p-3 rounded-xl flex-shrink-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
+                            {selectedContent.icon}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-2xl font-bold text-foreground">
+                                {selectedContent.title}
+                              </h3>
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setSelectedContent(null)}
+                                className="p-2 rounded-lg bg-card/10 hover:bg-card/20 transition-colors text-muted-foreground hover:text-foreground"
+                                title="Fermer le contenu"
+                              >
+                                <X className="w-4 h-4" />
+                              </motion.button>
+                            </div>
+                            <div className="prose prose-invert max-w-none">
+                              {selectedContent.content.split('\n').map((paragraph: string, pIndex: number) => {
+                                if (paragraph.trim() === '') return null;
+
+                                if (paragraph.trim().startsWith('•')) {
+                                  return (
+                                    <div key={pIndex} className="flex items-start gap-3 mb-3">
+                                      <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-blue-400" />
+                                      <p className="text-muted-foreground leading-relaxed">
+                                        {paragraph.trim().substring(1).trim()}
+                                      </p>
+                                    </div>
+                                  );
+                                }
+
+                                if (paragraph.trim().endsWith(':') && paragraph.trim().length < 50) {
+                                  return (
+                                    <h4 key={pIndex} className="text-lg font-semibold text-foreground mt-6 mb-3">
+                                      {paragraph.trim()}
+                                    </h4>
+                                  );
+                                }
+
+                                return (
+                                  <p key={pIndex} className="text-muted-foreground leading-relaxed mb-4">
+                                    {paragraph.trim()}
+                                  </p>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           </div>
         </section>
+
+
+         {/* Contact CTA */}
+         <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.8 }}
+           className="mb-8 flex justify-center"
+         >
+           <div className="max-w-2xl w-full bg-card/10 backdrop-blur-xl rounded-2xl border border-border/30 p-8 shadow-xl">
+             <div className="text-center">
+               <div className="flex justify-center mb-6">
+                 <div className="p-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-500/30">
+                   <Mail className="w-8 h-8 text-blue-400" />
+                 </div>
+               </div>
+               <h3 className="text-2xl font-bold text-foreground mb-4">
+                 {t('privacy.questionsTitle')}
+               </h3>
+               <p className="text-muted-foreground leading-relaxed mb-8 max-w-lg mx-auto">
+                 {t('privacy.questionsDescription')}
+               </p>
+               <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                 <a
+                   href="mailto:contact@loutsider.com"
+                   className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+                 >
+                   <Mail className="w-4 h-4" />
+                   {t('common.contactUs')}
+                 </a>
+                 <a
+                   href="/contact"
+                   className="inline-flex items-center justify-center gap-2 bg-card/20 hover:bg-card/30 text-foreground px-8 py-3 rounded-xl transition-colors font-medium border border-border/50 hover:border-border/70"
+                 >
+                   <Eye className="w-4 h-4" />
+                   {t('privacy.exerciseRights')}
+                 </a>
+               </div>
+             </div>
+           </div>
+         </motion.div>
+
+
       </div>
     </div>
   );

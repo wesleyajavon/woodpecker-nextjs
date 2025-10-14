@@ -111,7 +111,7 @@ export const fr = {
 
   // Beats
   beats: {
-    title: 'L.outsider | Site officiel',
+    title: 'l.outsider | Site officiel',
     description: 'Des beats frais, des vraies vibes. Pour ceux qui créent leur propre son.',
     searchPlaceholder: 'Rechercher un beat...',
     genres: 'Genres',
@@ -184,7 +184,7 @@ export const fr = {
     customLicenseTitle: 'Besoin d\'une licence personnalisée ?',
     customLicenseDescription: 'Pour des projets spéciaux, des licences exclusives ou des besoins particuliers, n\'hésitez pas à nous contacter pour une solution sur mesure.',
     includedFeatures: 'Fonctionnalités incluses',
-    completeInformation: 'Informations complètes sur cette licence',
+    tableOfContents: 'Table des Matières',
   },
   // Featured Products
   featured: {
@@ -229,6 +229,7 @@ export const fr = {
   // Profile
   profile: {
     title: 'Mon Profil',
+    description: 'Gérez vos informations personnelles, mettez à jour les détails de votre profil et consultez les paramètres de votre compte.',
     personalInfo: 'Informations personnelles',
     updateProfile: 'Mettre à jour le profil',
     profileUpdated: 'Profil mis à jour avec succès !',
@@ -285,6 +286,9 @@ export const fr = {
     noQuestionsFoundDescription: 'Essayez de modifier votre recherche ou sélectionner une autre catégorie.',
     needHelp: 'Vous ne trouvez pas votre réponse ?',
     needHelpDescription: 'Notre équipe est là pour vous aider. N\'hésitez pas à nous contacter pour toute question spécifique.',
+    totalQuestions: 'Questions Totales',
+    filterByCategory: 'Filtrer par Catégorie',
+    showingResults: 'Affichage de {start}-{end} sur {total} résultats',
     categories: {
       all: 'Toutes',
       licenses: 'Licences',
@@ -292,6 +296,7 @@ export const fr = {
       download: 'Téléchargement',
       usage: 'Utilisation',
       account: 'Compte',
+      word: 'Catégories'
     },
     noResults: 'Aucune question trouvée',
     noResultsDescription: 'Essayez de modifier votre recherche ou sélectionner une autre catégorie.',
@@ -343,9 +348,9 @@ export const fr = {
     title: 'Panneau d\'administration',
     dashboard: 'Uploadez des beats, gérez votre catalogue, suivez les commandes et analysez vos statistiques',
     dashboardTitle: 'Tableau de Bord',
-    dashboardSubtitle: 'Vue d\'ensemble de votre activité et performances',
+    dashboardSubtitle: 'Tableau de bord analytique complet offrant des insights en temps réel sur les performances de votre catalogue musical, les métriques de vente et les opportunités d\'optimisation des revenus.',
     beatManagement: 'Gestion de Beat',
-    beatManagementDescription: 'Modifiez les détails, gérez les fichiers et suivez les performances de votre beat',
+    beatManagementDescription: 'Suite complète de gestion de beats permettant l\'édition détaillée, l\'organisation des fichiers, l\'analyse des performances et l\'optimisation stratégique de vos actifs de catalogue musical.',
     editFilesDescription: 'Gérez tous les fichiers uploadés : preview, master, stems et artwork. Remplacez, supprimez ou ajoutez de nouveaux fichiers à votre beat.',
     noDescription: 'Aucune description disponible',
     navigation: 'Navigation',
@@ -358,8 +363,10 @@ export const fr = {
     closeMenu: 'Fermer le menu',
     beats: 'Gestion des Beats',
     orders: 'Commandes',
+    ordersDescription: 'Système complet de gestion des commandes offrant un suivi en temps réel, le traitement des paiements et des analyses de vente détaillées pour des performances commerciales optimales.',
     users: 'Utilisateurs',
     stats: 'Statistiques',
+    statsDescription: 'Plateforme d\'analytics avancée offrant des insights complets sur les performances des beats, l\'optimisation des revenus et l\'analyse des tendances de vente pour des décisions commerciales basées sur les données.',
     upload: 'Upload de Beats',
     uploadNewBeat: 'Upload d\'un nouveau beat',
     // Dashboard specific
@@ -373,6 +380,7 @@ export const fr = {
     orderReceived: 'Commande reçue',
     beatModified: 'Beat modifié',
     uploadBeat: 'Uploader un Beat',
+    uploadBeatDescription: 'Créez et publiez des beats de qualité professionnelle pour étendre votre catalogue musical. Uploadez des fichiers audio, définissez les niveaux de tarification et gérez les options de licence pour maximiser votre potentiel de revenus.',
     manageBeats: 'Gérer les Beats',
     viewOrders: 'Voir les Commandes',
     detailedAnalytics: 'Analytics Détaillés',
@@ -656,11 +664,15 @@ export const fr = {
     questionsDescription: 'Notre équipe est à votre disposition pour répondre à toutes vos questions concernant la protection de vos données personnelles et l\'exercice de vos droits.',
     exerciseRights: 'Exercer mes droits',
     gdprBadge: 'Conforme RGPD • Données protégées',
+    tableOfContents: 'Table des Matières',
+
   },
 
   // Terms Page
   terms: {
-    title: 'Conditions d\'Utilisation',
+    title: 'Conditions d\'',
+    titleHighlight: 'Utilisation',
+    tableOfContents: 'Table des Matières',
     subtitle: 'Veuillez lire attentivement ces conditions d\'utilisation avant d\'utiliser nos services. En utilisant l.outsider, vous acceptez d\'\u00eatre lié par ces conditions.',
     lastUpdated: 'Dernière mise à jour',
     importantNotice: 'Notice Importante',
@@ -679,9 +691,10 @@ export const fr = {
   admin_high: 'Élevé',
   admin_medium: 'Moyen',
   admin_low: 'Faible',
-  
+
   // Graphique des revenus quotidiens
   admin_dailyRevenue: 'Revenus Quotidiens (14 Derniers Jours)',
   admin_totalRevenue30Days: 'Revenus Totaux (30 Jours)',
   admin_noRevenueData: 'Aucune donnée de revenus disponible pour la période sélectionnée',
+
 };
