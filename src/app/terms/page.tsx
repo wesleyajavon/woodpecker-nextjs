@@ -8,13 +8,23 @@ import { Shield, FileText, Scale, AlertTriangle, Users, Clock, Mail, ChevronRigh
 import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
+// Type pour les sections des conditions d'utilisation
+type TermsSection = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  content: string;
+  categoryId?: string;
+  categoryColor?: string;
+};
+
 export default function TermsPage() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [lastUpdated, setLastUpdated] = useState('2 janvier 2025');
   const [activeSection, setActiveSection] = useState('');
   const [showTableOfContents, setShowTableOfContents] = useState(false);
-  const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [selectedContent, setSelectedContent] = useState<TermsSection | null>(null);
 
   useEffect(() => {
     setLastUpdated(new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { 
@@ -387,7 +397,7 @@ export default function TermsPage() {
                     >
                       <div className="bg-gradient-to-r from-card/30 to-card/10 backdrop-blur-xl rounded-2xl border border-border/40 p-8 shadow-xl">
                         <div className="flex items-start gap-6">
-                          <div className={cn("p-3 rounded-xl flex-shrink-0", `bg-gradient-to-r ${getColorClasses(selectedContent.categoryColor).split(' ')[0]} ${getColorClasses(selectedContent.categoryColor).split(' ')[1]} border ${getColorClasses(selectedContent.categoryColor).split(' ')[2]}`)}>
+                          <div className={cn("p-3 rounded-xl flex-shrink-0", selectedContent.categoryColor ? `bg-gradient-to-r ${getColorClasses(selectedContent.categoryColor).split(' ')[0]} ${getColorClasses(selectedContent.categoryColor).split(' ')[1]} border ${getColorClasses(selectedContent.categoryColor).split(' ')[2]}` : "bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20")}>
                             {selectedContent.icon}
                           </div>
                           <div className="flex-1">
@@ -396,7 +406,7 @@ export default function TermsPage() {
                                 <h3 className="text-2xl font-bold text-foreground">
                                   {selectedContent.title}
                                 </h3>
-                                <div className={cn("px-3 py-1 rounded-full text-xs font-medium", `bg-gradient-to-r ${getColorClasses(selectedContent.categoryColor).split(' ')[0]} ${getColorClasses(selectedContent.categoryColor).split(' ')[1]} border ${getColorClasses(selectedContent.categoryColor).split(' ')[2]}`)}>
+                                <div className={cn("px-3 py-1 rounded-full text-xs font-medium", selectedContent.categoryColor ? `bg-gradient-to-r ${getColorClasses(selectedContent.categoryColor).split(' ')[0]} ${getColorClasses(selectedContent.categoryColor).split(' ')[1]} border ${getColorClasses(selectedContent.categoryColor).split(' ')[2]}` : "bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20")}>
                                   {sectionCategories.find(cat => cat.id === selectedContent.categoryId)?.title}
                                 </div>
                               </div>
@@ -417,7 +427,7 @@ export default function TermsPage() {
                                 if (paragraph.trim().startsWith('•')) {
                                   return (
                                     <div key={pIndex} className="flex items-start gap-3 mb-3">
-                                      <div className={cn("w-2 h-2 rounded-full mt-2 flex-shrink-0", `bg-${selectedContent.categoryColor}-400`)} />
+                                      <div className={cn("w-2 h-2 rounded-full mt-2 flex-shrink-0", selectedContent.categoryColor ? `bg-${selectedContent.categoryColor}-400` : "bg-indigo-400")} />
                                       <p className="text-muted-foreground leading-relaxed">
                                         {paragraph.trim().substring(1).trim()}
                                       </p>

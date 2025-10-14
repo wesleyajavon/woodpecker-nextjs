@@ -429,12 +429,24 @@ const licenseSections = [
   }
 ];
 
+// Type pour les sections de licence
+type LicenseSection = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+  content: string;
+  features?: string[];
+  limitations?: string[];
+  useCases?: string[];
+};
+
 export default function LicensesPage() {
   const { t } = useTranslation();
   const [selectedLicense, setSelectedLicense] = useState<'wav' | 'trackout' | 'unlimited' | null>(null);
   const [activeSection, setActiveSection] = useState('');
   const [showTableOfContents, setShowTableOfContents] = useState(false);
-  const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [selectedContent, setSelectedContent] = useState<LicenseSection | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [showUsageExamples, setShowUsageExamples] = useState(false);
   const [showImportantPoints, setShowImportantPoints] = useState(false);
@@ -606,7 +618,7 @@ export default function LicensesPage() {
                                   Fonctionnalités
                                 </h4>
                                 <ul className="space-y-2">
-                                  {selectedContent.features.map((feature: string, index: number) => (
+                                  {selectedContent.features?.map((feature: string, index: number) => (
                                     <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
                                       <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2 flex-shrink-0" />
                                       <span>{feature}</span>
@@ -622,7 +634,7 @@ export default function LicensesPage() {
                                   Limitations
                                 </h4>
                                 <ul className="space-y-2">
-                                  {selectedContent.limitations.map((limitation: string, index: number) => (
+                                  {selectedContent.limitations?.map((limitation: string, index: number) => (
                                     <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
                                       <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full mt-2 flex-shrink-0" />
                                       <span>{limitation}</span>
@@ -638,7 +650,7 @@ export default function LicensesPage() {
                                   Cas d'Usage
                                 </h4>
                                 <ul className="space-y-2">
-                                  {selectedContent.useCases.map((useCase: string, index: number) => (
+                                  {selectedContent.useCases?.map((useCase: string, index: number) => (
                                     <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
                                       <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
                                       <span>{useCase}</span>

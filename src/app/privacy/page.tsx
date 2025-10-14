@@ -28,13 +28,22 @@ import {
 import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
+// Type pour les sections de confidentialité
+type PrivacySection = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  color?: string;
+  content: string;
+};
+
 export default function PrivacyPage() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [lastUpdated, setLastUpdated] = useState('2 janvier 2025');
   const [activeSection, setActiveSection] = useState('');
   const [showTableOfContents, setShowTableOfContents] = useState(false);
-  const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [selectedContent, setSelectedContent] = useState<PrivacySection | null>(null);
 
   useEffect(() => {
     setLastUpdated(new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', {
