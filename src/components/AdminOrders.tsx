@@ -366,12 +366,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                             {order.status}
                           </span>
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
-                          <span className="text-gray-300 text-sm sm:text-base">{t('admin.licenseType')}:</span>
-                          <span className="text-white text-sm sm:text-base">
-                            {order.type === 'single' ? order.licenseType : t('admin.multipleLicenses')}
-                          </span>
-                        </div>
+                        
                       </div>
                     </div>
 
