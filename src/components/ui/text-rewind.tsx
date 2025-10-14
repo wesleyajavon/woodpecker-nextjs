@@ -50,6 +50,7 @@ export function TextRewind({
                     "transition-all duration-300 ease-in-out tracking-wider",
                     "bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent",
                     "hover:scale-105 transform-gpu",
+                    "leading-normal py-6 sm:py-8 lg:py-12 overflow-visible",
                     className
                 )}
                 style={regularShadowStyle}

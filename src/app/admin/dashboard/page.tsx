@@ -14,15 +14,14 @@ export default function AdminDashboardPage() {
   const stats = [
     {
       title: t('admin.totalBeats'),
-      value: '24',
-      change: '+12%',
+      value: '17',
       changeType: 'positive',
       icon: Music,
       color: 'text-blue-400'
     },
     {
       title: t('admin.totalOrders'),
-      value: '156',
+      value: '63',
       change: '+8%',
       changeType: 'positive',
       icon: ShoppingCart,
@@ -30,7 +29,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: t('admin.totalRevenue'),
-      value: '€2,340',
+      value: '€2,989',
       change: '+23%',
       changeType: 'positive',
       icon: DollarSign,
