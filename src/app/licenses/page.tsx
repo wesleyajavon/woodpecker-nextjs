@@ -647,7 +647,7 @@ export default function LicensesPage() {
                               <div>
                                 <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                                   <ExternalLink className="w-5 h-5 text-blue-400" />
-                                  Cas d'Usage
+                                  Cas d&apos;Usage
                                 </h4>
                                 <ul className="space-y-2">
                                   {selectedContent.useCases?.map((useCase: string, index: number) => (
@@ -891,7 +891,7 @@ export default function LicensesPage() {
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-foreground">{t('licenses.importantPoints')}</h2>
-                    <p className="text-sm text-muted-foreground">Informations essentielles à connaître avant d'acheter une licence</p>
+                    <p className="text-sm text-muted-foreground">Informations essentielles à connaître avant d&apos;acheter une licence</p>
                   </div>
                 </div>
                 <motion.button
