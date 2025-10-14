@@ -5,6 +5,25 @@ import { getUserIdFromEmail } from '@/lib/userUtils'
 import { isUserAdmin } from '@/lib/roleUtils'
 import { prisma } from '@/lib/prisma'
 
+// Fonction pour récupérer les visiteurs actifs des 96 dernières heures
+async function getActiveVisitors() {
+  try {
+    // Calculer la date de début (96 heures = 4 jours)
+    const fourDaysAgo = new Date()
+    fourDaysAgo.setDate(fourDaysAgo.getDate() - 4)
+    
+    // Pour l'instant, on retourne une valeur simulée
+    // En production, vous devrez utiliser l'API Vercel Analytics
+    // ou implémenter votre propre système de tracking
+    const mockActiveVisitors = Math.floor(Math.random() * 500) + 100
+    
+    return mockActiveVisitors
+  } catch (error) {
+    console.error('Erreur lors de la récupération des visiteurs actifs:', error)
+    return 0
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Vérification de l'authentification
@@ -39,7 +58,8 @@ export async function GET(request: NextRequest) {
       totalBeats,
       totalOrders,
       totalRevenue,
-      uniqueCustomers
+      uniqueCustomers,
+      activeVisitors
     ] = await Promise.all([
       // Total des beats de l'admin
       prisma.beat.count({
@@ -78,7 +98,10 @@ export async function GET(request: NextRequest) {
           customerEmail: true
         },
         distinct: ['customerEmail']
-      })
+      }),
+      
+      // Visiteurs actifs des 96 dernières heures
+      getActiveVisitors()
     ])
 
     return NextResponse.json({
@@ -87,7 +110,8 @@ export async function GET(request: NextRequest) {
         totalBeats,
         totalOrders,
         totalRevenue: totalRevenue._sum.totalAmount || 0,
-        uniqueCustomers: uniqueCustomers.length
+        uniqueCustomers: uniqueCustomers.length,
+        activeVisitors
       }
     })
 

@@ -36,9 +36,9 @@ export default function AdminDashboardPage() {
       color: 'text-purple-400'
     },
     {
-      title: t('admin.totalViews'),
-      value: '1.2K',
-      change: '+5%',
+      title: t('admin.activeVisitors'),
+      value: '342',
+      change: '+12%',
       changeType: 'positive',
       icon: Eye,
       color: 'text-orange-400'

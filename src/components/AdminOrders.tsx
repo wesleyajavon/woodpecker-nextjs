@@ -287,7 +287,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-base sm:text-lg font-semibold text-white truncate">
-                        {order.type === 'single' ? order.beat.title : t('admin.multiOrderTitle', { count: (order as MultiItemOrder).items.length })}
+                        {(order as MultiItemOrder).items.length === 1 ? (order as MultiItemOrder).items[0].beat.title : t('admin.multiOrderTitle', { count: (order as MultiItemOrder).items.length })}
                       </h3>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-300 mt-1">
                         <span className="flex items-center gap-1">
@@ -297,6 +297,15 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                           {formatDate(order.createdAt)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <CreditCard className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className="truncate">
+                            {order.type === 'single' 
+                              ? order.licenseType 
+                              : `${(order as MultiItemOrder).items.length} ${t('admin.licenses')}`
+                            }
+                          </span>
                         </span>
                       </div>
                     </div>
@@ -357,6 +366,12 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                             {order.status}
                           </span>
                         </div>
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+                          <span className="text-gray-300 text-sm sm:text-base">{t('admin.licenseType')}:</span>
+                          <span className="text-white text-sm sm:text-base">
+                            {order.type === 'single' ? order.licenseType : t('admin.multipleLicenses')}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -373,6 +388,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                             <div className="text-right">
                               <div className="text-white font-semibold text-sm sm:text-base">{formatAmount(order.beat.wavLeasePrice)}</div>
                               <div className="text-xs sm:text-sm text-gray-300">{t('admin.quantity')}: 1</div>
+                              <div className="text-xs sm:text-sm text-indigo-300 font-medium">{order.licenseType}</div>
                             </div>
                           </div>
                         </div>
@@ -388,6 +404,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                                 <div className="text-right">
                                   <div className="text-white font-semibold text-sm sm:text-base">{formatAmount(item.unitPrice)}</div>
                                   <div className="text-xs sm:text-sm text-gray-300">{t('admin.quantity')}: {item.quantity}</div>
+                                  <div className="text-xs sm:text-sm text-indigo-300 font-medium">{item.licenseType}</div>
                                   <div className="text-xs sm:text-sm text-purple-300 font-medium">
                                     {t('common.total')}: {formatAmount(item.totalPrice)}
                                   </div>

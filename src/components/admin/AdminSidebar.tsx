@@ -65,12 +65,6 @@ export default function AdminSidebar({ beatId }: AdminSidebarProps) {
       label: t('admin.stats'),
       href: '/admin/stats',
       icon: <BarChart3 className="w-5 h-5" />
-    },
-    {
-      id: 'users',
-      label: t('admin.users'),
-      href: '/admin/users',
-      icon: <Users className="w-5 h-5" />
     }
   ];
 

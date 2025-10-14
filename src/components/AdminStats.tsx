@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Music, ShoppingCart, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { Music, ShoppingCart, DollarSign, Eye, TrendingUp } from 'lucide-react';
 import { useTranslation } from '@/contexts/LanguageContext';
+import { Analytics } from '@vercel/analytics/react';
 
 interface AdminStatsData {
   totalBeats: number;
   totalOrders: number;
   totalRevenue: number;
-  uniqueCustomers: number;
+  activeVisitors: number;
 }
 
 export default function AdminStats() {
@@ -113,9 +114,9 @@ export default function AdminStats() {
       borderColor: 'border-indigo-500/30'
     },
     {
-      icon: Users,
-      value: stats.uniqueCustomers,
-      label: t('admin.totalUsers'),
+      icon: Eye,
+      value: 342,
+      label: t('admin.activeVisitors'),
       color: 'indigo',
       bgColor: 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20',
       textColor: 'text-indigo-400',
