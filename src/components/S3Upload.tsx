@@ -35,7 +35,7 @@ export function S3Upload({
     // Vérification de la taille
     const fileSizeMB = file.size / (1024 * 1024)
     if (fileSizeMB > maxSize) {
-      const error = `Fichier trop volumineux: ${fileSizeMB.toFixed(2)}MB (limite: ${maxSize}MB)`
+      const error = t('upload.fileTooLarge', { size: fileSizeMB.toFixed(2), max: maxSize })
       setErrorMessage(error)
       setUploadStatus('error')
       onUploadError(error)
@@ -44,7 +44,7 @@ export function S3Upload({
 
     // Vérification du type
     if (!acceptedTypes.includes(file.type)) {
-      const error = `Type de fichier non supporté: ${file.type}`
+      const error = t('upload.unsupportedFileType', { type: file.type })
       setErrorMessage(error)
       setUploadStatus('error')
       onUploadError(error)
@@ -71,7 +71,7 @@ export function S3Upload({
       }
       
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Erreur inconnue'
+      const errorMsg = error instanceof Error ? error.message : t('upload.unknownError')
       setErrorMessage(errorMsg)
       setUploadStatus('error')
       onUploadError(errorMsg)
@@ -94,7 +94,7 @@ export function S3Upload({
     
     if (!presignedResponse.ok) {
       const errorData = await presignedResponse.json()
-      throw new Error(errorData.message || 'Erreur lors de la génération de l\'URL signée')
+      throw new Error(errorData.message || t('upload.signedUrlGenerationError'))
     }
 
     const presignedData = await presignedResponse.json()
@@ -111,7 +111,7 @@ export function S3Upload({
     })
 
     if (!uploadResponse.ok) {
-      throw new Error(`Erreur lors de l'upload vers S3: ${uploadResponse.status}`)
+      throw new Error(t('upload.s3UploadError', { status: uploadResponse.status }))
     }
 
     setProgress(100)
@@ -138,7 +138,7 @@ export function S3Upload({
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.message || 'Erreur lors de l\'upload via proxy')
+      throw new Error(errorData.message || t('upload.proxyUploadError'))
     }
 
     const result = await response.json()
@@ -168,13 +168,13 @@ export function S3Upload({
   const getStatusText = () => {
     switch (uploadStatus) {
       case 'uploading':
-        return 'Upload en cours...'
+        return t('upload.uploadInProgress')
       case 'success':
-        return 'Upload réussi!'
+        return t('upload.uploadSuccessful')
       case 'error':
-        return 'Erreur d\'upload'
+        return t('upload.uploadError')
       default:
-        return `Uploader ${folder === 'masters' ? 'Master' : 'Stems'}`
+        return folder === 'masters' ? t('upload.uploadMaster') : t('upload.uploadStems')
     }
   }
 
@@ -197,7 +197,7 @@ export function S3Upload({
           {getStatusIcon()}
           <span className="text-sm font-medium">{getStatusText()}</span>
           <span className="text-xs text-gray-500">
-            Max {maxSize}MB • {acceptedTypes.map(type => type.split('/')[1]).join(', ')}
+            {t('upload.maxSize', { size: maxSize })} • {t('upload.fileTypes', { types: acceptedTypes.map(type => type.split('/')[1]).join(', ') })}
           </span>
         </div>
       </button>
@@ -211,7 +211,7 @@ export function S3Upload({
             ></div>
           </div>
           <p className="text-xs text-center text-gray-500">
-            {progress}% - {progress < 50 ? 'Génération URL signée...' : 'Upload vers AWS S3...'}
+            {progress}% - {progress < 50 ? t('upload.generatingSignedUrl') : t('upload.uploadingToS3')}
           </p>
         </div>
       )}
@@ -225,7 +225,7 @@ export function S3Upload({
       {uploadStatus === 'success' && (
         <div className="p-3 bg-green-50 border border-green-200 rounded-lg dark:bg-green-950 dark:border-green-800">
           <p className="text-sm text-green-800 dark:text-green-200">
-            ✅ Fichier uploadé avec succès vers AWS S3!
+            {t('upload.fileUploadedSuccessfully')}
           </p>
         </div>
       )}

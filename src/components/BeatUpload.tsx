@@ -111,7 +111,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       newErrors.push(t('upload.descriptionTooLong', { max: BEAT_CONFIG.maxDescriptionLength }));
     }
     if (!cloudinaryUploads.preview) newErrors.push(t('upload.previewRequired'));
-    if (!s3Uploads.master) newErrors.push('Master audio required (S3 upload)');
+    if (!s3Uploads.master) newErrors.push(t('upload.masterRequired'));
     if (formData.wavLeasePrice <= 0) newErrors.push(t('upload.wavPriceRequired'));
     if (formData.trackoutLeasePrice <= 0) newErrors.push(t('upload.trackoutPriceRequired'));
     if (formData.unlimitedLeasePrice <= 0) newErrors.push(t('upload.unlimitedPriceRequired'));
@@ -252,7 +252,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
                   <div className="flex items-center gap-2">
                     <Music className="w-4 h-4 text-green-400" />
-                    <p className="text-green-300 text-sm">Preview uploaded to Cloudinary</p>
+                    <p className="text-green-300 text-sm">{t('upload.previewUploaded')}</p>
                   </div>
                   <button
                     onClick={() => setCloudinaryUploads(prev => ({ ...prev, preview: undefined }))}
@@ -263,10 +263,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 </div>
                 <div className="p-3 bg-white/5 rounded-lg">
                   <p className="text-foreground text-xs">
-                    ✅ Preview audio uploaded to Cloudinary (max 100MB)
+                    ✅ {t('upload.previewDetails')}
                   </p>
                   <p className="text-muted-foreground text-xs mt-1">
-                    Public ID: {cloudinaryUploads.preview.publicId}
+                    {t('upload.publicId')}: {cloudinaryUploads.preview.publicId}
                   </p>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
                   <div className="flex items-center gap-2">
                     <FileAudio className="w-4 h-4 text-green-400" />
-                    <p className="text-green-300 text-sm">Master audio uploaded to S3</p>
+                    <p className="text-green-300 text-sm">{t('upload.masterUploaded')}</p>
                   </div>
                   <button
                     onClick={() => setS3Uploads(prev => ({ ...prev, master: undefined }))}
@@ -306,10 +306,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 </div>
                 <div className="p-3 bg-white/5 rounded-lg">
                   <p className="text-foreground text-xs">
-                    ✅ Master audio uploaded to AWS S3 (max 500MB)
+                    ✅ {t('upload.masterDetails')}
                   </p>
                   <p className="text-muted-foreground text-xs mt-1">
-                    S3 Key: {s3Uploads.master.key}
+                    {t('upload.s3Key')}: {s3Uploads.master.key}
                   </p>
                 </div>
               </div>
@@ -335,7 +335,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
                   <div className="flex items-center gap-2">
                     <Image className="w-4 h-4 text-green-400" />
-                    <p className="text-green-300 text-sm">Artwork uploaded to Cloudinary</p>
+                    <p className="text-green-300 text-sm">{t('upload.artworkUploaded')}</p>
                   </div>
                   <button
                     onClick={() => setCloudinaryUploads(prev => ({ ...prev, artwork: undefined }))}
@@ -346,10 +346,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 </div>
                 <div className="p-3 bg-white/5 rounded-lg">
                   <p className="text-foreground text-xs">
-                    ✅ Artwork uploaded to Cloudinary (max 20MB)
+                    ✅ {t('upload.artworkDetails')}
                   </p>
                   <p className="text-muted-foreground text-xs mt-1">
-                    Public ID: {cloudinaryUploads.artwork.publicId}
+                    {t('upload.publicId')}: {cloudinaryUploads.artwork.publicId}
                   </p>
                 </div>
               </div>
@@ -378,7 +378,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
                   <div className="flex items-center gap-2">
                     <Archive className="w-4 h-4 text-green-400" />
-                    <p className="text-green-300 text-sm">Stems uploaded to S3</p>
+                    <p className="text-green-300 text-sm">{t('upload.stemsUploaded')}</p>
                   </div>
                   <button
                     onClick={() => setS3Uploads(prev => ({ ...prev, stems: undefined }))}
@@ -389,10 +389,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 </div>
                 <div className="p-3 bg-white/5 rounded-lg">
                   <p className="text-foreground text-xs">
-                    ✅ Stems ZIP uploaded to AWS S3 (max 1GB)
+                    ✅ {t('upload.stemsDetails')}
                   </p>
                   <p className="text-muted-foreground text-xs mt-1">
-                    S3 Key: {s3Uploads.stems.key}
+                    {t('upload.s3Key')}: {s3Uploads.stems.key}
                   </p>
                 </div>
               </div>
@@ -506,7 +506,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
                 value={formData.duration}
                 onChange={(e) => handleInputChange('duration', e.target.value)}
                 className="w-full p-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="3:24"
+                placeholder={t('upload.durationPlaceholder')}
               />
             </div>
           </div>
@@ -519,7 +519,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
               {/* WAV Lease */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-300">
-                  WAV Lease (EUR) <span className="text-red-400">*</span>
+                  {t('upload.wavLease')} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="number"
@@ -534,7 +534,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
               {/* Trackout Lease */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-300">
-                  Trackout Lease (EUR) <span className="text-red-400">*</span>
+                  {t('upload.trackoutLease')} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="number"
@@ -549,7 +549,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
               {/* Unlimited Lease */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-300">
-                  Unlimited Lease (EUR) <span className="text-red-400">*</span>
+                  {t('upload.unlimitedLease')} <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="number"
@@ -635,12 +635,12 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       <div className="mt-8 text-center">
         {/* Debug info pour comprendre l'état du bouton */}
         <div className="mb-4 p-3 bg-white/5 rounded-lg text-xs text-gray-300">
-          <p>État des uploads:</p>
-          <p>• Preview Cloudinary: {cloudinaryUploads.preview ? '✅ Uploadé' : '❌ Manquant'}</p>
-          <p>• Master S3: {s3Uploads.master ? '✅ Uploadé' : '❌ Manquant'}</p>
-          <p>• Artwork Cloudinary: {cloudinaryUploads.artwork ? '✅ Uploadé' : '⏸️ Optionnel'}</p>
-          <p>• Stems S3: {s3Uploads.stems ? '✅ Uploadé' : '⏸️ Optionnel'}</p>
-          <p>• Bouton activé: {(!isUploading && cloudinaryUploads.preview && s3Uploads.master) ? '✅ Oui' : '❌ Non'}</p>
+          <p>{t('upload.uploadStatus')}</p>
+          <p>• {t('upload.previewCloudinary')}: {cloudinaryUploads.preview ? `✅ ${t('upload.uploaded')}` : `❌ ${t('upload.missing')}`}</p>
+          <p>• {t('upload.masterS3')}: {s3Uploads.master ? `✅ ${t('upload.uploaded')}` : `❌ ${t('upload.missing')}`}</p>
+          <p>• {t('upload.artworkCloudinary')}: {cloudinaryUploads.artwork ? `✅ ${t('upload.uploaded')}` : `⏸️ ${t('upload.optional')}`}</p>
+          <p>• {t('upload.stemsS3')}: {s3Uploads.stems ? `✅ ${t('upload.uploaded')}` : `⏸️ ${t('upload.optional')}`}</p>
+          <p>• {t('upload.buttonEnabled')}: {(!isUploading && cloudinaryUploads.preview && s3Uploads.master) ? `✅ ${t('upload.yes')}` : `❌ ${t('upload.no')}`}</p>
         </div>
         
         <button
