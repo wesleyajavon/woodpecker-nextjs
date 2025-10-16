@@ -315,12 +315,12 @@ export default function BeatsPage() {
             <motion.div
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.2 }}
-              className="group relative bg-gradient-to-br from-purple-500/10 via-purple-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300"
+              className="group relative bg-white/5 dark:bg-black/5 backdrop-blur-2xl rounded-2xl p-6 border border-white/10 dark:border-white/5 hover:border-white/20 dark:hover:border-white/10 transition-all duration-300 shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-purple-500/20 rounded-xl">
+                  <div className="p-2 bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/5">
                     <Music className="w-5 h-5 text-purple-400" />
                   </div>
                   <div className="text-right">
@@ -339,12 +339,12 @@ export default function BeatsPage() {
             <motion.div
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.2 }}
-              className="group relative bg-gradient-to-br from-blue-500/10 via-blue-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-blue-500/20 hover:border-blue-400/40 transition-all duration-300"
+              className="group relative bg-white/5 dark:bg-black/5 backdrop-blur-2xl rounded-2xl p-6 border border-white/10 dark:border-white/5 hover:border-white/20 dark:hover:border-white/10 transition-all duration-300 shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-blue-500/20 rounded-xl">
+                  <div className="p-2 bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/5">
                     <Music className="w-5 h-5 text-blue-400" />
                   </div>
                   <div className="text-right">
@@ -363,12 +363,12 @@ export default function BeatsPage() {
             <motion.div
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.2 }}
-              className="group relative bg-gradient-to-br from-green-500/10 via-green-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-green-500/20 hover:border-green-400/40 transition-all duration-300"
+              className="group relative bg-white/5 dark:bg-black/5 backdrop-blur-2xl rounded-2xl p-6 border border-white/10 dark:border-white/5 hover:border-white/20 dark:hover:border-white/10 transition-all duration-300 shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-green-500/20 rounded-xl">
+                  <div className="p-2 bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/5">
                     <Music className="w-5 h-5 text-green-400" />
                   </div>
                   <div className="text-right">
@@ -387,12 +387,12 @@ export default function BeatsPage() {
             <motion.div
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ duration: 0.2 }}
-              className="group relative bg-gradient-to-br from-orange-500/10 via-orange-600/5 to-transparent backdrop-blur-xl rounded-2xl p-6 border border-orange-500/20 hover:border-orange-400/40 transition-all duration-300"
+              className="group relative bg-white/5 dark:bg-black/5 backdrop-blur-2xl rounded-2xl p-6 border border-white/10 dark:border-white/5 hover:border-white/20 dark:hover:border-white/10 transition-all duration-300 shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-orange-500/20 rounded-xl">
+                  <div className="p-2 bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 dark:border-white/5">
                     <Star className="w-5 h-5 text-orange-400" />
                   </div>
                   <div className="text-right">
