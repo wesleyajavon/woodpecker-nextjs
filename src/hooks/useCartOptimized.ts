@@ -1,17 +1,15 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useCartStore } from '@/stores/cartStore'
 import { Beat } from '@/types/beat'
 import { LicenseType } from '@/types/cart'
 
-// Nouveau hook useCart qui utilise Zustand (remplace l'ancien)
+// Hook principal pour le panier
 export function useCart() {
-  const cart = useCartStore()
-  return cart
+  return useCartStore()
 }
 
-// Hooks spécialisés pour des actions spécifiques
+// Hooks spécialisés pour des actions spécifiques - approche optimisée
 export function useAddToCart() {
   return useCartStore(state => state.addToCart)
 }
@@ -24,6 +22,23 @@ export function useUpdateQuantity() {
   return useCartStore(state => state.updateQuantity)
 }
 
+export function useClearCart() {
+  return useCartStore(state => state.clearCart)
+}
+
+export function useToggleCart() {
+  return useCartStore(state => state.toggleCart)
+}
+
+export function useOpenCart() {
+  return useCartStore(state => state.openCart)
+}
+
+export function useCloseCart() {
+  return useCartStore(state => state.closeCart)
+}
+
+// Hooks pour les données
 export function useCartCount() {
   return useCartStore(state => state.totalItems)
 }
@@ -38,27 +53,6 @@ export function useCartItems() {
 
 export function useIsCartOpen() {
   return useCartStore(state => state.isOpen)
-}
-
-// Hook optimisé pour les actions - utilise useMemo pour éviter les re-créations
-export function useCartActions() {
-  const addToCart = useCartStore(state => state.addToCart)
-  const removeFromCart = useCartStore(state => state.removeFromCart)
-  const updateQuantity = useCartStore(state => state.updateQuantity)
-  const clearCart = useCartStore(state => state.clearCart)
-  const toggleCart = useCartStore(state => state.toggleCart)
-  const openCart = useCartStore(state => state.openCart)
-  const closeCart = useCartStore(state => state.closeCart)
-
-  return useMemo(() => ({
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    toggleCart,
-    openCart,
-    closeCart,
-  }), [addToCart, removeFromCart, updateQuantity, clearCart, toggleCart, openCart, closeCart])
 }
 
 // Hook pour vérifier si un beat est dans le panier
@@ -78,4 +72,25 @@ export function useCartItemQuantity(beatId: string, licenseType: LicenseType) {
     )
     return item?.quantity || 0
   })
+}
+
+// Hook pour les actions multiples - version optimisée sans objet
+export function useCartActions() {
+  const addToCart = useAddToCart()
+  const removeFromCart = useRemoveFromCart()
+  const updateQuantity = useUpdateQuantity()
+  const clearCart = useClearCart()
+  const toggleCart = useToggleCart()
+  const openCart = useOpenCart()
+  const closeCart = useCloseCart()
+
+  return {
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    toggleCart,
+    openCart,
+    closeCart,
+  }
 }

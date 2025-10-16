@@ -1,12 +1,13 @@
 'use client'
 
-import { useSession, signOut } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
 import Image from 'next/image'
 import { User } from 'lucide-react'
 import UserMenu from './UserMenu'
 import { useState, useEffect } from 'react'
-import { useTranslation } from '@/contexts/LanguageContext'
+import { useTranslation } from '@/hooks/useApp'
+import { useCurrentUser } from '@/hooks/useAuthSync'
 
 export default function AuthButton({ 
   variant = 'default', 
@@ -15,7 +16,7 @@ export default function AuthButton({
   variant?: 'default' | 'floating' | 'mobile'
   onMobileMenuClose?: () => void
 } = {}) {
-  const { data: session, status } = useSession()
+  const { isAuthenticated, isLoading, user } = useCurrentUser()
   const { t } = useTranslation()
   const [mounted, setMounted] = useState(false)
 
@@ -35,7 +36,7 @@ export default function AuthButton({
     )
   }
 
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <Button 
         disabled 
@@ -46,7 +47,7 @@ export default function AuthButton({
     )
   }
 
-  if (session) {
+  if (isAuthenticated && user) {
     if (variant === 'floating') {
       return (
         <div className="flex items-center space-x-2">

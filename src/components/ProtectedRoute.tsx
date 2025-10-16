@@ -1,8 +1,8 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useCurrentUser } from '@/hooks/useAuthSync'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -10,16 +10,16 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
-  const { data: session, status } = useSession()
+  const { isAuthenticated, isLoading } = useCurrentUser()
   const router = useRouter()
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!isLoading && !isAuthenticated) {
       router.push('/auth/signin')
     }
-  }, [status, router])
+  }, [isAuthenticated, isLoading, router])
 
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       fallback || (
         <div className="min-h-screen flex items-center justify-center">
@@ -29,7 +29,7 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
     )
   }
 
-  if (status === 'unauthenticated') {
+  if (!isAuthenticated) {
     return null
   }
 

@@ -1,405 +1,372 @@
-# 🔄 Migration Guide - Licensing System
+# 🚀 Guide de Migration - Architecture Moderne de Gestion d'État
 
-## Overview
+## Vue d'ensemble
 
-This guide covers the migration from the old single-price system to the new three-tier licensing system with dynamic pricing and Stripe integration.
+Ce guide vous aide à migrer de l'ancienne architecture (React Context + useReducer) vers la nouvelle architecture moderne :
 
-## 🚀 Migration Steps
+- **🏠 État local** : `useState`, `useReducer` + hooks personnalisés
+- **🌐 État global UI** : Zustand
+- **🔁 État serveur** : TanStack Query
 
-### 1. Database Schema Updates
+## 📋 Checklist de Migration
 
-#### Add New Price Columns
-```sql
--- Add new pricing columns
-ALTER TABLE "Beat" ADD COLUMN "wavLeasePrice" DECIMAL(10,2) DEFAULT 19.99;
-ALTER TABLE "Beat" ADD COLUMN "trackoutLeasePrice" DECIMAL(10,2) DEFAULT 39.99;
-ALTER TABLE "Beat" ADD COLUMN "unlimitedLeasePrice" DECIMAL(10,2) DEFAULT 79.99;
+### ✅ Étapes Complétées
 
--- Add Stripe price ID columns
-ALTER TABLE "Beat" ADD COLUMN "stripeWavPriceId" VARCHAR(255);
-ALTER TABLE "Beat" ADD COLUMN "stripeTrackoutPriceId" VARCHAR(255);
-ALTER TABLE "Beat" ADD COLUMN "stripeUnlimitedPriceId" VARCHAR(255);
+- [x] Installation des dépendances (Zustand, TanStack Query)
+- [x] Configuration des stores Zustand
+- [x] Configuration de TanStack Query
+- [x] Création des hooks personnalisés
+- [x] Intégration dans le layout principal
+- [x] Création d'exemples pratiques
+
+### 🔄 Prochaines Étapes
+
+- [ ] Migration du CartContext vers Zustand
+- [ ] Migration des appels API vers TanStack Query
+- [ ] Mise à jour des composants existants
+- [ ] Tests et validation
+
+## 🏠 État Local - useState/useReducer
+
+### Avant (ancien système)
+```tsx
+const [isLoading, setIsLoading] = useState(false)
+const [error, setError] = useState(null)
+const [isOpen, setIsOpen] = useState(false)
 ```
 
-#### Update LicenseType Enum
-```sql
--- Add new license types
-ALTER TYPE "LicenseType" ADD VALUE 'WAV_LEASE';
-ALTER TYPE "LicenseType" ADD VALUE 'TRACKOUT_LEASE';
-ALTER TYPE "LicenseType" ADD VALUE 'UNLIMITED_LEASE';
+### Après (nouveau système)
+```tsx
+import { useLoading, useError, useModal } from '@/hooks/local'
 
--- Update existing records
-UPDATE "Order" SET "licenseType" = 'WAV_LEASE' WHERE "licenseType" = 'NON_EXCLUSIVE';
-UPDATE "MultiItemOrder" SET "licenseType" = 'WAV_LEASE' WHERE "licenseType" = 'NON_EXCLUSIVE';
-```
-
-### 2. Run Migration Scripts
-
-#### Add Missing Columns
-```bash
-# Run the script to add missing columns
-npx ts-node scripts/add-missing-columns.ts
-```
-
-#### Add Stripe Columns
-```bash
-# Run the script to add Stripe price ID columns
-npx ts-node scripts/add-stripe-columns.ts
-```
-
-#### Migrate Stripe Prices
-```bash
-# Create Stripe products for existing beats
-npx ts-node scripts/migrate-stripe-prices.ts
-```
-
-### 3. Update Application Code
-
-#### Update Beat Types
-```typescript
-// Update Beat interface
-interface Beat {
-  // ... existing fields
-  wavLeasePrice: number
-  trackoutLeasePrice: number
-  unlimitedLeasePrice: number
-  stripeWavPriceId?: string | null
-  stripeTrackoutPriceId?: string | null
-  stripeUnlimitedPriceId?: string | null
+function MyComponent() {
+  const { isLoading, startLoading, stopLoading } = useLoading()
+  const { error, setErrorMessage, clearError } = useError()
+  const { isOpen, open, close, toggle } = useModal()
+  
+  // Utilisation plus simple et réutilisable
 }
 ```
 
-#### Update Cart Context
-```typescript
-// Update CartItem interface
-interface CartItem {
-  beat: Beat
-  licenseType: LicenseType
-  quantity: number
-  addedAt: Date
-}
-```
+### Hooks Disponibles
 
-#### Update API Routes
-```typescript
-// Update checkout API
-const items = cartItems.map(item => ({
-  priceId: getPriceIdByLicense(item.beat, item.licenseType),
-  quantity: item.quantity,
-  beatTitle: item.beat.title,
-  licenseType: item.licenseType
-}))
-```
+- `useLoading()` - Gestion de l'état de chargement
+- `useError()` - Gestion des erreurs
+- `useForm<T>()` - Gestion des formulaires
+- `useModal()` - Gestion des modals/dialogs
+- `usePagination()` - Gestion de la pagination
+- `useMultiSelect<T>()` - Sélection multiple
+- `useSearch()` - Recherche avec debounce
 
-## 🔧 Migration Scripts
+## 🌐 État Global UI - Zustand
 
-### 1. add-missing-columns.ts
-```typescript
-import { PrismaClient } from '@prisma/client'
+### Avant (React Context)
+```tsx
+// CartContext.tsx
+const CartContext = createContext<CartContextType | undefined>(undefined)
 
-const prisma = new PrismaClient()
-
-async function addMissingColumns() {
-  try {
-    console.log('🔧 Adding missing price columns to database...')
-    
-    // Add price columns
-    await prisma.$executeRaw`
-      ALTER TABLE "Beat" 
-      ADD COLUMN IF NOT EXISTS "wavLeasePrice" DECIMAL(10,2) DEFAULT 19.99
-    `
-    
-    await prisma.$executeRaw`
-      ALTER TABLE "Beat" 
-      ADD COLUMN IF NOT EXISTS "trackoutLeasePrice" DECIMAL(10,2) DEFAULT 39.99
-    `
-    
-    await prisma.$executeRaw`
-      ALTER TABLE "Beat" 
-      ADD COLUMN IF NOT EXISTS "unlimitedLeasePrice" DECIMAL(10,2) DEFAULT 79.99
-    `
-    
-    console.log('✅ Price columns added successfully!')
-  } catch (error) {
-    console.error('❌ Error adding columns:', error)
-  } finally {
-    await prisma.$disconnect()
-  }
+export function CartProvider({ children }) {
+  const [cart, dispatch] = useReducer(cartReducer, initialState)
+  // ... logique complexe
 }
 
-addMissingColumns()
+// Dans le composant
+const { cart, addToCart } = useContext(CartContext)
 ```
 
-### 2. add-stripe-columns.ts
-```typescript
-import { PrismaClient } from '@prisma/client'
+### Après (Zustand)
+```tsx
+// cartStore.ts
+export const useCartStore = create<CartState & CartActions>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      totalItems: 0,
+      totalPrice: 0,
+      isOpen: false,
+      addToCart: (beat, licenseType, quantity = 1) => {
+        // Logique simplifiée
+      },
+      // ... autres actions
+    }),
+    { name: 'loutsider-cart' }
+  )
+)
 
-const prisma = new PrismaClient()
-
-async function addStripeColumns() {
-  try {
-    console.log('🔧 Adding Stripe price ID columns to database...')
-    
-    // Add Stripe columns
-    await prisma.$executeRaw`
-      ALTER TABLE "Beat" 
-      ADD COLUMN IF NOT EXISTS "stripeWavPriceId" VARCHAR(255) DEFAULT NULL
-    `
-    
-    await prisma.$executeRaw`
-      ALTER TABLE "Beat" 
-      ADD COLUMN IF NOT EXISTS "stripeTrackoutPriceId" VARCHAR(255) DEFAULT NULL
-    `
-    
-    await prisma.$executeRaw`
-      ALTER TABLE "Beat" 
-      ADD COLUMN IF NOT EXISTS "stripeUnlimitedPriceId" VARCHAR(255) DEFAULT NULL
-    `
-    
-    console.log('✅ Stripe columns added successfully!')
-  } catch (error) {
-    console.error('❌ Error adding Stripe columns:', error)
-  } finally {
-    await prisma.$disconnect()
-  }
-}
-
-addStripeColumns()
+// Dans le composant
+const { items, addToCart, totalItems } = useCartStore()
 ```
 
-### 3. migrate-stripe-prices.ts
-```typescript
-import { PrismaClient } from '@prisma/client'
-import { createBeatStripeProducts } from '../src/lib/stripe'
+### Stores Disponibles
 
-const prisma = new PrismaClient()
+- `useCartStore` - Gestion du panier
+- `useAppStore` - État global de l'app (thème, langue, notifications)
+- `useUserStore` - État utilisateur
 
-async function migrateStripePrices() {
-  try {
-    console.log('🚀 Starting Stripe prices migration...')
-    
-    // Get beats without Stripe prices
-    const beats = await prisma.beat.findMany({
-      where: {
-        stripeWavPriceId: null
-      }
-    })
-    
-    console.log(`📊 Found ${beats.length} beats to migrate`)
-    
-    for (const beat of beats) {
+### Avantages de Zustand
+
+- ✅ Moins de boilerplate
+- ✅ Pas de Provider nécessaire
+- ✅ Persistance automatique
+- ✅ DevTools intégrées
+- ✅ Meilleure performance
+
+## 🔁 État Serveur - TanStack Query
+
+### Avant (appels API directs)
+```tsx
+function BeatsList() {
+  const [beats, setBeats] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchBeats = async () => {
+      setLoading(true)
       try {
-        console.log(`🎵 Processing beat: ${beat.title}`)
-        
-        // Create Stripe products
-        const stripeProducts = await createBeatStripeProducts({
-          id: beat.id,
-          title: beat.title,
-          description: beat.description,
-          wavLeasePrice: Number(beat.wavLeasePrice),
-          trackoutLeasePrice: Number(beat.trackoutLeasePrice),
-          unlimitedLeasePrice: Number(beat.unlimitedLeasePrice)
-        })
-        
-        // Update beat with Stripe price IDs
-        await prisma.beat.update({
-          where: { id: beat.id },
-          data: {
-            stripeWavPriceId: stripeProducts.prices.wav,
-            stripeTrackoutPriceId: stripeProducts.prices.trackout,
-            stripeUnlimitedPriceId: stripeProducts.prices.unlimited
-          }
-        })
-        
-        console.log(`✅ Updated beat: ${beat.title}`)
-        
-        // Pause to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-      } catch (error) {
-        console.error(`❌ Error migrating beat ${beat.title}:`, error)
+        const response = await fetch('/api/beats')
+        const data = await response.json()
+        setBeats(data.beats)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
       }
     }
-    
-    console.log('🎉 Stripe prices migration completed!')
-    
-  } catch (error) {
-    console.error('❌ Global error during migration:', error)
-  } finally {
-    await prisma.$disconnect()
-  }
+    fetchBeats()
+  }, [])
+
+  if (loading) return <div>Chargement...</div>
+  if (error) return <div>Erreur: {error}</div>
+  return <div>{beats.map(beat => ...)}</div>
 }
-
-migrateStripePrices()
 ```
 
-## 🧪 Testing Migration
+### Après (TanStack Query)
+```tsx
+import { useBeats } from '@/hooks/queries/useBeats'
 
-### 1. Pre-Migration Tests
-```bash
-# Test database connection
-npx prisma db pull
+function BeatsList() {
+  const { data: beats, isLoading, error } = useBeats({
+    page: 1,
+    limit: 10,
+    sortBy: 'newest'
+  })
 
-# Check existing data
-npx prisma studio
+  if (isLoading) return <div>Chargement...</div>
+  if (error) return <div>Erreur: {error.message}</div>
+  return <div>{beats?.beats.map(beat => ...)}</div>
+}
 ```
 
-### 2. Post-Migration Tests
-```bash
-# Test new columns exist
-npx prisma db pull
+### Hooks Disponibles
 
-# Test Stripe integration
-npm run stripe:create-product
+- `useBeats()` - Récupération des beats
+- `useBeat(id)` - Récupération d'un beat
+- `useFeaturedBeats()` - Beats en vedette
+- `useCreateBeat()` - Création d'un beat
+- `useUpdateBeat()` - Mise à jour d'un beat
+- `useDeleteBeat()` - Suppression d'un beat
+- `useUserOrders()` - Commandes utilisateur
+- `useCreateStripeCheckout()` - Paiement Stripe
+- `useProfile()` - Profil utilisateur
 
-# Test application
-npm run dev
+### Avantages de TanStack Query
+
+- ✅ Cache automatique
+- ✅ Synchronisation en arrière-plan
+- ✅ Retry automatique
+- ✅ Optimistic updates
+- ✅ DevTools intégrées
+- ✅ Gestion des états de chargement/erreur
+
+## 🔄 Plan de Migration
+
+### Phase 1 : Préparation
+1. ✅ Installer les dépendances
+2. ✅ Configurer les providers
+3. ✅ Créer les stores et hooks
+
+### Phase 2 : Migration Graduelle
+1. **Composants simples** - Migrer les composants qui utilisent seulement useState
+2. **État global** - Remplacer CartContext par useCartStore
+3. **Appels API** - Remplacer les useEffect + fetch par TanStack Query
+4. **Composants complexes** - Migrer les composants avec logique métier
+
+### Phase 3 : Nettoyage
+1. Supprimer les anciens Context
+2. Supprimer les anciens hooks
+3. Mettre à jour les tests
+4. Documentation finale
+
+## 📝 Exemples Pratiques
+
+### Migration d'un Composant Simple
+
+**Avant :**
+```tsx
+function BeatCard({ beat }) {
+  const [isAdding, setIsAdding] = useState(false)
+  const { addToCart } = useCart()
+
+  const handleAddToCart = async () => {
+    setIsAdding(true)
+    try {
+      await addToCart(beat, 'WAV_LEASE')
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsAdding(false)
+    }
+  }
+
+  return (
+    <button onClick={handleAddToCart} disabled={isAdding}>
+      {isAdding ? 'Ajout...' : 'Ajouter au panier'}
+    </button>
+  )
+}
 ```
 
-### 3. Verification Checklist
-- [ ] All beats have three price columns
-- [ ] All beats have Stripe price IDs
-- [ ] License types are correctly set
-- [ ] Cart functionality works
-- [ ] Checkout process works
-- [ ] Download restrictions work
-- [ ] Stems access is properly restricted
+**Après :**
+```tsx
+function BeatCard({ beat }) {
+  const { addToCart } = useCartStore()
+  const { isLoading, startLoading, stopLoading } = useLoading()
 
-## 🚨 Rollback Plan
+  const handleAddToCart = async () => {
+    startLoading()
+    try {
+      addToCart(beat, 'WAV_LEASE')
+    } catch (error) {
+      console.error(error)
+    } finally {
+      stopLoading()
+    }
+  }
 
-### 1. Database Rollback
-```sql
--- Remove new columns (if needed)
-ALTER TABLE "Beat" DROP COLUMN "wavLeasePrice";
-ALTER TABLE "Beat" DROP COLUMN "trackoutLeasePrice";
-ALTER TABLE "Beat" DROP COLUMN "unlimitedLeasePrice";
-ALTER TABLE "Beat" DROP COLUMN "stripeWavPriceId";
-ALTER TABLE "Beat" DROP COLUMN "stripeTrackoutPriceId";
-ALTER TABLE "Beat" DROP COLUMN "stripeUnlimitedPriceId";
-
--- Revert license types
-UPDATE "Order" SET "licenseType" = 'NON_EXCLUSIVE' WHERE "licenseType" = 'WAV_LEASE';
-UPDATE "MultiItemOrder" SET "licenseType" = 'NON_EXCLUSIVE' WHERE "licenseType" = 'WAV_LEASE';
+  return (
+    <button onClick={handleAddToCart} disabled={isLoading}>
+      {isLoading ? 'Ajout...' : 'Ajouter au panier'}
+    </button>
+  )
+}
 ```
 
-### 2. Code Rollback
-```bash
-# Revert to previous commit
-git revert <commit-hash>
+### Migration d'une Liste avec API
 
-# Or reset to previous state
-git reset --hard <previous-commit>
+**Avant :**
+```tsx
+function BeatsList() {
+  const [beats, setBeats] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetchBeats()
+  }, [])
+
+  const fetchBeats = async () => {
+    try {
+      const response = await fetch('/api/beats')
+      const data = await response.json()
+      setBeats(data.beats)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) return <div>Chargement...</div>
+  if (error) return <div>Erreur: {error}</div>
+  
+  return (
+    <div>
+      {beats.map(beat => <BeatCard key={beat.id} beat={beat} />)}
+    </div>
+  )
+}
 ```
 
-## 📊 Migration Monitoring
+**Après :**
+```tsx
+import { useBeats } from '@/hooks/queries/useBeats'
 
-### 1. Database Metrics
-- Monitor column addition progress
-- Check data integrity
-- Verify foreign key constraints
+function BeatsList() {
+  const { data, isLoading, error } = useBeats({
+    page: 1,
+    limit: 20
+  })
 
-### 2. Stripe Metrics
-- Monitor API rate limits
-- Check product creation success rate
-- Verify price ID generation
-
-### 3. Application Metrics
-- Test cart functionality
-- Verify checkout process
-- Check download access
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-#### 1. Column Already Exists
-```sql
--- Check if columns exist
-SELECT column_name 
-FROM information_schema.columns 
-WHERE table_name = 'Beat' 
-AND column_name IN ('wavLeasePrice', 'trackoutLeasePrice', 'unlimitedLeasePrice');
+  if (isLoading) return <div>Chargement...</div>
+  if (error) return <div>Erreur: {error.message}</div>
+  
+  return (
+    <div>
+      {data?.beats.map(beat => <BeatCard key={beat.id} beat={beat} />)}
+    </div>
+  )
+}
 ```
 
-#### 2. Stripe API Errors
-```typescript
-// Check Stripe configuration
-console.log('Stripe Secret Key:', process.env.STRIPE_SECRET_KEY ? 'Set' : 'Missing')
-console.log('Stripe Publishable Key:', process.env.STRIPE_PUBLISHABLE_KEY ? 'Set' : 'Missing')
+## 🧪 Tests et Validation
+
+### Tests des Stores Zustand
+```tsx
+import { renderHook, act } from '@testing-library/react'
+import { useCartStore } from '@/stores/cartStore'
+
+test('should add item to cart', () => {
+  const { result } = renderHook(() => useCartStore())
+  
+  act(() => {
+    result.current.addToCart(mockBeat, 'WAV_LEASE')
+  })
+  
+  expect(result.current.items).toHaveLength(1)
+  expect(result.current.totalItems).toBe(1)
+})
 ```
 
-#### 3. License Type Errors
-```sql
--- Check license type values
-SELECT DISTINCT "licenseType" FROM "Order";
-SELECT DISTINCT "licenseType" FROM "MultiItemOrder";
+### Tests des Hooks TanStack Query
+```tsx
+import { renderHook, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useBeats } from '@/hooks/queries/useBeats'
+
+test('should fetch beats', async () => {
+  const queryClient = new QueryClient()
+  
+  const wrapper = ({ children }) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  )
+  
+  const { result } = renderHook(() => useBeats(), { wrapper })
+  
+  await waitFor(() => {
+    expect(result.current.isSuccess).toBe(true)
+  })
+  
+  expect(result.current.data?.beats).toBeDefined()
+})
 ```
 
-### Solutions
+## 🎯 Prochaines Étapes
 
-#### 1. Fix Missing Columns
-```bash
-# Run column addition script
-npx ts-node scripts/add-missing-columns.ts
-```
+1. **Tester la démo** : Visitez `/state-demo` pour voir l'architecture en action
+2. **Migrer un composant** : Commencez par un composant simple
+3. **Valider les performances** : Vérifiez que les performances sont améliorées
+4. **Former l'équipe** : Partagez ce guide avec votre équipe
 
-#### 2. Fix Stripe Integration
-```bash
-# Check environment variables
-echo $STRIPE_SECRET_KEY
-echo $STRIPE_PUBLISHABLE_KEY
+## 📚 Ressources
 
-# Test Stripe connection
-npx ts-node scripts/test-stripe-connection.ts
-```
-
-#### 3. Fix License Types
-```sql
--- Update license types
-UPDATE "Order" SET "licenseType" = 'WAV_LEASE' WHERE "licenseType" = 'NON_EXCLUSIVE';
-UPDATE "MultiItemOrder" SET "licenseType" = 'WAV_LEASE' WHERE "licenseType" = 'NON_EXCLUSIVE';
-```
-
-## 📈 Post-Migration Tasks
-
-### 1. Data Cleanup
-- Remove old price column (if desired)
-- Clean up unused Stripe products
-- Archive old migration scripts
-
-### 2. Performance Optimization
-- Add indexes on new columns
-- Optimize queries with new fields
-- Monitor database performance
-
-### 3. Documentation Updates
-- Update API documentation
-- Update user guides
-- Update deployment guides
-
-## 🎯 Success Criteria
-
-### 1. Functional Requirements
-- [ ] All beats have three license prices
-- [ ] Cart supports license selection
-- [ ] Checkout works with new pricing
-- [ ] Downloads respect license restrictions
-- [ ] Stems access is properly controlled
-
-### 2. Performance Requirements
-- [ ] Page load times maintained
-- [ ] Database queries optimized
-- [ ] Stripe integration stable
-- [ ] No memory leaks
-
-### 3. Security Requirements
-- [ ] License verification working
-- [ ] Download access controlled
-- [ ] No unauthorized access
-- [ ] Data integrity maintained
+- [Documentation Zustand](https://zustand-demo.pmnd.rs/)
+- [Documentation TanStack Query](https://tanstack.com/query/latest)
+- [React Hooks Patterns](https://reactjs.org/docs/hooks-patterns.html)
 
 ---
 
-**Migration Version**: 1.0.0
-**Last Updated**: January 2025
-**Maintainer**: Development Team
+**Note** : Cette migration peut être faite progressivement. Vous pouvez garder l'ancien système en parallèle pendant la transition.

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { User } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useCurrentUser } from '@/hooks/useAuthSync'
 
 interface UserAvatarProps {
   size?: 'sm' | 'md' | 'lg'
@@ -23,13 +23,11 @@ const iconSizes = {
 }
 
 export default function UserAvatar({ size = 'md', showName = false, className = '' }: UserAvatarProps) {
-  const { data: session } = useSession()
+  const { isAuthenticated, user } = useCurrentUser()
 
-  if (!session?.user) {
+  if (!isAuthenticated || !user) {
     return null
   }
-
-  const { user } = session
 
   return (
     <div className={`flex items-center space-x-2 ${className}`}>

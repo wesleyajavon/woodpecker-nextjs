@@ -1,67 +1,86 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useUserStore } from '@/stores/userStore'
+import { User } from '@prisma/client'
 
-interface UserData {
-  id: string
-  name: string | null
-  email: string
-  image: string | null
-  emailVerified: Date | null
-  createdAt: Date
-  updatedAt: Date
+// Hook principal pour accéder au store utilisateur
+export function useUser() {
+  return useUserStore()
 }
 
-export function useUser() {
-  const { data: session, status } = useSession()
-  const [userData, setUserData] = useState<UserData | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+// Hook pour obtenir les données utilisateur
+export function useUserData(): User | null {
+  return useUserStore(state => state.user)
+}
 
-  useEffect(() => {
-    if (session?.user?.email && status === 'authenticated') {
-      fetchUserData()
-    }
-  }, [session, status])
+// Hook pour vérifier l'authentification
+export function useIsAuthenticated(): boolean {
+  return useUserStore(state => state.isAuthenticated)
+}
 
-  const fetchUserData = async () => {
-    if (!session?.user?.email) return
+// Hook pour l'état de chargement
+export function useUserLoading(): boolean {
+  return useUserStore(state => state.isLoading)
+}
 
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch('/api/user/profile')
-      if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des données utilisateur')
-      }
-      
-      const data = await response.json()
-      setUserData(data.user)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue')
-    } finally {
-      setLoading(false)
-    }
-  }
+// Hook pour les actions utilisateur
+export function useUserActions() {
+  const setUser = useUserStore(state => state.setUser)
+  const setLoading = useUserStore(state => state.setLoading)
+  const logout = useUserStore(state => state.logout)
+  const updateUser = useUserStore(state => state.updateUser)
 
   return {
-    user: userData,
-    session,
-    loading: loading || status === 'loading',
-    error,
-    isAuthenticated: status === 'authenticated',
-    refetch: fetchUserData
+    setUser,
+    setLoading,
+    logout,
+    updateUser
   }
 }
 
+// Hook pour définir l'utilisateur
+export function useSetUser() {
+  return useUserStore(state => state.setUser)
+}
 
+// Hook pour définir l'état de chargement
+export function useSetLoading() {
+  return useUserStore(state => state.setLoading)
+}
 
+// Hook pour la déconnexion
+export function useLogout() {
+  return useUserStore(state => state.logout)
+}
 
+// Hook pour mettre à jour l'utilisateur
+export function useUpdateUser() {
+  return useUserStore(state => state.updateUser)
+}
 
+// Hook pour obtenir les informations de profil
+export function useUserProfile() {
+  const user = useUserStore(state => state.user)
+  
+  return {
+    id: user?.id,
+    name: user?.name,
+    email: user?.email,
+    image: user?.image,
+    role: user?.role,
+    createdAt: user?.createdAt,
+    updatedAt: user?.updatedAt
+  }
+}
 
+// Hook pour vérifier si l'utilisateur est admin
+export function useIsAdmin(): boolean {
+  const user = useUserStore(state => state.user)
+  return user?.role === 'ADMIN'
+}
 
-
-
-
+// Hook pour vérifier si l'utilisateur est premium
+export function useIsPremium(): boolean {
+  const user = useUserStore(state => state.user)
+  return user?.role === 'PREMIUM'
+}

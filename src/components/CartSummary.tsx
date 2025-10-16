@@ -14,7 +14,7 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ onCheckout }: CartSummaryProps) {
-  const { cart } = useCart()
+  const cart = useCart()
   const { clearCart } = useCartActions()
   const [isClearing, setIsClearing] = useState(false)
   const { t } = useTranslation()

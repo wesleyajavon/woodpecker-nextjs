@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User, Settings, LogOut, ShoppingBag } from 'lucide-react'
 import Avatar from './Avatar'
-import { useTranslation } from '@/contexts/LanguageContext'
+import { useTranslation } from '@/hooks/useApp'
+import { useCurrentUser } from '@/hooks/useAuthSync'
 
 export default function UserMenu({ 
   variant = 'default', 
@@ -16,7 +17,7 @@ export default function UserMenu({
   onMobileMenuClose?: () => void
 } = {}) {
   const { t } = useTranslation()
-  const { data: session } = useSession()
+  const { isAuthenticated, user } = useCurrentUser()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -34,7 +35,7 @@ export default function UserMenu({
     }
   }, [])
 
-  if (!session?.user) {
+  if (!isAuthenticated || !user) {
     return null
   }
 
@@ -93,14 +94,14 @@ export default function UserMenu({
         className="flex items-center space-x-2 p-2 rounded-lg transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 touch-manipulation"
       >
         <Avatar
-          src={session.user.image}
-          name={session.user.name ?? ''}
-          email={session.user.email ?? ''}
+          src={user.image || undefined}
+          name={user.name || ''}
+          email={user.email || ''}
           size="sm"
           showName={false}
         />
         <span className="text-sm font-medium hidden sm:block transition-colors duration-300 text-gray-700 dark:text-gray-300">
-          {session.user.name || session.user.email}
+          {user.name || user.email}
         </span>
       </button>
 

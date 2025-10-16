@@ -15,7 +15,7 @@ import { Beat } from '@/types/beat'
 import { useTranslation } from '@/contexts/LanguageContext'
 
 export default function CartPage() {
-  const { cart } = useCart()
+  const cart = useCart()
   const { clearCart } = useCartActions()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const { t } = useTranslation()

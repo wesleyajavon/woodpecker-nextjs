@@ -3,11 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import SessionProvider from "@/components/SessionProvider";
-import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { Footer } from "@/components/blocks/footer-section";
 import { Analytics } from "@vercel/analytics/next"
+import { QueryProvider } from "@/providers/QueryProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
+import { NotificationContainer } from "@/components/NotificationContainer";
 
 
 const geistSans = Geist({
@@ -41,21 +43,24 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <LanguageProvider>
-            <SessionProvider>
-              <CartProvider>
-                <div className="flex flex-col min-h-screen">
-                  <Navigation />
-                  <main className="flex-1">
-                    {children}
+          <QueryProvider>
+            <LanguageProvider>
+              <SessionProvider>
+                <AuthProvider>
+                  <div className="flex flex-col min-h-screen">
+                    <Navigation />
+                    <main className="flex-1">
+                      {children}
 
-                    <Analytics />
-                  </main>
-                  <Footer />
-                </div>
-              </CartProvider>
-            </SessionProvider>
-          </LanguageProvider>
+                      <Analytics />
+                    </main>
+                    <Footer />
+                  </div>
+                  <NotificationContainer />
+                </AuthProvider>
+              </SessionProvider>
+            </LanguageProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

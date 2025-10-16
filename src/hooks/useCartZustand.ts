@@ -1,11 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useCartStore } from '@/stores/cartStore'
 import { Beat } from '@/types/beat'
 import { LicenseType } from '@/types/cart'
 
-// Nouveau hook useCart qui utilise Zustand (remplace l'ancien)
+// Hook principal pour le panier avec Zustand
 export function useCart() {
   const cart = useCartStore()
   return cart
@@ -40,25 +39,16 @@ export function useIsCartOpen() {
   return useCartStore(state => state.isOpen)
 }
 
-// Hook optimisé pour les actions - utilise useMemo pour éviter les re-créations
 export function useCartActions() {
-  const addToCart = useCartStore(state => state.addToCart)
-  const removeFromCart = useCartStore(state => state.removeFromCart)
-  const updateQuantity = useCartStore(state => state.updateQuantity)
-  const clearCart = useCartStore(state => state.clearCart)
-  const toggleCart = useCartStore(state => state.toggleCart)
-  const openCart = useCartStore(state => state.openCart)
-  const closeCart = useCartStore(state => state.closeCart)
-
-  return useMemo(() => ({
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    toggleCart,
-    openCart,
-    closeCart,
-  }), [addToCart, removeFromCart, updateQuantity, clearCart, toggleCart, openCart, closeCart])
+  return useCartStore(state => ({
+    addToCart: state.addToCart,
+    removeFromCart: state.removeFromCart,
+    updateQuantity: state.updateQuantity,
+    clearCart: state.clearCart,
+    toggleCart: state.toggleCart,
+    openCart: state.openCart,
+    closeCart: state.closeCart,
+  }))
 }
 
 // Hook pour vérifier si un beat est dans le panier

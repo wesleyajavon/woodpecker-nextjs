@@ -1,12 +1,13 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Shield, Home, Loader2 } from 'lucide-react'
 import { DottedSurface } from './ui/dotted-surface'
-import { useTranslation } from '@/contexts/LanguageContext'
+import { useTranslation } from '@/hooks/useApp'
+import { useCurrentUser } from '@/hooks/useAuthSync'
+import { useIsAdmin } from '@/hooks/useUser'
 
 interface AdminRouteProps {
   children: React.ReactNode
@@ -14,42 +15,18 @@ interface AdminRouteProps {
 }
 
 export default function AdminRoute({ children, fallback }: AdminRouteProps) {
-  const { data: session, status } = useSession()
+  const { isAuthenticated, isLoading } = useCurrentUser()
+  const isAdmin = useIsAdmin()
   const router = useRouter()
   const { t } = useTranslation()
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (status === 'unauthenticated') {
-        router.push('/auth/signin')
-        return
-      }
-
-      if (status === 'authenticated' && session?.user?.email) {
-        try {
-          const response = await fetch('/api/user/profile')
-          if (response.ok) {
-            const data = await response.json()
-            const userRole = data.user?.role
-            setIsAdmin(userRole === 'ADMIN')
-          } else {
-            setIsAdmin(false)
-          }
-        } catch (error) {
-          console.error('Error checking admin status:', error)
-          setIsAdmin(false)
-        }
-      }
-      
-      setLoading(false)
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth/signin')
     }
+  }, [isAuthenticated, isLoading, router])
 
-    checkAdminStatus()
-  }, [session, status, router])
-
-  if (loading || isAdmin === null) {
+  if (isLoading) {
     return (
       fallback || (
         <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
@@ -73,7 +50,7 @@ export default function AdminRoute({ children, fallback }: AdminRouteProps) {
     )
   }
 
-  if (status === 'unauthenticated') {
+  if (!isAuthenticated) {
     return null
   }
 
