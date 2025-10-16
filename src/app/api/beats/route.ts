@@ -5,9 +5,16 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { getUserIdFromEmail } from '@/lib/userUtils'
 import { isUserAdmin } from '@/lib/roleUtils'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export async function GET(request: NextRequest) {
   try {
+    // Vérification du rate limiting pour les lectures
+    const rateLimitResult = await withRateLimit(request, 'READ')
+    if ('status' in rateLimitResult) {
+      return rateLimitResult
+    }
+
     // Récupération de la session utilisateur
     const session = await getServerSession(authOptions)
     const userId = session?.user?.email ? await getUserIdFromEmail(session.user.email) : undefined

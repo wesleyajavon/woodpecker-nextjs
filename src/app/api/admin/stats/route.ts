@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { getUserIdFromEmail } from '@/lib/userUtils'
 import { isUserAdmin } from '@/lib/roleUtils'
 import { prisma } from '@/lib/prisma'
+import { withUserRateLimit } from '@/lib/rate-limit'
 
 // Fonction pour récupérer les visiteurs actifs des 96 dernières heures
 async function getActiveVisitors() {
@@ -26,6 +27,12 @@ async function getActiveVisitors() {
 
 export async function GET(request: NextRequest) {
   try {
+    // Vérification du rate limiting pour les routes admin
+    const rateLimitResult = await withUserRateLimit(request, 'ADMIN')
+    if ('status' in rateLimitResult) {
+      return rateLimitResult
+    }
+
     // Vérification de l'authentification
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {

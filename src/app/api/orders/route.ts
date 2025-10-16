@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { withUserRateLimit } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   try {
+    // Vérification du rate limiting pour les routes critiques
+    const rateLimitResult = await withUserRateLimit(request, 'CRITICAL')
+    if ('status' in rateLimitResult) {
+      return rateLimitResult
+    }
+
     // Check if user is authenticated and is admin
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {

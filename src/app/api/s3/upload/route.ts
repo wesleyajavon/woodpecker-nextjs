@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { s3Service } from '@/lib/s3-service'
 import { S3_CONFIG } from '@/lib/aws-s3'
+import { withUserRateLimit } from '@/lib/rate-limit'
 
 // POST désactivé - utilisez GET pour obtenir une URL signée et uploader directement
 export async function POST(request: NextRequest) {
@@ -19,6 +20,12 @@ export async function POST(request: NextRequest) {
 // Génération d'URL signée pour upload direct
 export async function GET(request: NextRequest) {
   try {
+    // Vérification du rate limiting pour les uploads
+    const rateLimitResult = await withUserRateLimit(request, 'UPLOAD')
+    if ('status' in rateLimitResult) {
+      return rateLimitResult
+    }
+
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
       return NextResponse.json(

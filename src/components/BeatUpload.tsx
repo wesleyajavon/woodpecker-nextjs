@@ -216,8 +216,8 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white/10 backdrop-blur-lg rounded-2xl">
-      <h2 className="text-3xl font-bold text-white mb-6 text-center">
+    <div className="max-w-full mx-auto p-4 sm:p-6 bg-white/10 backdrop-blur-lg rounded-2xl">
+      <h2 className="text-2xl font-bold text-white mb-4 text-center">
         {t('admin.uploadNewBeat')}
       </h2>
 
@@ -237,10 +237,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
         </motion.div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Section des fichiers */}
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-white mb-4">{t('upload.files')}</h3>
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold text-white mb-3">{t('upload.files')}</h3>
 
           {/* Preview Audio (Requis) */}
           <div className="space-y-2">
@@ -411,8 +411,8 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
         </div>
 
         {/* Section des informations */}
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-white mb-4">{t('upload.information')}</h3>
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold text-white mb-3">{t('upload.information')}</h3>
 
           {/* Titre */}
           <div className="space-y-2">
@@ -512,10 +512,10 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
           </div>
 
           {/* Prix par licence */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-white">{t('upload.pricePerLicense')}</h4>
+          <div className="space-y-3">
+            <h4 className="text-base font-semibold text-white">{t('upload.pricePerLicense')}</h4>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               {/* WAV Lease */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-300">
@@ -632,7 +632,7 @@ export default function BeatUpload({ onUploadSuccess, onUploadError }: BeatUploa
       </div>
 
       {/* Bouton d'upload */}
-      <div className="mt-8 text-center">
+      <div className="mt-6 text-center">
         {/* Debug info pour comprendre l'état du bouton */}
         <div className="mb-4 p-3 bg-white/5 rounded-lg text-xs text-gray-300">
           <p>{t('upload.uploadStatus')}</p>
