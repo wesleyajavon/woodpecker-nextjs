@@ -31,7 +31,7 @@ export function useError() {
 }
 
 // Hook pour gérer l'état de formulaire
-export function useForm<T extends Record<string, any>>(initialValues: T) {
+export function useForm<T extends Record<string, unknown>>(initialValues: T) {
   const [values, setValues] = useState<T>(initialValues)
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({})
   const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({})

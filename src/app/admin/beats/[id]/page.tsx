@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
@@ -11,6 +11,7 @@ import BeatInfoCard from '@/components/ui/BeatInfoCard';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
 import { useTranslation } from '@/contexts/LanguageContext';
+import { useBeat } from '@/hooks/queries/useBeats';
 
 export default function BeatManagementPage() {
   const { t } = useTranslation();
@@ -18,39 +19,20 @@ export default function BeatManagementPage() {
   const router = useRouter();
   const beatId = params?.id as string;
 
-  const [beat, setBeat] = useState<Beat | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // TanStack Query hook
+  const {
+    data: beatData,
+    isLoading: loading,
+    error,
+    refetch
+  } = useBeat(beatId);
+
+  const beat = beatData?.data || null;
+
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editData, setEditData] = useState<Partial<Beat>>({});
-
-  // Chargement des données du beat
-  useEffect(() => {
-    const fetchBeat = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/beats/${beatId}`);
-
-        if (!response.ok) {
-          throw new Error('Beat non trouvé');
-        }
-
-        const data = await response.json();
-        setBeat(data.data);
-        setEditData(data.data); // Initialiser les données d'édition
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (beatId) {
-      fetchBeat();
-    }
-  }, [beatId]);
 
   // Gestion des modifications
   const handleEditChange = (field: keyof Beat, value: string | number | boolean | string[]) => {
@@ -84,10 +66,10 @@ export default function BeatManagementPage() {
       }
 
       const result = await response.json();
-      setBeat(result.data);
+      await refetch(); // Refresh data from TanStack Query
       setIsEditing(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde');
+      console.error('Erreur lors de la sauvegarde:', err);
     } finally {
       setIsSaving(false);
     }
@@ -117,7 +99,7 @@ export default function BeatManagementPage() {
 
       router.push('/admin/upload');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression');
+      console.error('Erreur lors de la suppression:', err);
     } finally {
       setIsDeleting(false);
     }
@@ -176,7 +158,7 @@ export default function BeatManagementPage() {
         >
           <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">{t('admin.beatNotFound')}</h1>
-          <p className="text-muted-foreground mb-6">{error || t('admin.beatNotFoundDescription')}</p>
+          <p className="text-muted-foreground mb-6">{error instanceof Error ? error.message : error || t('admin.beatNotFoundDescription')}</p>
           <Link
             href="/admin/upload"
             className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-6 py-3 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"

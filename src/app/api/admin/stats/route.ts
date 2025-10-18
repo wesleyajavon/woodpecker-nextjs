@@ -118,7 +118,12 @@ export async function GET(request: NextRequest) {
         totalOrders,
         totalRevenue: totalRevenue._sum.totalAmount || 0,
         uniqueCustomers: uniqueCustomers.length,
-        activeVisitors
+        activeVisitors,
+        // Valeurs simulées pour les changements (à remplacer par de vrais calculs plus tard)
+        beatsChange: Math.floor(Math.random() * 20) + 5, // 5-25% d'augmentation
+        ordersChange: Math.floor(Math.random() * 30) + 10, // 10-40% d'augmentation
+        revenueChange: Math.floor(Math.random() * 25) + 8, // 8-33% d'augmentation
+        visitorsChange: Math.floor(Math.random() * 15) + 3 // 3-18% d'augmentation
       }
     })
 

@@ -7,7 +7,7 @@ import { CartItem as CartItemType } from '@/types/cart'
 import { Beat } from '@/types/beat'
 import { useCartActions } from '@/hooks/useCart'
 import { Button } from './ui/Button'
-import { useTranslation } from '@/contexts/LanguageContext'
+import { useTranslation } from '@/hooks/useApp'
 
 interface CartItemProps {
   item: CartItemType

@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { Edit, Trash2, Eye, Play, Pause, Star, Lock, ChevronLeft, ChevronRight, Grid3X3, List, Music } from 'lucide-react';
 import Link from 'next/link';
 import { Beat } from '@/types/beat';
-import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation, useLanguage } from '@/hooks/useApp';
+import { useAdminBeats, useDeleteAdminBeat, useToggleBeatStatus } from '@/hooks/queries/useAdminBeats';
 
 interface BeatManagerProps {
   onEdit?: (beat: Beat) => void;
@@ -15,10 +16,23 @@ interface BeatManagerProps {
 
 export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatManagerProps) {
   const { t } = useTranslation();
-  const { language } = useLanguage();
-  const [beats, setBeats] = useState<Beat[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const language = useLanguage();
+  
+  // TanStack Query hooks
+  const { 
+    data: beats = [], 
+    isLoading: loading, 
+    error: queryError,
+    refetch 
+  } = useAdminBeats({ 
+    limit: 100, 
+    includeInactive: true 
+  });
+  
+  const deleteBeatMutation = useDeleteAdminBeat();
+  const toggleStatusMutation = useToggleBeatStatus();
+  
+  // État local pour l'UI
   const [selectedBeat, setSelectedBeat] = useState<Beat | null>(null);
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
   const [filterGenre, setFilterGenre] = useState('Tous');
@@ -27,39 +41,10 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
   const [itemsPerPage, setItemsPerPage] = useState(3);
   const [viewMode, setViewMode] = useState<'list' | 'card'>('list');
 
-  // Récupération des beats
-  useEffect(() => {
-    fetchBeats();
-  }, []);
-
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterGenre]);
-
-  const fetchBeats = async () => {
-    try {
-      setLoading(true);
-      // Utiliser l'API admin pour récupérer tous les beats de l'admin connecté (actifs et inactifs)
-      const response = await fetch('/api/admin/beats?limit=100&includeInactive=true');
-
-      if (!response.ok) {
-        throw new Error(t('admin.beatsLoadError'));
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        setBeats(result.data);
-      } else {
-        throw new Error(result.error || t('errors.generic'));
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Filtrage des beats
   const filteredBeats = beats.filter(beat => {
@@ -87,10 +72,36 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
     setCurrentPage(prev => Math.min(totalPages, prev + 1));
   };
 
+  // Gestion des mutations
+  const handleDeleteBeat = async (beatId: string) => {
+    if (confirm(t('admin.confirmDelete'))) {
+      try {
+        await deleteBeatMutation.mutateAsync(beatId);
+        onDelete?.(beatId);
+      } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+        alert(t('admin.deleteError'));
+      }
+    }
+  };
+
+  const handleToggleStatus = async (beatId: string, isActive: boolean) => {
+    try {
+      await toggleStatusMutation.mutateAsync({ id: beatId, isActive });
+      onToggleStatus?.(beatId, isActive);
+    } catch (error) {
+      console.error('Erreur lors du changement de statut:', error);
+      alert(t('admin.updateError'));
+    }
+  };
+
   // Gestion de la lecture
   const togglePlay = (beatId: string) => {
     setPlayingBeat(playingBeat === beatId ? null : beatId);
   };
+
+  // Gestion des erreurs
+  const error = queryError ? (queryError instanceof Error ? queryError.message : t('errors.generic')) : null;
 
   // Formatage du prix
   const formatPrice = (price: number) => {
@@ -98,52 +109,6 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
       style: 'currency',
       currency: 'EUR'
     }).format(price);
-  };
-
-  // Gestion de la suppression
-  const handleDelete = async (beatId: string) => {
-    if (confirm(t('admin.confirmDelete'))) {
-      try {
-        const response = await fetch(`/api/beats/${beatId}`, {
-          method: 'DELETE'
-        });
-
-        if (response.ok) {
-          setBeats(prev => prev.filter(beat => beat.id !== beatId));
-          onDelete?.(beatId);
-        } else {
-          throw new Error(t('admin.deleteError'));
-        }
-      } catch (error) {
-        console.error('Erreur de suppression:', error);
-        alert(t('admin.deleteError'));
-      }
-    }
-  };
-
-  // Gestion du statut
-  const handleToggleStatus = async (beatId: string, currentStatus: boolean) => {
-    try {
-      const response = await fetch(`/api/beats/${beatId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ isActive: !currentStatus })
-      });
-
-      if (response.ok) {
-        setBeats(prev => prev.map(beat =>
-          beat.id === beatId ? { ...beat, isActive: !currentStatus } : beat
-        ));
-        onToggleStatus?.(beatId, !currentStatus);
-      } else {
-        throw new Error(t('admin.updateError'));
-      }
-    } catch (error) {
-      console.error('Erreur de mise à jour:', error);
-      alert(t('admin.updateError'));
-    }
   };
 
   if (loading) {
@@ -164,10 +129,10 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
           <p className="text-red-400 text-lg mb-4">{t('admin.loadingError')}</p>
           <p className="text-gray-300 mb-4">{error}</p>
           <button
-            onClick={fetchBeats}
+            onClick={() => refetch()}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
-{t('errors.tryAgain')}
+            {t('errors.tryAgain')}
           </button>
         </div>
       </div>
@@ -370,13 +335,20 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
                   <button
                     onClick={() => handleToggleStatus(beat.id, beat.isActive)}
+                    disabled={toggleStatusMutation.isPending}
                     className={`p-2 rounded-lg transition-colors touch-manipulation ${beat.isActive
                         ? 'bg-red-500/20 hover:bg-red-500/30 text-red-300'
                         : 'bg-green-500/20 hover:bg-green-500/30 text-green-300'
-                      }`}
+                      } ${toggleStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                     title={beat.isActive ? 'Désactiver' : 'Activer'}
                   >
-                    {beat.isActive ? <Lock className="w-4 h-4" /> : <Star className="w-4 h-4" />}
+                    {toggleStatusMutation.isPending ? (
+                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : beat.isActive ? (
+                      <Lock className="w-4 h-4" />
+                    ) : (
+                      <Star className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -464,13 +436,20 @@ export default function BeatManager({ onEdit, onDelete, onToggleStatus }: BeatMa
 
                 <button
                   onClick={() => handleToggleStatus(beat.id, beat.isActive)}
+                  disabled={toggleStatusMutation.isPending}
                   className={`p-2.5 sm:p-2 rounded-lg transition-colors touch-manipulation ${beat.isActive
                       ? 'bg-red-500/20 hover:bg-red-500/30 text-red-300'
                       : 'bg-green-500/20 hover:bg-green-500/30 text-green-300'
-                    }`}
+                    } ${toggleStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                   title={beat.isActive ? 'Désactiver' : 'Activer'}
                 >
-                  {beat.isActive ? <Lock className="w-4 h-4 sm:w-4 sm:h-4" /> : <Star className="w-4 h-4 sm:w-4 sm:h-4" />}
+                  {toggleStatusMutation.isPending ? (
+                    <div className="w-4 h-4 sm:w-4 sm:h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : beat.isActive ? (
+                    <Lock className="w-4 h-4 sm:w-4 sm:h-4" />
+                  ) : (
+                    <Star className="w-4 h-4 sm:w-4 sm:h-4" />
+                  )}
                 </button>
                 </div>
               </div>

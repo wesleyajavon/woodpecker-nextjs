@@ -10,6 +10,11 @@ export function useAuthSync() {
   const { data: session, status } = useSession()
   const { setUser, setLoading, logout } = useUserStore()
 
+  // Fonction utilitaire pour convertir null en undefined
+  const nullToUndefined = <T>(value: T | null): T | undefined => {
+    return value === null ? undefined : value
+  }
+
   useEffect(() => {
     if (status === 'loading') {
       setLoading(true)
@@ -29,24 +34,26 @@ export function useAuthSync() {
           const response = await fetch('/api/user/profile')
           if (response.ok) {
             const data = await response.json()
-            const user: User = {
-              id: data.user.id || session.user.id || '',
-              name: data.user.name || session.user.name || '',
-              email: data.user.email || session.user.email || '',
-              image: data.user.image || session.user.image || null,
-              role: data.user.role || 'USER',
-              createdAt: data.user.createdAt ? new Date(data.user.createdAt) : new Date(),
-              updatedAt: data.user.updatedAt ? new Date(data.user.updatedAt) : new Date()
-            }
+                const user: User = {
+                  id: data.user.id || '',
+                  name: nullToUndefined(data.user.name ?? session.user?.name),
+                  email: data.user.email || session.user?.email || '',
+                  image: data.user.image || session.user?.image || null,
+                  role: data.user.role || 'USER',
+                  emailVerified: data.user.emailVerified ? new Date(data.user.emailVerified) : null,
+                  createdAt: data.user.createdAt ? new Date(data.user.createdAt) : new Date(),
+                  updatedAt: data.user.updatedAt ? new Date(data.user.updatedAt) : new Date()
+                }
             setUser(user)
           } else {
             // Fallback si l'API échoue
             const user: User = {
-              id: session.user.id || '',
-              name: session.user.name || '',
-              email: session.user.email || '',
-              image: session.user.image || null,
+              id: '',
+              name: session.user?.name || null,
+              email: session.user?.email || '',
+              image: session.user?.image || null,
               role: 'USER',
+              emailVerified: null,
               createdAt: new Date(),
               updatedAt: new Date()
             }
@@ -56,11 +63,12 @@ export function useAuthSync() {
           console.error('Error fetching user profile:', error)
           // Fallback en cas d'erreur
           const user: User = {
-            id: session.user.id || '',
-            name: session.user.name || '',
-            email: session.user.email || '',
-            image: session.user.image || null,
+            id: '',
+            name: session.user?.name || null,
+            email: session.user?.email || '',
+            image: session.user?.image || null,
             role: 'USER',
+            emailVerified: null,
             createdAt: new Date(),
             updatedAt: new Date()
           }

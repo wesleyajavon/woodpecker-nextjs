@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, Music, FileAudio, X, AlertCircle, Image, Archive } from 'lucide-react';
 import { BEAT_CONFIG } from '@/config/constants';
-import { useTranslation } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useApp';
 import { Beat } from '@/types/beat';
 import { S3Upload } from '@/components/S3Upload';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';

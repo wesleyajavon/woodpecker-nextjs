@@ -1,52 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Music, ShoppingCart, DollarSign, BarChart3, Calendar } from 'lucide-react';
-import { useTranslation } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useApp';
+import { useAdminStats, useAdminDailyRevenue } from '@/hooks/queries/useAdminStats';
 import { Chart } from 'react-google-charts';
-
-interface AdminStatsData {
-  totalBeats: number;
-  totalOrders: number;
-  totalRevenue: number;
-  uniqueCustomers: number;
-}
-
-interface DailyRevenueData {
-  date: string;
-  revenue: number;
-  formattedDate: string;
-}
-
-interface DailyRevenueResponse {
-  success: boolean;
-  data: DailyRevenueData[];
-  totalRevenue: number;
-  averageDailyRevenue: number;
-}
 
 export default function AdminStatsGraphics() {
   const { t } = useTranslation();
-  const [stats, setStats] = useState<AdminStatsData | null>(null);
-  const [dailyRevenue, setDailyRevenue] = useState<DailyRevenueData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Helper function to safely calculate total revenue
-  const getTotalRevenue = (data: DailyRevenueData[]) => {
-    return Array.isArray(data) ? data.reduce((sum, d) => sum + (d.revenue || 0), 0) : 0;
-  };
+  
+  // TanStack Query hooks
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    error: statsError
+  } = useAdminStats();
+  
+  const {
+    data: dailyRevenueData,
+    isLoading: dailyRevenueLoading,
+    error: dailyRevenueError
+  } = useAdminDailyRevenue(30);
 
   // Format data for Google Charts
-  const getChartData = (data: DailyRevenueData[]) => {
-    if (!Array.isArray(data) || data.length === 0) {
+  const getChartData = (data: typeof dailyRevenueData) => {
+    if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
       return [['Date', 'Revenue (€)'], ['No Data', 0]];
     }
 
     const chartData = [
       ['Date', 'Revenue (€)'],
-      ...data.slice(-14).map(item => [item.formattedDate, item.revenue || 0])
+      ...data.data.slice(-14).map(item => [item.formattedDate, item.revenue || 0])
     ];
 
     return chartData;
@@ -85,49 +69,9 @@ export default function AdminStatsGraphics() {
     }
   };
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Fetch both stats and daily revenue data
-      const [statsResponse, revenueResponse] = await Promise.all([
-        fetch('/api/admin/stats'),
-        fetch('/api/admin/revenue-daily?days=30')
-      ]);
-      
-      if (!statsResponse.ok) {
-        throw new Error(t('admin.statsError'));
-      }
-
-      if (!revenueResponse.ok) {
-        throw new Error(t('admin.statsError'));
-      }
-
-      const statsResult = await statsResponse.json();
-      const revenueResult: DailyRevenueResponse = await revenueResponse.json();
-      
-      if (statsResult.success) {
-        setStats(statsResult.data);
-      } else {
-        throw new Error(statsResult.error || t('errors.generic'));
-      }
-
-      if (revenueResult.success) {
-        setDailyRevenue(revenueResult.data);
-      } else {
-        throw new Error(t('errors.generic'));
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Combine loading and error states
+  const loading = statsLoading || dailyRevenueLoading;
+  const error = statsError || dailyRevenueError;
 
   if (loading) {
     return (
@@ -158,13 +102,7 @@ export default function AdminStatsGraphics() {
       <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8">
         <h3 className="text-xl font-semibold text-white mb-4">{t('admin.charts')}</h3>
         <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-6 text-center">
-          <p className="text-red-400">{error}</p>
-          <button
-            onClick={fetchStats}
-            className="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-          >
-{t('errors.tryAgain')}
-          </button>
+          <p className="text-red-400">{error instanceof Error ? error.message : String(error)}</p>
         </div>
       </div>
     );
@@ -178,7 +116,7 @@ export default function AdminStatsGraphics() {
   const totalRevenue = stats.totalRevenue || 0;
   const totalOrders = stats.totalOrders || 0;
   const totalBeats = stats.totalBeats || 0;
-  const uniqueCustomers = stats.uniqueCustomers || 0;
+  const uniqueCustomers = stats.activeVisitors || 0;
   
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
   const revenuePerBeat = totalBeats > 0 ? totalRevenue / totalBeats : 0;
@@ -303,7 +241,7 @@ export default function AdminStatsGraphics() {
               chartType="ColumnChart"
               width="100%"
               height="100%"
-              data={getChartData(dailyRevenue)}
+              data={getChartData(dailyRevenueData)}
               options={chartOptions}
               style={{
                 backgroundColor: 'transparent'

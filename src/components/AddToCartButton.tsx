@@ -7,7 +7,7 @@ import { Beat } from '@/types/beat'
 import { LicenseType } from '@/types/cart'
 import { useAddToCart } from '@/hooks/useCart'
 import { Button } from './ui/Button'
-import { useTranslation } from '@/contexts/LanguageContext'
+import { useTranslation } from '@/hooks/useApp'
 
 interface AddToCartButtonProps {
   beat: Beat

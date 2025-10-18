@@ -78,9 +78,3 @@ export function useIsAdmin(): boolean {
   const user = useUserStore(state => state.user)
   return user?.role === 'ADMIN'
 }
-
-// Hook pour vérifier si l'utilisateur est premium
-export function useIsPremium(): boolean {
-  const user = useUserStore(state => state.user)
-  return user?.role === 'PREMIUM'
-}

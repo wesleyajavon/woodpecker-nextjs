@@ -27,7 +27,7 @@ interface UsersResponse {
 export const userKeys = {
   all: ['users'] as const,
   lists: () => [...userKeys.all, 'list'] as const,
-  list: (filters: Record<string, any>) => [...userKeys.lists(), filters] as const,
+  list: (filters: Record<string, unknown>) => [...userKeys.lists(), filters] as const,
   details: () => [...userKeys.all, 'detail'] as const,
   detail: (id: string) => [...userKeys.details(), id] as const,
   profile: () => [...userKeys.all, 'profile'] as const,
@@ -53,7 +53,7 @@ export function useProfile() {
 }
 
 // Hook pour récupérer un utilisateur spécifique (admin seulement)
-export function useUser(id: string) {
+export function useUserQuery(id: string) {
   return useQuery({
     queryKey: userKeys.detail(id),
     queryFn: async (): Promise<UserResponse> => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -17,7 +17,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Order, MultiItemOrder } from '@/types/order';
-import { useTranslation, useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation, useLanguage } from '@/hooks/useApp';
+import { useAdminOrders, useAdminMultiItemOrders } from '@/hooks/queries/useOrders';
 
 type OrderWithType = (Order & { type: 'single' }) | (MultiItemOrder & { type: 'multi' });
 
@@ -27,10 +28,31 @@ interface AdminOrdersProps {
 
 export default function AdminOrders({ className = '' }: AdminOrdersProps) {
   const { t } = useTranslation();
-  const { language } = useLanguage();
-  const [orders, setOrders] = useState<OrderWithType[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<OrderWithType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const language = useLanguage();
+  
+  // TanStack Query hooks
+  const {
+    data: singleOrdersData,
+    isLoading: singleOrdersLoading,
+    error: singleOrdersError
+  } = useAdminOrders();
+  
+  const {
+    data: multiOrdersData,
+    isLoading: multiOrdersLoading,
+    error: multiOrdersError
+  } = useAdminMultiItemOrders();
+  
+  // Combine orders
+  const orders: OrderWithType[] = [
+    ...(singleOrdersData?.orders || []).map((order: Order) => ({ ...order, type: 'single' as const })),
+    ...(multiOrdersData?.orders || []).map((order: MultiItemOrder) => ({ ...order, type: 'multi' as const }))
+  ];
+  
+  const loading = singleOrdersLoading || multiOrdersLoading;
+  const error = singleOrdersError || multiOrdersError;
+  
+  // États locaux pour l'UI
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'single' | 'multi'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'amount' | 'status'>('date');
@@ -39,46 +61,8 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  useEffect(() => {
-    filterAndSortOrders();
-  }, [orders, searchTerm, filterType, sortBy, sortOrder]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterType, sortBy, sortOrder]);
-
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch both single and multi-item orders
-      const [singleOrdersResponse, multiOrdersResponse] = await Promise.all([
-        fetch('/api/orders'),
-        fetch('/api/orders/multi')
-      ]);
-
-      const singleOrdersData = singleOrdersResponse.ok ? await singleOrdersResponse.json() : { data: [] };
-      const multiOrdersData = multiOrdersResponse.ok ? await multiOrdersResponse.json() : { data: [] };
-
-      // Combine and normalize orders
-      const allOrders = [
-        ...(singleOrdersData.data || []).map((order: Order) => ({ ...order, type: 'single' as const })),
-        ...(multiOrdersData.data || []).map((order: MultiItemOrder) => ({ ...order, type: 'multi' as const }))
-      ];
-
-      setOrders(allOrders);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterAndSortOrders = () => {
+  // Use useMemo to calculate filtered orders
+  const filteredOrders = useMemo(() => {
     let filtered = orders;
 
     // Filter by search term
@@ -124,8 +108,12 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
       }
     });
 
-    setFilteredOrders(filtered);
-  };
+    return filtered;
+  }, [orders, searchTerm, filterType, sortBy, sortOrder]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, sortBy, sortOrder]);
 
   const formatDate = (date: string | Date) => {
     return new Date(date).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', {
@@ -287,7 +275,12 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-base sm:text-lg font-semibold text-white truncate">
-                        {(order as MultiItemOrder).items.length === 1 ? (order as MultiItemOrder).items[0].beat.title : t('admin.multiOrderTitle', { count: (order as MultiItemOrder).items.length })}
+                        {order.type === 'single' 
+                          ? (order as Order & { type: 'single' }).beat?.title || 'Beat non trouvé'
+                          : (order as MultiItemOrder & { type: 'multi' }).items?.length === 1 
+                            ? (order as MultiItemOrder & { type: 'multi' }).items[0]?.beat?.title || 'Beat non trouvé'
+                            : t('admin.multiOrderTitle', { count: (order as MultiItemOrder & { type: 'multi' }).items?.length || 0 })
+                        }
                       </h3>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-300 mt-1">
                         <span className="flex items-center gap-1">
@@ -303,7 +296,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                           <span className="truncate">
                             {order.type === 'single' 
                               ? order.licenseType 
-                              : `${(order as MultiItemOrder).items.length} ${t('admin.licenses')}`
+                              : `${(order as MultiItemOrder & { type: 'multi' }).items?.length || 0} ${t('admin.licenses')}`
                             }
                           </span>
                         </span>
@@ -389,7 +382,7 @@ export default function AdminOrders({ className = '' }: AdminOrdersProps) {
                         </div>
                       ) : (
                         <div className="space-y-2 sm:space-y-3">
-                          {(order as MultiItemOrder).items.map((item, itemIndex) => (
+                          {(order as MultiItemOrder & { type: 'multi' }).items?.map((item, itemIndex) => (
                             <div key={itemIndex} className="bg-white/10 rounded-lg p-3 sm:p-4">
                               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                                 <div className="min-w-0 flex-1">

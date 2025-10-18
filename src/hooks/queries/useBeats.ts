@@ -3,21 +3,28 @@ import { Beat } from '@/types/beat'
 
 // Types pour les réponses API
 interface BeatsResponse {
-  beats: Beat[]
-  total: number
-  page: number
-  limit: number
+  success: boolean
+  data: Beat[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
 }
 
 interface BeatResponse {
-  beat: Beat
+  success: boolean
+  data: Beat
 }
 
 // Clés de requête
 export const beatKeys = {
   all: ['beats'] as const,
   lists: () => [...beatKeys.all, 'list'] as const,
-  list: (filters: Record<string, any>) => [...beatKeys.lists(), filters] as const,
+  list: (filters: Record<string, unknown>) => [...beatKeys.lists(), filters] as const,
   details: () => [...beatKeys.all, 'detail'] as const,
   detail: (id: string) => [...beatKeys.details(), id] as const,
   featured: () => [...beatKeys.all, 'featured'] as const,
@@ -45,7 +52,22 @@ export function useBeats(filters: {
       if (filters.genre) params.append('genre', filters.genre)
       if (filters.priceMin) params.append('priceMin', filters.priceMin.toString())
       if (filters.priceMax) params.append('priceMax', filters.priceMax.toString())
-      if (filters.sortBy) params.append('sortBy', filters.sortBy)
+      if (filters.sortBy) {
+        // Convertir sortBy vers les paramètres de l'API
+        if (filters.sortBy === 'newest') {
+          params.append('sortField', 'createdAt')
+          params.append('sortOrder', 'desc')
+        } else if (filters.sortBy === 'oldest') {
+          params.append('sortField', 'createdAt')
+          params.append('sortOrder', 'asc')
+        } else if (filters.sortBy === 'price_asc') {
+          params.append('sortField', 'price')
+          params.append('sortOrder', 'asc')
+        } else if (filters.sortBy === 'price_desc') {
+          params.append('sortField', 'price')
+          params.append('sortOrder', 'desc')
+        }
+      }
 
       const response = await fetch(`/api/beats?${params}`)
       if (!response.ok) {

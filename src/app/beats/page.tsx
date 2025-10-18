@@ -4,35 +4,42 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Grid3X3, List, ChevronLeft, ChevronRight, Music, TrendingUp, Users, Clock, Star } from 'lucide-react';
 import Link from 'next/link';
-import { useBeats } from '@/hooks/useBeats';
+import { useBeats } from '@/hooks/queries/useBeats';
 import BeatCard from '@/components/BeatCard';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
 import { TextRewind } from '@/components/ui/text-rewind';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useApp';
 
 export default function BeatsPage() {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [playingBeat, setPlayingBeat] = useState<string | null>(null);
   const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState(t('beats.allGenres'));
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Utilisation du hook personnalisé
+  // TanStack Query hook
   const {
-    beats,
-    loading,
+    data: beatsData,
+    isLoading: loading,
     error,
-    totalPages,
-    totalBeats,
-    currentPage,
-    searchBeats,
-    filterByGenre,
-    changePage,
-    resetFilters,
-    updateLimit
-  } = useBeats(1, itemsPerPage);
+    refetch
+  } = useBeats({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchTerm || undefined,
+    genre: selectedGenre === t('beats.allGenres') ? undefined : selectedGenre,
+    sortBy: 'newest'
+  });
+
+  // Extract data from response
+  const beats = beatsData?.data || [];
+  const totalBeats = beatsData?.pagination?.total || 0;
+  const totalPages = beatsData?.pagination?.totalPages || Math.ceil(totalBeats / itemsPerPage);
 
   // Genres disponibles
   const genres = [t('beats.allGenres'), 'Trap', 'Hip-Hop', 'Drill', 'Jazz', 'Electronic', 'Boom Bap', 'Synthwave', 'R&B', 'Pop', 'Rock'];
@@ -111,24 +118,46 @@ export default function BeatsPage() {
   const endIndex = Math.min(currentPage * itemsPerPage, totalBeats);
 
   const goToPage = (page: number) => {
-    changePage(Math.max(1, Math.min(page, totalPages)));
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      changePage(currentPage - 1);
+      setCurrentPage(currentPage - 1);
     }
   };
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      changePage(currentPage + 1);
+      setCurrentPage(currentPage + 1);
     }
+  };
+
+  // Search and filter handlers
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  const handleGenreFilter = (genre: string) => {
+    setSelectedGenre(genre);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setSelectedGenre(t('beats.allGenres'));
+    setCurrentPage(1);
+  };
+
+  const handleLimitChange = (limit: number) => {
+    setItemsPerPage(limit);
+    setCurrentPage(1); // Reset to first page
   };
 
   const handleItemsPerPageChange = (newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
-    updateLimit(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page
   };
 
   if (loading && beats.length === 0) {
@@ -181,9 +210,9 @@ export default function BeatsPage() {
           <div className="text-center">
             <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-6 max-w-md mx-auto">
               <p className="text-red-400 text-lg mb-4">{t('beats.errorLoading')}</p>
-              <p className="text-muted-foreground mb-4">{error}</p>
+              <p className="text-muted-foreground mb-4">{error instanceof Error ? error.message : String(error)}</p>
               <button
-                onClick={() => resetFilters()}
+                onClick={() => handleResetFilters()}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 {t('beats.retry')}
@@ -245,7 +274,7 @@ export default function BeatsPage() {
               <input
                 type="text"
                 placeholder={t('beats.searchPlaceholder')}
-                onChange={(e) => searchBeats(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-card/20 border border-border/30 rounded-lg text-sm sm:text-base text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent touch-manipulation"
               />
             </div>
@@ -256,7 +285,7 @@ export default function BeatsPage() {
               <div className="flex items-center gap-2 flex-1">
                 <Filter className="text-muted-foreground w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <select
-                  onChange={(e) => filterByGenre(e.target.value)}
+                  onChange={(e) => handleGenreFilter(e.target.value)}
                   className="w-full bg-card/20 border border-border/30 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 touch-manipulation"
                 >
                   {genres.map((genre) => (
@@ -547,7 +576,7 @@ export default function BeatsPage() {
               {t('beats.noBeatsAvailable')}
             </div>
             <button
-              onClick={resetFilters}
+              onClick={handleResetFilters}
               className="bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-colors text-sm sm:text-base touch-manipulation"
             >
               {t('beats.resetFilters')}

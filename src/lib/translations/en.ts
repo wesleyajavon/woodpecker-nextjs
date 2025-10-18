@@ -394,6 +394,7 @@ export const en = {
     statsError: 'Error retrieving statistics',
     totalUsers: 'Users',
     activeVisitors: 'Active Visitors (96h)',
+
     beatsLoadError: 'Error loading beats',
     updateError: 'Update error',
     loadingBeats: 'Loading beats...',

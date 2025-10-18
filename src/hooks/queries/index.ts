@@ -2,3 +2,5 @@
 export * from './useBeats'
 export * from './useOrders'
 export * from './useUsers'
+export * from './useAdminBeats'
+export * from './useAdminStats'

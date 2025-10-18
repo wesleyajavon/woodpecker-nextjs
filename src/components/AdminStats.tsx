@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Music, ShoppingCart, DollarSign, Eye, TrendingUp } from 'lucide-react';
-import { useTranslation } from '@/contexts/LanguageContext';
-import { Analytics } from '@vercel/analytics/react';
+import { useTranslation } from '@/hooks/useApp';
+import { useAdminStats } from '@/hooks/queries/useAdminStats';
 
 interface AdminStatsData {
   totalBeats: number;
@@ -15,36 +15,13 @@ interface AdminStatsData {
 
 export default function AdminStats() {
   const { t } = useTranslation();
-  const [stats, setStats] = useState<AdminStatsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/admin/stats');
-      
-      if (!response.ok) {
-        throw new Error(t('admin.statsError'));
-      }
-
-      const result = await response.json();
-      
-      if (result.success) {
-        setStats(result.data);
-      } else {
-        throw new Error(result.error || t('errors.generic'));
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.generic'));
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  // TanStack Query hook
+  const {
+    data: stats,
+    isLoading: loading,
+    error
+  } = useAdminStats();
 
   if (loading) {
     return (
@@ -70,13 +47,7 @@ export default function AdminStats() {
   if (error) {
     return (
       <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-6 text-center">
-        <p className="text-red-400">{error}</p>
-        <button
-          onClick={fetchStats}
-          className="mt-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-        >
-{t('errors.tryAgain')}
-        </button>
+        <p className="text-red-400">{error instanceof Error ? error.message : String(error)}</p>
       </div>
     );
   }

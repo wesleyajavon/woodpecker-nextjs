@@ -1,56 +1,124 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BarChart3, Music, ShoppingCart, Users, TrendingUp, DollarSign, Eye } from 'lucide-react';
+import { BarChart3, Music, ShoppingCart, Users, TrendingUp, DollarSign, Eye, Loader2 } from 'lucide-react';
 import { DottedSurface } from '@/components/ui/dotted-surface';
 import { TextRewind } from '@/components/ui/text-rewind';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/LanguageContext';
+import { useAdminStats, useAdminActivities } from '@/hooks/queries/useAdminStats';
 
 export default function AdminDashboardPage() {
   const { t } = useTranslation();
 
-  // Mock data - à remplacer par de vraies données
-  const stats = [
+  // TanStack Query hooks
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    error: statsError
+  } = useAdminStats();
+
+  const {
+    data: activities = [],
+    isLoading: activitiesLoading,
+    error: activitiesError
+  } = useAdminActivities();
+
+  // Formatage des statistiques
+  const formattedStats = stats ? [
     {
       title: t('admin.totalBeats'),
-      value: '17',
+      value: stats.totalBeats.toString(),
+      change: `+${stats.beatsChange}%`,
       changeType: 'positive',
       icon: Music,
       color: 'text-blue-400'
     },
     {
       title: t('admin.totalOrders'),
-      value: '63',
-      change: '+8%',
+      value: stats.totalOrders.toString(),
+      change: `+${stats.ordersChange}%`,
       changeType: 'positive',
       icon: ShoppingCart,
       color: 'text-green-400'
     },
     {
       title: t('admin.totalRevenue'),
-      value: '€2,989',
-      change: '+23%',
+      value: `€${stats.totalRevenue.toLocaleString()}`,
+      change: `+${stats.revenueChange}%`,
       changeType: 'positive',
       icon: DollarSign,
       color: 'text-purple-400'
     },
     {
       title: t('admin.activeVisitors'),
-      value: '342',
-      change: '+12%',
+      value: stats.activeVisitors.toString(),
+      change: `+${stats.visitorsChange}%`,
       changeType: 'positive',
       icon: Eye,
       color: 'text-orange-400'
     }
-  ];
+  ] : [];
 
-  const recentActivities = [
-    { id: 1, action: t('admin.newBeatUploaded'), beat: 'Trap Beat #24', time: `2h ${t('admin.ago')}`, type: 'upload' },
-    { id: 2, action: t('admin.orderReceived'), beat: 'Hip Hop Beat #12', time: `4h ${t('admin.ago')}`, type: 'order' },
-    { id: 3, action: t('admin.beatModified'), beat: 'R&B Beat #8', time: `6h ${t('admin.ago')}`, type: 'edit' },
-    { id: 4, action: t('admin.newBeatUploaded'), beat: 'Drill Beat #15', time: `8h ${t('admin.ago')}`, type: 'upload' }
-  ];
+  // Formatage des activités
+  const formattedActivities = activities.map(activity => ({
+    ...activity,
+    action: t(`admin.${activity.action}`),
+    time: `${activity.time} ${t('admin.ago')}`
+  }));
+
+  // États de chargement et d'erreur
+  const isLoading = statsLoading || activitiesLoading;
+  const hasError = statsError || activitiesError;
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8 relative flex items-center justify-center">
+        <DottedSurface className="size-full z-0" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-4 relative z-10"
+        >
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-purple-500/20 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-foreground mb-1">Chargement du dashboard...</h3>
+            <p className="text-sm text-muted-foreground">Veuillez patienter</p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8 relative flex items-center justify-center">
+        <DottedSurface className="size-full z-0" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md mx-auto p-6 relative z-10"
+        >
+          <BarChart3 className="h-16 w-16 text-red-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-2">Erreur de chargement</h1>
+          <p className="text-muted-foreground mb-6">
+            {statsError instanceof Error ? statsError.message : 
+             activitiesError instanceof Error ? activitiesError.message : 
+             'Impossible de charger les données du dashboard.'}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Réessayer
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-12 px-3 sm:px-4 lg:px-8 relative">
@@ -99,7 +167,7 @@ export default function AdminDashboardPage() {
           transition={{ delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
         >
-          {stats.map((stat, index) => (
+          {formattedStats.map((stat, index) => (
             <motion.div
               key={stat.title}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -137,7 +205,7 @@ export default function AdminDashboardPage() {
               <h2 className="text-xl font-bold text-foreground">{t('admin.recentActivity')}</h2>
             </div>
             <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
+              {formattedActivities.map((activity, index) => (
                 <motion.div
                   key={activity.id}
                   initial={{ opacity: 0, x: -20 }}

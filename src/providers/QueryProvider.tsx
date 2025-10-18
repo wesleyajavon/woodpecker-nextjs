@@ -18,14 +18,10 @@ export function QueryProvider({ children }: QueryProviderProps) {
             staleTime: 5 * 60 * 1000, // 5 minutes
             gcTime: 10 * 60 * 1000, // 10 minutes (anciennement cacheTime)
             // Retry automatique
-            retry: (failureCount, error: any) => {
-              // Ne pas retry sur les erreurs 4xx (erreurs client)
-              if (error?.status >= 400 && error?.status < 500) {
-                return false
-              }
-              // Retry jusqu'à 3 fois pour les autres erreurs
-              return failureCount < 3
-            },
+                retry: (failureCount) => {
+                  // Retry jusqu'à 3 fois pour toutes les erreurs
+                  return failureCount < 3
+                },
             // Refetch automatique
             refetchOnWindowFocus: false,
             refetchOnReconnect: true,

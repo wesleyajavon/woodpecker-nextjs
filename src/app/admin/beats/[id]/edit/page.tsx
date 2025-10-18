@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
@@ -11,6 +11,7 @@ import BeatEditCard from '@/components/ui/BeatEditCard';
 import { cn } from '@/lib/utils';
 import { Beat } from '@/types/beat';
 import { useTranslation } from '@/contexts/LanguageContext';
+import { useBeat, useUpdateBeat } from '@/hooks/queries/useBeats';
 
 export default function BeatEditPage() {
     const { t } = useTranslation();
@@ -18,9 +19,18 @@ export default function BeatEditPage() {
     const router = useRouter();
     const beatId = params?.id as string;
 
-    const [beat, setBeat] = useState<Beat | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    // TanStack Query hooks
+    const {
+        data: beatData,
+        isLoading: loading,
+        error,
+        refetch
+    } = useBeat(beatId);
+
+    const updateBeatMutation = useUpdateBeat();
+
+    const beat = beatData?.data || null;
+
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<{
         preview: number;
@@ -39,31 +49,6 @@ export default function BeatEditPage() {
         artwork?: File;
         stems?: File;
     }>({});
-
-    // Chargement des données du beat
-    useEffect(() => {
-        const fetchBeat = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch(`/api/beats/${beatId}`);
-
-                if (!response.ok) {
-                    throw new Error('Beat non trouvé');
-                }
-
-                const data = await response.json();
-                setBeat(data.data);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (beatId) {
-            fetchBeat();
-        }
-    }, [beatId]);
 
     // Gestion des fichiers sélectionnés
     const handleFileSelect = (field: 'preview' | 'master' | 'artwork' | 'stems', file: File) => {
@@ -85,48 +70,39 @@ export default function BeatEditPage() {
 
         try {
             setIsUploading(true);
-
-            const response = await fetch(`/api/beats/${beatId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    artworkUrl: null
-                })
+            await updateBeatMutation.mutateAsync({
+                id: beatId,
+                data: { artworkUrl: null }
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Erreur lors de la suppression');
-            }
-
-            const result = await response.json();
-            if (result.success) {
-                setBeat(result.data);
-            }
-
+            await refetch(); // Refresh data from TanStack Query
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-            setError(errorMessage);
+            console.error('Erreur lors de la suppression de l\'artwork:', err);
         } finally {
             setIsUploading(false);
         }
     };
 
     // Gestion des uploads S3
-    const handleS3UploadComplete = (type: 'master' | 'stems', result: { url: string; key: string }) => {
+    const handleS3UploadComplete = async (type: 'master' | 'stems', result: { url: string; key: string }) => {
         if (!beat) return;
 
         const updateData = type === 'master'
             ? { s3MasterUrl: result.url, s3MasterKey: result.key }
             : { s3StemsUrl: result.url, s3StemsKey: result.key };
 
-        setBeat(prev => prev ? { ...prev, ...updateData } : null);
+        try {
+            await updateBeatMutation.mutateAsync({
+                id: beatId,
+                data: updateData
+            });
+            await refetch(); // Refresh data from TanStack Query
+        } catch (err) {
+            console.error('Erreur lors de la mise à jour S3:', err);
+        }
     };
 
     const handleS3UploadError = (error: string) => {
-        setError(error);
+        console.error('Erreur S3:', error);
     };
 
     // Suppression des stems
@@ -135,30 +111,13 @@ export default function BeatEditPage() {
 
         try {
             setIsUploading(true);
-
-            const response = await fetch(`/api/beats/${beatId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    stemsUrl: null
-                })
+            await updateBeatMutation.mutateAsync({
+                id: beatId,
+                data: { stemsUrl: null }
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Erreur lors de la suppression');
-            }
-
-            const result = await response.json();
-            if (result.success) {
-                setBeat(result.data);
-            }
-
+            await refetch(); // Refresh data from TanStack Query
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-            setError(errorMessage);
+            console.error('Erreur lors de la suppression des stems:', err);
         } finally {
             setIsUploading(false);
         }
@@ -205,15 +164,14 @@ export default function BeatEditPage() {
             const result = await response.json();
 
             if (result.success) {
-                setBeat(result.data);
+                await refetch(); // Refresh data from TanStack Query
                 setUploadedFiles({});
                 setUploadProgress({ preview: 0, master: 0, artwork: 0, stems: 0 });
                 router.push(`/admin/beats/${beatId}`);
             }
 
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-            setError(errorMessage);
+            console.error('Erreur lors de l\'upload:', err);
         } finally {
             setIsUploading(false);
         }
@@ -272,7 +230,7 @@ export default function BeatEditPage() {
                 >
                     <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
                     <h1 className="text-2xl font-bold text-foreground mb-2">Beat non trouvé</h1>
-                    <p className="text-muted-foreground mb-6">{error || 'Ce beat n\'existe pas ou a été supprimé'}</p>
+                    <p className="text-muted-foreground mb-6">{error instanceof Error ? error.message : error || 'Ce beat n\'existe pas ou a été supprimé'}</p>
                     <Link
                         href="/admin/upload"
                         className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-lg hover:bg-card/30 text-foreground px-6 py-3 rounded-lg transition-all duration-300 border border-border/20 hover:border-border/30"

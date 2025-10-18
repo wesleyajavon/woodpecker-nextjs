@@ -1,13 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-interface User {
-  id: string
-  name?: string
-  email: string
-  image?: string
-  role: 'USER' | 'ADMIN'
-}
+import { User } from '@prisma/client'
 
 interface UserState {
   user: User | null

@@ -7,7 +7,7 @@ import { useCart, useCartActions } from '@/hooks/useCart'
 import { Button } from './ui/Button'
 import { Beat } from '@/types/beat'
 import { LicenseType } from '@/types/cart'
-import { useTranslation } from '@/contexts/LanguageContext'
+import { useTranslation } from '@/hooks/useApp'
 
 interface CartSummaryProps {
   onCheckout: () => void

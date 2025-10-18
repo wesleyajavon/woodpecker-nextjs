@@ -24,12 +24,12 @@ interface OrderResponse {
 export const orderKeys = {
   all: ['orders'] as const,
   lists: () => [...orderKeys.all, 'list'] as const,
-  list: (filters: Record<string, any>) => [...orderKeys.lists(), filters] as const,
+  list: (filters: Record<string, unknown>) => [...orderKeys.lists(), filters] as const,
   details: () => [...orderKeys.all, 'detail'] as const,
   detail: (id: string) => [...orderKeys.details(), id] as const,
   user: (userId: string) => [...orderKeys.all, 'user', userId] as const,
   multiItem: () => [...orderKeys.all, 'multiItem'] as const,
-  multiItemList: (filters: Record<string, any>) => [...orderKeys.multiItem(), 'list', filters] as const,
+  multiItemList: (filters: Record<string, unknown>) => [...orderKeys.multiItem(), 'list', filters] as const,
   multiItemDetail: (id: string) => [...orderKeys.multiItem(), 'detail', id] as const,
 }
 
@@ -183,6 +183,57 @@ export function useOrderBySession(sessionId: string) {
     },
     enabled: !!sessionId,
     staleTime: 1 * 60 * 1000, // 1 minute pour les sessions
+  })
+}
+
+// Hook pour récupérer toutes les commandes (admin)
+export function useAdminOrders(filters: {
+  page?: number
+  limit?: number
+  status?: string
+  type?: 'all' | 'single' | 'multi'
+} = {}) {
+  return useQuery({
+    queryKey: orderKeys.list({ admin: true, ...filters }),
+    queryFn: async (): Promise<OrdersResponse> => {
+      const params = new URLSearchParams()
+      
+      if (filters.page) params.append('page', filters.page.toString())
+      if (filters.limit) params.append('limit', filters.limit.toString())
+      if (filters.status) params.append('status', filters.status)
+
+      const response = await fetch(`/api/orders?${params}`)
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement des commandes admin')
+      }
+      return response.json()
+    },
+    staleTime: 1 * 60 * 1000, // 1 minute pour les commandes admin
+  })
+}
+
+// Hook pour récupérer toutes les commandes multi-articles (admin)
+export function useAdminMultiItemOrders(filters: {
+  page?: number
+  limit?: number
+  status?: string
+} = {}) {
+  return useQuery({
+    queryKey: orderKeys.multiItemList({ admin: true, ...filters }),
+    queryFn: async (): Promise<MultiItemOrdersResponse> => {
+      const params = new URLSearchParams()
+      
+      if (filters.page) params.append('page', filters.page.toString())
+      if (filters.limit) params.append('limit', filters.limit.toString())
+      if (filters.status) params.append('status', filters.status)
+
+      const response = await fetch(`/api/orders/multi?${params}`)
+      if (!response.ok) {
+        throw new Error('Erreur lors du chargement des commandes multi-articles admin')
+      }
+      return response.json()
+    },
+    staleTime: 1 * 60 * 1000, // 1 minute pour les commandes admin
   })
 }
 

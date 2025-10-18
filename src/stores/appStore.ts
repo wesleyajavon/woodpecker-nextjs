@@ -20,7 +20,7 @@ interface AppActions {
   t: (key: string, params?: Record<string, string | number>) => string
 }
 
-interface Notification {
+export interface Notification {
   id: string
   type: 'success' | 'error' | 'warning' | 'info'
   title: string
@@ -29,20 +29,20 @@ interface Notification {
 }
 
 // Fonction pour naviguer dans les objets de traduction
-function getNestedValue(obj: any, path: string): string {
-  return path.split('.').reduce((current, key) => {
+function getNestedValue(obj: Record<string, unknown>, path: string): string {
+  return path.split('.').reduce((current: unknown, key: string) => {
     if (current && typeof current === 'object' && key in current) {
-      return current[key]
+      return (current as Record<string, unknown>)[key]
     }
     return undefined
-  }, obj) || path
+  }, obj) as string || path
 }
 
 // Fonction pour remplacer les paramètres dans les traductions
 function replaceParams(text: string, params?: Record<string, string | number>): string {
   if (!params) return text
   
-  return text.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+  return text.replace(/\{(\w+)\}/g, (match, key) => {
     return params[key]?.toString() || match
   })
 }

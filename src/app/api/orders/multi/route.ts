@@ -65,8 +65,10 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      success: true,
-      data: orders
+      orders: orders,
+      total: orders.length,
+      page: 1,
+      limit: orders.length
     });
 
   } catch (error) {
